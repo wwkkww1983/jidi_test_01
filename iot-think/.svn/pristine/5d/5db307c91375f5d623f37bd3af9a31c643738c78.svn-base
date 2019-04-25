@@ -1,0 +1,547 @@
+package com.rz.iot.think.websocket.screen;
+
+import com.alibaba.fastjson.JSONObject;
+import com.rz.iot.think.mapper.IotScreenMapper;
+import com.rz.iot.think.mapper.IotScreenRecordMapper;
+import com.rz.iot.think.mapper.screen.IotScreenCommandSendRecordMapper;
+import com.rz.iot.think.mapper.screen.IotScreenPlayStrategyCommandRelMapper;
+import com.rz.iot.think.mapper.screen.IotScreenPlayStrategyMapper;
+import com.rz.iot.think.model.IotScreen;
+import com.rz.iot.think.model.SysDeviceConnRecord;
+import com.rz.iot.think.model.screen.*;
+import com.rz.iot.think.model.show.IotScreenShowSendStatus;
+import com.rz.iot.think.service.SysDeviceConnRecordService;
+import com.rz.iot.think.utils.RzIotDBConstParam;
+import com.rz.iot.think.websocket.screen.model.FpgaInfomation;
+import com.rz.iot.think.websocket.screen.model.FpgaInfomationBase;
+import com.rz.iot.think.websocket.screen.model.ReceiveBase;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.*;
+
+@Component
+@Slf4j
+public class ScreenSendHandler {
+
+    @Resource
+    private IotScreenMapper iotScreenMapper;
+    @Resource
+    private IotScreenRecordMapper iotScreenRecordMapper;
+    @Resource
+    private SysDeviceConnRecordService sysDeviceConnRecordService;
+    @Resource
+    private IotScreenPlayStrategyCommandRelMapper iotScreenPlayStrategyCommandRelMapper;
+    @Resource
+    private IotScreenPlayStrategyMapper iotScreenPlayStrategyMapper;
+    @Resource
+    private IotScreenCommandSendRecordMapper iotScreenCommandSendRecordMapper;
+    // 不记录日志白名单
+    private static List<String> whiteListFn;
+    private static List<String> whiteListType;
+
+    static {
+        whiteListFn = new ArrayList<>();
+        whiteListFn.add("getFpgaInfomation");
+        whiteListFn.add("isScreenOpen");
+        whiteListFn.add("getBrightness");
+        whiteListFn.add("getVolume");
+        whiteListFn.add("getScreenWidth");
+        whiteListFn.add("getScreenHeight");
+        whiteListFn.add("getNetworkType");
+
+        whiteListType = new ArrayList<>();
+        whiteListType.add("getPackageVersion");
+    }
+
+    public static String getUUID(){
+        return UUID.randomUUID().toString();
+    }
+    /**
+     * 获取硬件状态
+     * @param cardId
+     * @return
+     */
+    public FpgaInfomation getFpgaInfomation(String cardId){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","getFpgaInfomation");
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            FpgaInfomationBase fpgaInfomationBase = JSONObject.parseObject(message, FpgaInfomationBase.class);
+            return fpgaInfomationBase.getResult().get(0);
+        }
+        return null;
+    }
+
+    /**
+     * 获取屏幕是否打开
+     * @param cardId
+     * @return
+     */
+    public Boolean isScreenOpen(String cardId){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","isScreenOpen");
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            Boolean result = (Boolean) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 重启
+     * @param cardId
+     * @return
+     */
+    public Boolean reboot(String cardId){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","reboot");
+        map.put("arg1",1);
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            Boolean result = (Boolean) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 获取屏幕亮度
+     * @param cardId
+     * @return
+     */
+    public Integer getBrightness(String cardId){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","getBrightness");
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            Integer result = (Integer) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+
+    /**
+     * 获取音量
+     * @param cardId
+     * @return
+     */
+    public Integer getVolume(String cardId){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","getVolume");
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            Integer result = (Integer) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 获取屏宽
+     * @param cardId
+     * @return
+     */
+    public Integer getScreenWidth(String cardId){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","getScreenWidth");
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            Integer result = (Integer) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 获取屏高
+     * @param cardId
+     * @return
+     */
+    public Integer getScreenHeight(String cardId){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","getScreenHeight");
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            Integer result = (Integer) receiveModel.getResult();
+            return result;
+        }
+        return null;
+
+    }
+
+    /**
+     * 获取网络类型
+     * @param cardId
+     * @return
+     */
+    public String getNetworkType(String cardId){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","getNetworkType");
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            String result = (String) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 开关屏幕
+     * @param bl true:开；false：关
+     * @return true:成功；false：失败
+     */
+    public Boolean setScreenOpenOrOff(String cardId , boolean bl){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","setScreenOpen");
+        map.put("arg1",bl);
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            Boolean result = (Boolean) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 获取apk信息，版本
+     * @param cardId
+     * @return
+     */
+    public String getPackageVersion(String cardId) {
+
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","getPackageVersion");
+        map.put("apk","com.xixun.xy.conn");
+
+        String message = this.sendMessage(cardId, map);
+        return message;
+    }
+
+
+    /**
+     * 获取截图
+     * @param cardId
+     * @return
+     */
+    public String screenshot(String cardId){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","screenshot");
+        map.put("arg1",100);
+        map.put("arg2",100);
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            String result = (String) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 设置音量
+     * @param cardId
+     * @param volume
+     * @return
+     */
+    public Boolean setVolume(String cardId, Integer volume){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","setVolume");
+        map.put("arg1",volume);
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            Boolean result = (Boolean) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 设置亮度
+     * @param cardId
+     * @param brightness
+     * @return
+     */
+    public Boolean setBrightness(String cardId, Integer brightness){
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","callCardService");
+        map.put("fn","setBrightness");
+        map.put("arg1",brightness);
+
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            ReceiveBase receiveModel = JSONObject.parseObject(message, ReceiveBase.class);
+            Boolean result = (Boolean) receiveModel.getResult();
+            return result;
+        }
+        return null;
+    }
+
+    /**
+     * 清除播放策略
+     * @param cardId
+     */
+    public Boolean clearPlayerTask(String cardId) {
+
+        Map map = new HashMap<String,String>();
+        map.put("_id",getUUID());
+        map.put("type","clearPlayerTask");
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            Map messageMap = JSONObject.parseObject(message, Map.class);
+            String type = (String) messageMap.get("_type");
+            if (!StringUtils.isEmpty(type) && "success".equals(type)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 发送播放策略
+     * @param cardId 信息屏sn
+     * @param command 封装好的command
+     */
+    @Async("screenTaskPool")
+    public void commandXixunPlayer(String cardId, Command command, Integer strategyId) {
+
+        Map map = new HashMap<String, Object>();
+        map.put("_id", getUUID());
+        map.put("type", "commandXixunPlayer");
+        map.put("command", command);
+        String message = this.sendMessage(cardId, map);
+
+        IotScreen screen = iotScreenMapper.findScreenByCardId(cardId);
+        IotScreenPlayStrategyCommandRel iotScreenPlayStrategyCommandRel = iotScreenPlayStrategyCommandRelMapper.findByStrategyIdAndScreenId(strategyId, screen.getId());
+
+        if (!StringUtils.isEmpty(message)) {
+            Map messageMap = JSONObject.parseObject(message, Map.class);
+            String type = (String) messageMap.get("_type");
+            if (!StringUtils.isEmpty(type) && "success".equals(type)) {
+                // 数据库记录更新发送状态
+
+                iotScreenPlayStrategyCommandRel.setStatus(RzIotDBConstParam.SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_SEND_SUCCESS);
+            } else {
+                iotScreenPlayStrategyCommandRel.setStatus(RzIotDBConstParam.SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_SEND_FAILED);
+            }
+        } else {
+            iotScreenPlayStrategyCommandRel.setStatus(RzIotDBConstParam.SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_SEND_FAILED);
+        }
+
+        iotScreenPlayStrategyCommandRelMapper.updateByPrimaryKeySelective(iotScreenPlayStrategyCommandRel);
+
+        // 判断是否所有屏幕都已发送成功
+        List<IotScreenShowSendStatus> screens = iotScreenPlayStrategyCommandRelMapper.findScreenByStrategyId(strategyId);
+        Boolean flag = true;
+        for (IotScreenShowSendStatus item : screens) {
+            if (item.getStatus() != RzIotDBConstParam.SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_SEND_SUCCESS) {
+                flag = false;
+                break;
+            }
+        }
+        if (flag) {
+            // 所有屏幕都已发送成更新策略发送状态
+            IotScreenPlayStrategy iotScreenPlayStrategy = new IotScreenPlayStrategy();
+            iotScreenPlayStrategy.setId(strategyId);
+            iotScreenPlayStrategy.setStatus(RzIotDBConstParam.SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_SEND_SUCCESS);
+            iotScreenPlayStrategyMapper.updateByPrimaryKeySelective(iotScreenPlayStrategy);
+        }
+    }
+
+    /**
+     * 停止默认播放器 (xixunplayer)
+     * @param cardId
+     * @param operation
+     */
+    public Boolean stopPlayer(String cardId, Boolean operation) {
+
+        if (operation == null) {
+            operation = true;
+        }
+        Map map = new HashMap<String, Object>();
+        map.put("_id", getUUID());
+        map.put("type", "stopPlayer");
+        map.put("stop", operation);
+        String message = this.sendMessage(cardId, map);
+        if (!StringUtils.isEmpty(message)) {
+            Map receive = JSONObject.parseObject(message, Map.class);
+            String type = (String) receive.get("_type");
+            if (!StringUtils.isEmpty(type) && "success".equals(type)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 发送消息的封装方法
+     * @param cardId 屏幕sn
+     * @param message 消息内容
+     * @return
+     */
+    public String sendMessage(String cardId, Map message) {
+
+
+        String type = (String) message.get("type");
+        String fn = (String) message.get("fn");
+
+        String receive = ScreenWebSocketHandler.sendMessage(cardId, message);
+        if (!StringUtils.isEmpty(receive)) {
+            // 记录日志
+            if ((!StringUtils.isEmpty(fn)) &&  (!whiteListFn.contains(fn))) {
+                IotScreen screen = iotScreenMapper.findScreenByCardId(cardId);
+                IotScreenCommandSendRecord iotScreenCommandSendRecord = new IotScreenCommandSendRecord(fn, screen.getId(), JSONObject.toJSONString(message));
+                iotScreenCommandSendRecordMapper.insertSelective(iotScreenCommandSendRecord);
+            } else if ((!StringUtils.isEmpty(type)) &&  (!whiteListType.contains(type))) {
+                if (StringUtils.isEmpty(fn)) {
+                    IotScreen screen = iotScreenMapper.findScreenByCardId(cardId);
+                    IotScreenCommandSendRecord iotScreenCommandSendRecord = new IotScreenCommandSendRecord(type, screen.getId(), JSONObject.toJSONString(message));
+                    iotScreenCommandSendRecordMapper.insertSelective(iotScreenCommandSendRecord);
+                }
+            }
+        }
+
+        return receive;
+    }
+
+    /**
+     * 信息屏连接
+     * @param cardId
+     * @return
+     */
+    @Async("screenTaskPool")
+    public void connScreen(String cardId) {
+        IotScreen screen = iotScreenMapper.findScreenByCardId(cardId);
+        IotScreenRecord iotScreenRecord = new IotScreenRecord();
+
+        if(screen != null){
+            //日志
+            SysDeviceConnRecord sysDeviceConnRecord = new SysDeviceConnRecord(screen.getId(),
+                    RzIotDBConstParam.DEVICE_CONN_RECORD_DEVICE_TYPE_OF_SCREEN,
+                    RzIotDBConstParam.DEVICE_CONN_RECORD_CONN_TYPE_OF_CONNECT,
+                    "设备上线");
+            sysDeviceConnRecordService.insertConn(sysDeviceConnRecord);
+
+            iotScreenRecord = iotScreenRecordMapper.selectByScreenId(screen.getId());
+        }
+
+        //屏幕亮度
+        Integer brightness = this.getBrightness(cardId);
+        //硬件状态
+        FpgaInfomation fpgaInfomation = this.getFpgaInfomation(cardId);
+        //屏幕是否打开
+        Boolean screenOpen = this.isScreenOpen(cardId);
+        //获取音量
+        Integer volume = this.getVolume(cardId);
+        //获取屏宽
+        Integer screenWidth = this.getScreenWidth(cardId);
+        //获取屏高
+        Integer screenHeight = this.getScreenHeight(cardId);
+        //获取网络类型
+        String networkType = this.getNetworkType(cardId);
+        //获取apk信息
+        String packageVersion = this.getPackageVersion(cardId);
+
+
+
+        //更新状态表
+        iotScreenRecord.setScreenStatus(screenOpen == true ? RzIotDBConstParam.SCREEN_DOOR_OPEND_STATUS_OF_OPEN : RzIotDBConstParam.SCREEN_DOOR_OPEND_STATUS_OF_CLOSE);
+        iotScreenRecord.setBrightness(brightness);
+        iotScreenRecord.setVolume(volume);
+        iotScreenRecord.setNetworkStatus(RzIotDBConstParam.DEVICE_NETWORK_STATUS_OF_ONLINE);
+
+        //解析硬件属性
+        //温度：55.0℃
+        String temperature = fpgaInfomation.getTemperature();
+        //箱门:open
+        String doorOpened = fpgaInfomation.getDoorOpened();
+        //湿度：20%
+        String humidity = fpgaInfomation.getHumidity();
+        //电压
+        String cardVoltage = fpgaInfomation.getCardVoltage();
+
+        iotScreenRecord.setTemperature(Float.valueOf(temperature.substring(0, temperature.indexOf("℃"))));
+        iotScreenRecord.setHumidity(Float.valueOf(humidity.substring(0,humidity.indexOf("%"))));
+        iotScreenRecord.setDooropened(doorOpened == "Open" ? RzIotDBConstParam.SCREEN_DOOR_OPEND_STATUS_OF_OPEN : RzIotDBConstParam.SCREEN_DOOR_OPEND_STATUS_OF_CLOSE);
+
+
+        screen.setHeight(screenHeight);
+        screen.setWidth(screenWidth);
+        screen.setSn(cardId);
+        screen.setName(cardId);
+        screen.setStatus(RzIotDBConstParam.DEVICE_STATUS_OF_NORMAL);
+
+        switch (networkType) {
+            // 有线网络
+            case "ETH":
+                screen.setNetType(RzIotDBConstParam.NETWORK_TYPE_OF_WIRED_NETWORK);
+                break;
+            default:
+                screen.setNetType(RzIotDBConstParam.NETWORK_TYPE_OF_WIRED_NETWORK);
+        }
+
+        //初次连接,增加
+        if(screen.getId() == null){
+
+            iotScreenMapper.insertSelective(screen);
+
+            iotScreenRecord.setScreenId(screen.getId());
+            iotScreenRecordMapper.insertSelective(iotScreenRecord);
+        }else{
+            //更新状态
+            iotScreenMapper.updateByPrimaryKeySelective(screen);
+
+            iotScreenRecord.setScreenId(screen.getId());
+            iotScreenRecordMapper.updateByPrimaryKeySelective(iotScreenRecord);
+        }
+    }
+}

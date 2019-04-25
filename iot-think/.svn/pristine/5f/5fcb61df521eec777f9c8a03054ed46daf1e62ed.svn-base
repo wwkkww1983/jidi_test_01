@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.screen.IotScreenPlayStrategyScreenRelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.screen.IotScreenPlayStrategyScreenRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="play_strategy_id" property="playStrategyId" jdbcType="INTEGER" />
+    <result column="screen_id" property="screenId" jdbcType="INTEGER" />
+    <result column="command_no" property="commandNo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, play_strategy_id, screen_id, command_no, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_screen_play_strategy_screen_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_screen_play_strategy_screen_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.screen.IotScreenPlayStrategyScreenRel" >
+    insert into iot_screen_play_strategy_screen_rel (id, play_strategy_id, screen_id, 
+      command_no, status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{playStrategyId,jdbcType=INTEGER}, #{screenId,jdbcType=INTEGER}, 
+      #{commandNo,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.screen.IotScreenPlayStrategyScreenRel" >
+    insert into iot_screen_play_strategy_screen_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="playStrategyId != null" >
+        play_strategy_id,
+      </if>
+      <if test="screenId != null" >
+        screen_id,
+      </if>
+      <if test="commandNo != null" >
+        command_no,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="playStrategyId != null" >
+        #{playStrategyId,jdbcType=INTEGER},
+      </if>
+      <if test="screenId != null" >
+        #{screenId,jdbcType=INTEGER},
+      </if>
+      <if test="commandNo != null" >
+        #{commandNo,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.screen.IotScreenPlayStrategyScreenRel" >
+    update iot_screen_play_strategy_screen_rel
+    <set >
+      <if test="playStrategyId != null" >
+        play_strategy_id = #{playStrategyId,jdbcType=INTEGER},
+      </if>
+      <if test="screenId != null" >
+        screen_id = #{screenId,jdbcType=INTEGER},
+      </if>
+      <if test="commandNo != null" >
+        command_no = #{commandNo,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.screen.IotScreenPlayStrategyScreenRel" >
+    update iot_screen_play_strategy_screen_rel
+    set play_strategy_id = #{playStrategyId,jdbcType=INTEGER},
+      screen_id = #{screenId,jdbcType=INTEGER},
+      command_no = #{commandNo,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <resultMap id="ResultMapFindScreenByStrategyId" type="com.rz.iot.think.model.show.IotScreenShowSendStatus">
+    <result column="id" property="id"></result>
+    <result column="sn" property="sn"></result>
+    <result column="name" property="name"></result>
+    <result column="status" property="status"></result>
+  </resultMap>
+
+  <!--根据策略id查找信息屏-->
+  <select id="findScreenByStrategyId" resultMap="ResultMapFindScreenByStrategyId">
+    SELECT
+      screen.id,
+      screen.sn,
+      screen.name,
+      strategy_screen_rel.status
+    FROM
+      iot_screen screen,
+      iot_screen_play_strategy_screen_rel strategy_screen_rel
+    WHERE
+      screen.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+      AND strategy_screen_rel.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+      AND screen.id = strategy_screen_rel.screen_id
+      AND strategy_screen_rel.play_strategy_id = #{playStrategyId}
+  </select>
+
+  <!--根据策略id、屏幕id查找记录-->
+  <select id="findByStrategyIdAndScreenId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from iot_screen_play_strategy_screen_rel
+    where play_strategy_id = #{strategyId}
+    AND screen_id = #{screenId}
+    AND status = ${@com.rz.iot.think.utils.RzIotDBConstParam@SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_SENDING}
+  </select>
+
+  <!--批量插入-->
+  <insert id="insertBatch" parameterType="list">
+    insert into iot_screen_play_strategy_screen_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="list[0].id != null" >
+        id,
+      </if>
+      <if test="list[0].playStrategyId != null" >
+        play_strategy_id,
+      </if>
+      <if test="list[0].screenId != null" >
+        screen_id,
+      </if>
+      <if test="list[0].commandNo != null" >
+        command_no,
+      </if>
+      <if test="list[0].status != null" >
+        status,
+      </if>
+    </trim>
+    VALUES
+    <foreach collection="list" item="item" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+        <if test="item.id != null" >
+          #{item.id,jdbcType=INTEGER},
+        </if>
+        <if test="item.playStrategyId != null" >
+          #{item.playStrategyId,jdbcType=INTEGER},
+        </if>
+        <if test="item.screenId != null" >
+          #{item.screenId,jdbcType=INTEGER},
+        </if>
+        <if test="item.commandNo != null" >
+          #{item.commandNo,jdbcType=INTEGER},
+        </if>
+        <if test="item.status != null" >
+          #{item.status,jdbcType=INTEGER},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+
+  <!--根据策略id删除记录-->
+  <update id="delByStrategyId">
+    UPDATE iot_screen_play_strategy_screen_rel
+    SET status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    WHERE play_strategy_id = #{strategyId}
+  </update>
+
+  <!--根据指令编号查找记录-->
+  <select id="findByCommandNo" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from iot_screen_play_strategy_screen_rel
+    where command_no = #{commandNo}
+    AND status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+  </select>
+</mapper>

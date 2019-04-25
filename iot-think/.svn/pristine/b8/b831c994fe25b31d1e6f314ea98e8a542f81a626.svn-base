@@ -1,0 +1,18 @@
+package com.rz.iot.think.service.impl;
+
+import com.rz.iot.think.mapper.IotMonitorMapper;
+import com.rz.iot.think.service.IotMonitorService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+/**
+ * Author by xuxiake, Date on 2019/3/19.
+ * PS: Not easy to write code, please indicate.
+ * Description：
+ */
+@Service("iotMonitorService")
+public class IotMonitorServiceImpl implements IotMonitorService {
+
+    @Resource
+    private IotMonitorMapper iotMonitorMapper;
+}

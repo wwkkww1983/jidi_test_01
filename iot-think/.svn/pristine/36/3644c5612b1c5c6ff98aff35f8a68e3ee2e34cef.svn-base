@@ -1,0 +1,30 @@
+package com.rz.iot.think.service.impl;
+
+import com.rz.iot.think.mapper.alarm.IotAlarmBoxRecordLogMapper;
+import com.rz.iot.think.model.alarm.IotAlarmBoxRecordLog;
+import com.rz.iot.think.service.IotAlarmBoxRecordLogService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
+/**
+ * @Author:jidi
+ * @Date:2019/04/22 17:42
+ * @Description:报警箱报警日志记录
+ **/
+@Service("iotAlarmBoxRecordLogService")
+public class IotAlarmBoxRecordLogServiceImpl implements IotAlarmBoxRecordLogService {
+
+    @Resource
+    private IotAlarmBoxRecordLogMapper iotAlarmBoxRecordLogMapper;
+
+    /***
+     * 增加一条记录
+     * @param iotAlarmBoxRecordLog
+     * @return
+     */
+    @Override
+    public int addIotAlarmBoxRecorderLog(IotAlarmBoxRecordLog iotAlarmBoxRecordLog) {
+        return iotAlarmBoxRecordLogMapper.insertSelective(iotAlarmBoxRecordLog);
+    }
+}

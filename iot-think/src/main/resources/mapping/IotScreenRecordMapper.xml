@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotScreenRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.screen.IotScreenRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="screen_id" property="screenId" jdbcType="INTEGER" />
+    <result column="screen_status" property="screenStatus" jdbcType="INTEGER" />
+    <result column="brightness" property="brightness" jdbcType="INTEGER" />
+    <result column="volume" property="volume" jdbcType="INTEGER" />
+    <result column="network_status" property="networkStatus" jdbcType="INTEGER" />
+    <result column="storage_size" property="storageSize" jdbcType="INTEGER" />
+    <result column="temperature" property="temperature" jdbcType="REAL" />
+    <result column="humidity" property="humidity" jdbcType="REAL" />
+    <result column="doorOpened" property="dooropened" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, screen_id, screen_status, brightness, volume, network_status, storage_size, temperature, 
+    humidity, doorOpened, create_time, update_time
+  </sql>
+
+  <select id="selectByScreenId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+      select
+      <include refid="Base_Column_List" />
+      from iot_screen_record
+      where screen_id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_screen_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_screen_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.screen.IotScreenRecord" >
+    insert into iot_screen_record (id, screen_id, screen_status, 
+      brightness, volume, network_status, 
+      storage_size, temperature, humidity, 
+      doorOpened, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{screenId,jdbcType=INTEGER}, #{screenStatus,jdbcType=INTEGER}, 
+      #{brightness,jdbcType=INTEGER}, #{volume,jdbcType=INTEGER}, #{networkStatus,jdbcType=INTEGER}, 
+      #{storageSize,jdbcType=INTEGER}, #{temperature,jdbcType=REAL}, #{humidity,jdbcType=REAL}, 
+      #{dooropened,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.screen.IotScreenRecord" >
+    insert into iot_screen_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="screenId != null" >
+        screen_id,
+      </if>
+      <if test="screenStatus != null" >
+        screen_status,
+      </if>
+      <if test="brightness != null" >
+        brightness,
+      </if>
+      <if test="volume != null" >
+        volume,
+      </if>
+      <if test="networkStatus != null" >
+        network_status,
+      </if>
+      <if test="storageSize != null" >
+        storage_size,
+      </if>
+      <if test="temperature != null" >
+        temperature,
+      </if>
+      <if test="humidity != null" >
+        humidity,
+      </if>
+      <if test="dooropened != null" >
+        doorOpened,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="screenId != null" >
+        #{screenId,jdbcType=INTEGER},
+      </if>
+      <if test="screenStatus != null" >
+        #{screenStatus,jdbcType=INTEGER},
+      </if>
+      <if test="brightness != null" >
+        #{brightness,jdbcType=INTEGER},
+      </if>
+      <if test="volume != null" >
+        #{volume,jdbcType=INTEGER},
+      </if>
+      <if test="networkStatus != null" >
+        #{networkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="storageSize != null" >
+        #{storageSize,jdbcType=INTEGER},
+      </if>
+      <if test="temperature != null" >
+        #{temperature,jdbcType=REAL},
+      </if>
+      <if test="humidity != null" >
+        #{humidity,jdbcType=REAL},
+      </if>
+      <if test="dooropened != null" >
+        #{dooropened,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.screen.IotScreenRecord" >
+    update iot_screen_record
+    <set >
+      <if test="screenId != null" >
+        screen_id = #{screenId,jdbcType=INTEGER},
+      </if>
+      <if test="screenStatus != null" >
+        screen_status = #{screenStatus,jdbcType=INTEGER},
+      </if>
+      <if test="brightness != null" >
+        brightness = #{brightness,jdbcType=INTEGER},
+      </if>
+      <if test="volume != null" >
+        volume = #{volume,jdbcType=INTEGER},
+      </if>
+      <if test="networkStatus != null" >
+        network_status = #{networkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="storageSize != null" >
+        storage_size = #{storageSize,jdbcType=INTEGER},
+      </if>
+      <if test="temperature != null" >
+        temperature = #{temperature,jdbcType=REAL},
+      </if>
+      <if test="humidity != null" >
+        humidity = #{humidity,jdbcType=REAL},
+      </if>
+      <if test="dooropened != null" >
+        doorOpened = #{dooropened,jdbcType=INTEGER},
+      </if>
+      <!--<if test="createTime != null" >-->
+        <!--create_time = #{createTime,jdbcType=TIMESTAMP},-->
+      <!--</if>-->
+      <!--<if test="updateTime != null" >-->
+        <!--update_time = #{updateTime,jdbcType=TIMESTAMP},-->
+      <!--</if>-->
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.screen.IotScreenRecord" >
+    update iot_screen_record
+    set screen_id = #{screenId,jdbcType=INTEGER},
+      screen_status = #{screenStatus,jdbcType=INTEGER},
+      brightness = #{brightness,jdbcType=INTEGER},
+      volume = #{volume,jdbcType=INTEGER},
+      network_status = #{networkStatus,jdbcType=INTEGER},
+      storage_size = #{storageSize,jdbcType=INTEGER},
+      temperature = #{temperature,jdbcType=REAL},
+      humidity = #{humidity,jdbcType=REAL},
+      doorOpened = #{dooropened,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByCardId" >
+    UPDATE iot_screen_record record,
+    iot_screen screen
+
+    <set >
+      <if test="record.screenStatus != null" >
+        screen_status = #{record.screenStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.brightness != null" >
+        brightness = #{record.brightness,jdbcType=INTEGER},
+      </if>
+      <if test="record.volume != null" >
+        volume = #{record.volume,jdbcType=INTEGER},
+      </if>
+      <if test="record.networkStatus != null" >
+        network_status = #{record.networkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.storageSize != null" >
+        storage_size = #{record.storageSize,jdbcType=INTEGER},
+      </if>
+      <if test="record.temperature != null" >
+        temperature = #{record.temperature,jdbcType=REAL},
+      </if>
+      <if test="record.humidity != null" >
+        humidity = #{record.humidity,jdbcType=REAL},
+      </if>
+      <if test="record.dooropened != null" >
+        doorOpened = #{record.dooropened,jdbcType=INTEGER},
+      </if>
+      </set>
+
+    WHERE
+        screen.sn = #{cardId,jdbcType=VARCHAR}
+        AND screen.id = record.screen_id
+  </update>
+
+
+
+</mapper>

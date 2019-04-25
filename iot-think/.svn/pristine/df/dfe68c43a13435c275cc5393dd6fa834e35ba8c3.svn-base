@@ -1,0 +1,288 @@
+package com.rz.iot.think.mqtt.model.report;
+
+import com.rz.iot.think.mqtt.model.LongitudeAndLatitudeAppoint;
+import com.rz.iot.think.mqtt.model.DateAppoint;
+import com.rz.iot.think.mqtt.model.WeekAppoint;
+import com.rz.iot.think.mqtt.util.RzIotConcentratorConstParam;
+import com.rz.iot.utils.RzIotDatetime;
+import com.rz.iot.utils.RzIotDigit;
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @Author:jidi
+ * @Date:2019/04/15 18:01
+ * @Description:预约方案上报
+ **/
+
+@Data
+@Log4j2
+public class ConcentratorAppointParamReport {
+    //预约方案类型：1.日期 2.星期 3.经纬度
+    private int type;
+
+    //日期预约方案列表
+    private List<DateAppoint> dateAppointList;
+
+    //星期预约方案列表
+    private List<WeekAppoint> weekAppointList;
+
+    //经纬预约方案列表
+    private List<LongitudeAndLatitudeAppoint> longitudeAndLatitudeAppointList;
+
+
+    /**
+     * 数据处理
+     * @param data 原始消息报文
+     * @param offset 消息头heard长度
+     * @param length 数据长度
+     */
+    public void setParam(byte[] data, int offset, int length)  {
+        this.type = RzIotDigit.getUnInt(data, offset);
+        if(this.type == RzIotConcentratorConstParam.CYCLE_TYPE_DATE){//日期
+            this.dateAppointList = new ArrayList<>();
+            //日期预约方案套数
+            int numLoops = (length-1) / 21;
+            for(int i=0; i<numLoops; i++){
+                //日期预约方案
+                DateAppoint dateAppoint = new DateAppoint();
+                //方案名
+                String name = "第"+(i+1)+"套日期预约时段方案";
+                dateAppoint.setName(name);
+                //起始时间 日
+                int beginDateDay = RzIotDigit.getUnInt(data,offset+i*21+1);
+                //起始时间 月
+                int beginDateMonth = RzIotDigit.getUnInt(data,offset+i*21+2);
+                //起始时间 年
+                int beginDateYear = 2000 + RzIotDigit.getUnInt(data,offset+i*21+3);
+                //结束时间 日
+                int endDateDay = RzIotDigit.getUnInt(data, offset+i*21+4);
+                //结束时间 月
+                int endDateMonth = RzIotDigit.getUnInt(data, offset+i*21+5);
+                //结束时间 年
+                int endDateYear = 2000 + RzIotDigit.getUnInt(data,offset+i*21+6);
+                //开灯时间 秒
+                int openLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*21+7);
+                //开灯时间 分
+                int openLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*21+8);
+                //开灯时间 时
+                int openLightTimeHour = RzIotDigit.getUnInt(data,offset+i*21+9);
+                //关灯时间 秒
+                int closeLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*21+10);
+                //关灯时间 分
+                int closeLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*21+11);
+                //关灯时间 时
+                int closeLightTimeHour = RzIotDigit.getUnInt(data,offset+i*21+12);
+                //调光时间开 秒
+                int beginMoveLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*21+13);
+                //调光时间开 分
+                int beginMoveLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*21+14);
+                //调光时间开 时
+                int beginMoveLightTimeHour = RzIotDigit.getUnInt(data,offset+i*21+15);
+                //调光时间关 秒
+                int endMoveLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*21+16);
+                //调光时间关 分
+                int endMoveLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*21+17);
+                //调光时间关 时
+                int endMoveLightTimeHour = RzIotDigit.getUnInt(data,offset+i*21+18);
+                try {
+                    //起始时间
+                    Date startDate = RzIotDatetime.stringToDate(beginDateYear+"-"+beginDateMonth+"-"+beginDateDay,"yyyy-MM-dd");
+                    dateAppoint.setStartDate(startDate);
+                    //结束时间
+                    Date endDate = RzIotDatetime.stringToDate(endDateYear+"-"+endDateMonth+"-"+endDateDay,"yyyy-MM-dd");
+                    dateAppoint.setEndDate(endDate);
+                    //开灯时间
+                    Date startTime = RzIotDatetime.stringToDate(openLightTimeHour+":"+openLightTimeMinute+":"+openLightTimeSecond,"HH:mm:ss");
+                    dateAppoint.setStartTime(startTime);
+                    //关灯时间
+                    Date endTime = RzIotDatetime.stringToDate(closeLightTimeHour+":"+closeLightTimeMinute+":"+closeLightTimeSecond,"HH:mm:ss");
+                    dateAppoint.setEndTime(endTime);
+                    //调光时间 开
+                    Date beginMoveLightTime = RzIotDatetime.stringToDate(beginMoveLightTimeHour+":"+beginMoveLightTimeMinute+":"+beginMoveLightTimeSecond,"HH:mm:ss");
+                    dateAppoint.setBeginMoveLightTime(beginMoveLightTime);
+                    //调光时间 关
+                    Date endMoveLightTime = RzIotDatetime.stringToDate(endMoveLightTimeHour+":"+endMoveLightTimeMinute+":"+endMoveLightTimeSecond,"HH:mm:ss");
+                    dateAppoint.setEndMoveLightTime(endMoveLightTime);
+                } catch (ParseException e) {
+                    log.error(e.getMessage(), e);
+                }
+                //调光百分比
+                int moveLightPercent = RzIotDigit.getUnInt(data,offset+i*21+19);
+                if(moveLightPercent != 0){
+                    dateAppoint.setMoveLightPercent(moveLightPercent);
+                }
+                //隔杆模式
+                int intervalType = RzIotDigit.getUnInt(data,offset+i*21+20);
+                if(intervalType != 0){
+                    dateAppoint.setIntervalType(intervalType);
+                }
+                //开关标记
+                int switchTag = RzIotDigit.getUnInt16(data,offset+i*21+21);
+                dateAppoint.setSwitchTag(switchTag);
+                this.dateAppointList.add(dateAppoint);
+            }
+        }
+        if(this.type == RzIotConcentratorConstParam.CYCLE_TYPE_WEEK){//星期
+            this.weekAppointList = new ArrayList<>();
+            //星期方案预约套数
+            int numLoops = (length-1) / 16;
+            for(int i=0; i<numLoops; i++){
+                //星期预约方案
+                WeekAppoint weekAppoint = new WeekAppoint();
+                //方案名
+                String name = "第"+(i+1)+"套星期预约方案";
+                weekAppoint.setName(name);
+                //星期标记
+                int weekTag = RzIotDigit.getUnInt(data, offset+i*16+1);
+                weekAppoint.setWeekTag(weekTag);
+                //开灯时间 秒
+                int openLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*16+2);
+                //开灯时间 分
+                int openLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*16+3);
+                //开灯时间 时
+                int openLightTimeHour = RzIotDigit.getUnInt(data,offset+i*16+4);
+                //关灯时间 秒
+                int closeLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*16+5);
+                //关灯时间 分
+                int closeLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*16+6);
+                //关灯时间 时
+                int closeLightTimeHour = RzIotDigit.getUnInt(data,offset+i*16+7);
+                //调光时间开 秒
+                int beginMoveLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*16+8);
+                //调光时间开 分
+                int beginMoveLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*16+9);
+                //调光时间开 时
+                int beginMoveLightTimeHour = RzIotDigit.getUnInt(data,offset+i*16+10);
+                //调光时间关 秒
+                int endMoveLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*16+11);
+                //调光时间关 分
+                int endMoveLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*16+12);
+                //调光时间关 时
+                int endMoveLightTimeHour = RzIotDigit.getUnInt(data,offset+i*16+13);
+                try {
+                    //开灯时间
+                    Date startTime = RzIotDatetime.stringToDate(openLightTimeHour+":"+openLightTimeMinute+":"+openLightTimeSecond,"HH:mm:ss");
+                    weekAppoint.setStartTime(startTime);
+                    //关灯时间
+                    Date endTime = RzIotDatetime.stringToDate(closeLightTimeHour+":"+closeLightTimeMinute+":"+closeLightTimeSecond,"HH:mm:ss");
+                    weekAppoint.setEndTime(endTime);
+                    //调光时间 开
+                    Date beginMoveLightTime = RzIotDatetime.stringToDate(beginMoveLightTimeHour+":"+beginMoveLightTimeMinute+":"+beginMoveLightTimeSecond,"HH:mm:sss");
+                    weekAppoint.setBeginMoveLightTime(beginMoveLightTime);
+                    //调光时间 关
+                    Date endMoveLightTime = RzIotDatetime.stringToDate(endMoveLightTimeHour+":"+endMoveLightTimeMinute+":"+endMoveLightTimeSecond,"HH:mm:sss");
+                    weekAppoint.setEndMoveLightTime(endMoveLightTime);
+                } catch (ParseException e) {
+                    log.error(e.getMessage(), e);
+                }
+                //调光百分比
+                int moveLightPercent = RzIotDigit.getUnInt(data,offset+i*16+14);
+                if(moveLightPercent != 0){
+                    weekAppoint.setMoveLightPercent(moveLightPercent);
+                }
+                //隔杆模式
+                int intervalType = RzIotDigit.getUnInt(data,offset+i*16+15);
+                if(intervalType != 0){
+                    weekAppoint.setIntervalType(intervalType);
+                }
+                //开关标记
+                int switchTag = RzIotDigit.getUnInt16(data,offset+i*16+16);
+                weekAppoint.setSwitchTag(switchTag);
+                this.weekAppointList.add(weekAppoint);
+            }
+        }
+        if(this.type == RzIotConcentratorConstParam.CYCLE_TYPE_LONGITUDE_AND_LATITUDE){//经纬度
+            this.longitudeAndLatitudeAppointList = new ArrayList<>();
+            //方案套数
+            int numLoops = (length-1)/22;
+            for (int i=0; i<numLoops; i++){
+                //经纬度预约方案
+                LongitudeAndLatitudeAppoint longitudeAndLatitudeAppoint = new LongitudeAndLatitudeAppoint();
+                //方案名字
+                String name = "第"+(i+1)+"套经纬度预约方案";
+                longitudeAndLatitudeAppoint.setName(name);
+                //起始时间 日
+                int beginDateDay = RzIotDigit.getUnInt(data,offset+i*22+1);
+                //起始时间 月
+                int beginDateMonth = RzIotDigit.getUnInt(data,offset+i*22+2);
+                //起始时间 年
+                int beginDateYear = 2000 + RzIotDigit.getUnInt(data,offset+i*22+3);
+                //结束时间 日
+                int endDateDay = RzIotDigit.getUnInt(data, offset+i*22+4);
+                //结束时间 月
+                int endDateMonth = RzIotDigit.getUnInt(data, offset+i*22+5);
+                //结束时间 年
+                int endDateYear = 2000 + RzIotDigit.getUnInt(data,offset+i*22+6);
+                //开灯时间 秒
+                int openLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*22+7);
+                //开灯时间 分
+                int openLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*22+8);
+                //开灯时间 时
+                int openLightTimeHour = RzIotDigit.getUnInt(data,offset+i*22+9);
+                //关灯时间 秒
+                int closeLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*22+10);
+                //关灯时间 分
+                int closeLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*22+11);
+                //关灯时间 时
+                int closeLightTimeHour = RzIotDigit.getUnInt(data,offset+i*22+12);
+                //偏移时间
+                int migrationTtime = RzIotDigit.getUnInt(data,offset+i*22+13);
+                longitudeAndLatitudeAppoint.setOffset(migrationTtime);
+                //调光时间开 秒
+                int beginMoveLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*22+14);
+                //调光时间开 分
+                int beginMoveLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*22+15);
+                //调光时间开 时
+                int beginMoveLightTimeHour = RzIotDigit.getUnInt(data,offset+i*22+16);
+                //调光时间关 秒
+                int endMoveLightTimeSecond = RzIotDigit.getUnInt(data,offset+i*22+17);
+                //调光时间关 分
+                int endMoveLightTimeMinute = RzIotDigit.getUnInt(data,offset+i*22+18);
+                //调光时间关 时
+                int endMoveLightTimeHour = RzIotDigit.getUnInt(data,offset+i*22+19);
+                try {
+                    //起始时间
+                    Date startDate = RzIotDatetime.stringToDate(beginDateYear+"-"+beginDateMonth+"-"+beginDateDay,"yyyy-MM-dd");
+                    longitudeAndLatitudeAppoint.setStartDate(startDate);
+                    //结束时间
+                    Date endDate = RzIotDatetime.stringToDate(endDateYear+"-"+endDateMonth+"-"+endDateDay,"yyyy-MM-dd");
+                    longitudeAndLatitudeAppoint.setEndDate(endDate);
+                    //开灯时间
+                    Date startTime = RzIotDatetime.stringToDate(openLightTimeHour+":"+openLightTimeMinute+":"+openLightTimeSecond,"HH:mm:ss");
+                    longitudeAndLatitudeAppoint.setStartTime(startTime);
+                    //关灯时间
+                    Date endTime = RzIotDatetime.stringToDate(closeLightTimeHour+":"+closeLightTimeMinute+":"+closeLightTimeSecond,"HH:mm:ss");
+                    longitudeAndLatitudeAppoint.setEndTime(endTime);
+                    //调光时间 开
+                    Date beginMoveLightTime = RzIotDatetime.stringToDate(beginMoveLightTimeHour+":"+beginMoveLightTimeMinute+":"+beginMoveLightTimeSecond,"HH:mm:sss");
+                    longitudeAndLatitudeAppoint.setBeginMoveLightTime(beginMoveLightTime);
+                    //调光时间 关
+                    Date endMoveLightTime = RzIotDatetime.stringToDate(endMoveLightTimeHour+":"+endMoveLightTimeMinute+":"+endMoveLightTimeSecond,"HH:mm:sss");
+                    longitudeAndLatitudeAppoint.setEndMoveLightTime(endMoveLightTime);
+                } catch (ParseException e) {
+                    log.error(e.getMessage(), e);
+                }
+                //调光百分比
+                int moveLightPercent = RzIotDigit.getUnInt(data,offset+i*22+20);
+                if(moveLightPercent != 0){
+                    longitudeAndLatitudeAppoint.setMoveLightPercent(moveLightPercent);
+                }
+                //隔杆模式
+                int intervalType = RzIotDigit.getUnInt(data,offset+i*22+21);
+                if(intervalType != 0){
+                    longitudeAndLatitudeAppoint.setIntervalType(intervalType);
+                }
+                //开关标记
+                int switchTag = RzIotDigit.getUnInt16(data,offset+i*22+22);
+                longitudeAndLatitudeAppoint.setSwitchTag(switchTag);
+                this.longitudeAndLatitudeAppointList.add(longitudeAndLatitudeAppoint);
+            }
+        }
+    }
+}

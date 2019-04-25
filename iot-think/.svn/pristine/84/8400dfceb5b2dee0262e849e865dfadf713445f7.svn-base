@@ -1,0 +1,663 @@
+package com.rz.iot.think.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rz.iot.think.mapper.*;
+import com.rz.iot.think.model.*;
+import com.rz.iot.think.model.excel.IotStreetlightExportModel;
+import com.rz.iot.think.model.param.IotStreetlightAddParam;
+import com.rz.iot.think.model.param.IotStreetlightDelParam;
+import com.rz.iot.think.model.param.IotStreetlightListQueryParam;
+import com.rz.iot.think.model.show.*;
+import com.rz.iot.think.service.IotBusinessUserRelService;
+import com.rz.iot.think.service.IotStreetlightService;
+import com.rz.iot.think.utils.CommonFunctions;
+import com.rz.iot.think.utils.ExcelUtils;
+import com.rz.iot.think.utils.RzIotDBConstParam;
+import com.rz.iot.think.utils.RzIotErrMessage;
+import lombok.extern.log4j.Log4j2;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * Author by xuxiake, Date on 2019/3/13.
+ * PS: Not easy to write code, please indicate.
+ * Description：
+ */
+@Log4j2
+@Service("iotStreetlightService")
+public class IotStreetlightServiceImpl implements IotStreetlightService {
+
+    @Resource
+    private IotStreetlightMapper iotStreetlightMapper;
+    @Resource
+    private IotSingleLightControllerMapper iotSingleLightControllerMapper;
+    @Resource
+    private IotStreetlightInstallDevRelMapper iotStreetlightInstallDevRelMapper;
+    @Resource
+    private IotBusinessUserRelService iotBusinessUserRelService;
+    @Resource
+    private IotStreetlightLedLightsMapper iotStreetlightLedLightsMapper;
+    @Resource
+    private IotBuilderPicMapper iotBuilderPicMapper;
+    @Resource
+    private IotBuilderMapper iotBuilderMapper;
+    @Resource
+    private IotAreaRelMapper iotAreaRelMapper;
+    @Resource
+    private IotSingleLightControllerLedLightsRelMapper iotSingleLightControllerLedLightsRelMapper;
+    @Resource
+    private IotBusinessUserRelMapper iotBusinessUserRelMapper;
+
+    /**
+     * 查询所有路灯
+     * @return
+     */
+    @Override
+    public Result findAll(Page page, IotStreetlightListQueryParam param) {
+
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        Result result = new Result();
+        PageHelper.startPage(page.getPageNum(), page.getPageSize());
+        List<IotStreetlightShowList> streetlights = iotStreetlightMapper.findAll(userInfo.getId(), param);
+        PageInfo<IotStreetlightShowList> pageInfo = new PageInfo<>(streetlights);
+
+        List<IotStreetlightShowList> iotStreetlightShowLists = new ArrayList<>();
+        for (IotStreetlightShowList streetlight : streetlights) {
+
+            List<IotSingleLightControllerShowForStreetLightDetail> singleLightControllers = iotSingleLightControllerMapper.findByStreetlightId(streetlight.getId());
+            streetlight.setSingleLightControllers(singleLightControllers);
+            boolean flag = true;
+            for (IotSingleLightControllerShowForStreetLightDetail controller : singleLightControllers) {
+                // 判断是否所有的单灯控制器都是开启状态
+                if (controller.getStatus() == RzIotDBConstParam.DEVICE_SWITCH_STATUS_OF_OFF) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag) {
+                if (singleLightControllers.size() > 0) {
+                    streetlight.setLightStatus(RzIotDBConstParam.DEVICE_SWITCH_STATUS_OF_ON);
+                } else {
+                    streetlight.setLightStatus(RzIotDBConstParam.DEVICE_SWITCH_STATUS_OF_OFF);
+                }
+            }
+        }
+        page.setPages(pageInfo.getPages());
+        page.setTotal(pageInfo.getTotal());
+        page.setList(iotStreetlightShowLists);
+        result.setData(pageInfo);
+        return result;
+    }
+
+    /**
+     * 路灯详情
+     * @param streetlightId
+     * @return
+     */
+    @Override
+    public Result detail(Integer streetlightId) {
+
+        Result result = new Result();
+        if (streetlightId == null) {
+            return Result.paramNull(result);
+        }
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        boolean authorized = iotBusinessUserRelService.isAuthorized(streetlightId, RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT, userInfo.getId());
+        // 鉴权
+        if (!authorized) {
+            return Result.unAuthorized(result);
+        }
+        IotStreetlightShowDetail streetlight = iotStreetlightMapper.findById(streetlightId);
+
+        if (streetlight != null) {
+            // 单灯控制器列表
+            List<IotSingleLightControllerShowForStreetLightDetail> singleLightControllers = iotSingleLightControllerMapper.findByStreetlightId(streetlightId);
+            streetlight.setSingleLightControllers(singleLightControllers);
+
+            // LED列表
+            List<IotStreetlightLedLights> streetlightLedLightsList = iotStreetlightLedLightsMapper.findByStreetlightId(streetlightId);
+            streetlight.setStreetlightLedLights(streetlightLedLightsList);
+
+            // 挂载设备列表
+            List<IotStreetlightInstallDevShowList> installDevs = iotStreetlightInstallDevRelMapper.findByStreetlightId(streetlightId);
+            streetlight.setInstallDevs(installDevs);
+
+            // 查询施工图
+            List<String> builderPics = iotBuilderPicMapper.findByBusinessId(streetlightId, RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT);
+            streetlight.setBuilderPics(builderPics);
+        }
+
+        result.setData(streetlight);
+        return result;
+    }
+
+    @Resource
+    private IotStreetlightSlcRelMapper iotStreetlightSlcRelMapper;
+
+
+    /**
+     * 获取单灯调光页面所必须的信息列表
+     *
+     * @see IotStreetlightMapper#getInfoList(Integer userId,HashMap param)
+     * @return 返回查询结果
+     */
+    @Override
+    public List<StreetlightSwitch> getSlcSwitchLightInfoList(HashMap map) {
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        //查询路灯表
+        List<StreetlightSwitch> listMapStreetlight = iotStreetlightMapper.getInfoList(userInfo.getId(), map);
+
+        log.debug(listMapStreetlight);
+
+        return listMapStreetlight;
+    }
+
+    /**
+     * 增加路灯
+     * @param param
+     * @return
+     */
+    @Transactional
+    @Override
+    public Result add(IotStreetlightAddParam param) {
+
+        Result result = new Result();
+
+        //增加施工单位信息
+        IotBuilder iotBuilder = new IotBuilder();
+        iotBuilder.setName(param.getBuilderName());
+        iotBuilder.setPhone(param.getPhone());
+        iotBuilder.setLinkman(param.getLinkman());
+        iotBuilderMapper.insertSelective(iotBuilder);
+
+        //增加省市区关联
+        Map<String, Object> areaInfo = CommonFunctions.getAreaInfo(param.getAreaAddress());
+        IotAreaRel iotAreaRel = (IotAreaRel) areaInfo.get("iotAreaRel");
+
+        //检查是否已经存在这条记录
+        IotAreaRel iotAreaRelCheck = iotAreaRelMapper.isExists(iotAreaRel);
+        if (iotAreaRelCheck == null){
+            iotAreaRelMapper.insertSelective(iotAreaRel);
+        }else{
+            iotAreaRel = iotAreaRelCheck;
+        }
+
+        // 增加路灯信息
+        IotStreetlight streetlight = new IotStreetlight();
+        streetlight.setName(param.getName());
+        streetlight.setSn(param.getSn());
+        streetlight.setRoadId(new Long(param.getRoadId() + ""));
+        streetlight.setVersion(param.getVersion());
+        streetlight.setLng(param.getLng());
+        streetlight.setLat(param.getLat());
+        streetlight.setFullAddress(param.getFullAddress());
+        streetlight.setBrandType(param.getBrandType());
+        streetlight.setHeight(param.getHeight());
+        streetlight.setAreaRelId(iotAreaRel.getId());
+        streetlight.setBuildId(iotBuilder.getId());
+
+        iotStreetlightMapper.insertSelective(streetlight);
+
+        // LED列表
+        List<IotStreetlightLedLights> streetlightLedLights = param.getStreetlightLedLights();
+        // 单灯控制器ID列表
+        List<Integer> singleLightControllerIds = param.getSingleLightControllerIds();
+
+        // 批量增加LED灯信息
+        iotStreetlightLedLightsMapper.insertBatch(streetlightLedLights);
+
+        List<IotSingleLightControllerLedLightsRel> iotSingleLightControllerLedLightsRels = new ArrayList<>();
+        List<IotStreetlightSlcRel> iotStreetlightSlcRels = new ArrayList<>();
+
+        for (int i = 0; i < singleLightControllerIds.size(); i++) {
+
+            //LED、单灯控制器顺序一一对应！
+            IotSingleLightControllerLedLightsRel iotSingleLightControllerLedLightsRel = new IotSingleLightControllerLedLightsRel();
+            iotSingleLightControllerLedLightsRel.setLetLightsId(streetlightLedLights.get(i).getId());
+            iotSingleLightControllerLedLightsRel.setSlcId(singleLightControllerIds.get(i));
+            iotSingleLightControllerLedLightsRels.add(iotSingleLightControllerLedLightsRel);
+
+            IotStreetlightSlcRel iotStreetlightSlcRel = new IotStreetlightSlcRel();
+            iotStreetlightSlcRel.setStreetlightId(streetlight.getId());
+            iotStreetlightSlcRel.setSlcId(singleLightControllerIds.get(i));
+            iotStreetlightSlcRels.add(iotStreetlightSlcRel);
+        }
+
+        // 批量插入LED与单灯控制器的关联关系
+        iotSingleLightControllerLedLightsRelMapper.insertBatch(iotSingleLightControllerLedLightsRels);
+
+        // 批量插入路灯与单灯控制器之间的关联关系
+        iotStreetlightSlcRelMapper.insertBatch(iotStreetlightSlcRels);
+
+        // 增加挂载设备
+        List<IotStreetlightInstallDevRel> installDevs = param.getInstallDevs();
+        for (IotStreetlightInstallDevRel item : installDevs) {
+            item.setStreetlightId(streetlight.getId());
+        }
+        iotStreetlightInstallDevRelMapper.insertBatch(installDevs);
+
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+        // 增加用户路灯关联关系
+        if (userInfo.getStatus() == RzIotDBConstParam.USER_STATUS_OF_NORMAL) {
+            IotBusinessUserRel iotBusinessUserRel = new IotBusinessUserRel();
+            iotBusinessUserRel.setBusinessId(streetlight.getId());
+            iotBusinessUserRel.setBusinessType(RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT);
+            iotBusinessUserRel.setUserId(userInfo.getId());
+            iotBusinessUserRelMapper.insertSelective(iotBusinessUserRel);
+        }
+
+        //批量增加施工图片
+        List<IotBuilderPic> pics = new ArrayList<>();
+        for(String url : param.getBuilderPics()) {
+            IotBuilderPic iotBuilderPic = new IotBuilderPic();
+            iotBuilderPic.setUserId(userInfo.getId());
+            iotBuilderPic.setBusinessId(streetlight.getId());
+            iotBuilderPic.setBusinessType(RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT);
+            iotBuilderPic.setUrl(url);
+            pics.add(iotBuilderPic);
+        }
+        if (pics != null && pics.size() > 0) {
+            iotBuilderPicMapper.insertBatch(pics);
+        }
+        return result;
+    }
+
+    /**
+     * 删除路灯
+     * @param streetlightIds 路灯ids
+     * @return
+     */
+    @Transactional
+    @Override
+    public Result del(List<Integer> streetlightIds) {
+
+        Result result = new Result();
+
+        if (streetlightIds == null || streetlightIds.size() == 0) {
+            return Result.paramNull(result);
+        }
+
+        //鉴权
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        for (Integer streetlightId : streetlightIds) {
+            boolean authorized = iotBusinessUserRelService.isAuthorized(streetlightId, RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT, userInfo.getId());
+            if (!authorized) {
+                return Result.unAuthorized(result);
+            }
+        }
+
+        for (Integer streetlightId : streetlightIds) {
+
+            IotStreetlight streetlightLast = iotStreetlightMapper.selectByPrimaryKey(streetlightId);
+
+            // 删除施工单位信息
+            IotBuilder iotBuilder = new IotBuilder();
+            iotBuilder.setId(streetlightLast.getBuildId());
+            iotBuilder.setStatus(RzIotDBConstParam.DATA_STATUS_OF_DELETE);
+            iotBuilderMapper.updateByPrimaryKeySelective(iotBuilder);
+
+            // 删除LED
+            iotStreetlightLedLightsMapper.delByStreetlightId(streetlightId);
+
+            // 删除LED与单灯控制器的关联关系
+            iotSingleLightControllerLedLightsRelMapper.delByStreetlightId(streetlightId);
+
+            // 删除单灯控制器与路灯之间的关联关系
+            iotStreetlightSlcRelMapper.delByStreetlightId(streetlightId);
+
+            // 删除挂载设备
+            iotStreetlightInstallDevRelMapper.delByStreetlightId(streetlightId);
+
+            // 删除施工图
+            iotBuilderPicMapper.delByBusinessId(streetlightId, RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT);
+
+            // 删除路灯
+            IotStreetlight streetlight = new IotStreetlight();
+            streetlight.setId(streetlightId);
+            streetlight.setStatus(RzIotDBConstParam.DATA_STATUS_OF_DELETE);
+            iotStreetlightMapper.updateByPrimaryKeySelective(streetlight);
+
+            // 删除用户路灯关联关系
+            if (userInfo.getStatus() == RzIotDBConstParam.USER_STATUS_OF_NORMAL) {
+                iotBusinessUserRelMapper.delRel(userInfo.getId(), userInfo.getId(), RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 更新路灯信息
+     * @param param
+     * @return
+     */
+    @Transactional
+    @Override
+    public Result update(IotStreetlightAddParam param) {
+
+        Result result = new Result();
+
+        //鉴权
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        boolean authorized = iotBusinessUserRelService.isAuthorized(param.getId(), RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT, userInfo.getId());
+        if (!authorized) {
+            return Result.unAuthorized(result);
+        }
+
+        IotStreetlight streetlightLast = iotStreetlightMapper.selectByPrimaryKey(param.getId());
+
+        // 更新施工单位信息
+        // 先删除再增加
+        IotBuilder iotBuilder = new IotBuilder();
+        iotBuilder.setId(streetlightLast.getBuildId());
+        iotBuilder.setStatus(RzIotDBConstParam.DATA_STATUS_OF_DELETE);
+        iotBuilderMapper.updateByPrimaryKeySelective(iotBuilder);
+
+        iotBuilder = new IotBuilder();
+        iotBuilder.setName(param.getBuilderName());
+        iotBuilder.setPhone(param.getPhone());
+        iotBuilder.setLinkman(param.getLinkman());
+        iotBuilderMapper.insertSelective(iotBuilder);
+
+        //更新省市区关联
+        Map<String, Object> areaInfo = CommonFunctions.getAreaInfo(param.getAreaAddress());
+        IotAreaRel iotAreaRel = (IotAreaRel) areaInfo.get("iotAreaRel");
+
+        //检查是否已经存在这条记录
+        IotAreaRel iotAreaRelCheck = iotAreaRelMapper.isExists(iotAreaRel);
+        if (iotAreaRelCheck == null){
+            iotAreaRelMapper.insertSelective(iotAreaRel);
+        }else{
+            iotAreaRel = iotAreaRelCheck;
+        }
+
+        // 更新路灯信息
+        IotStreetlight streetlight = new IotStreetlight();
+        streetlight.setId(param.getId());
+        streetlight.setName(param.getName());
+        streetlight.setSn(param.getSn());
+        streetlight.setRoadId(new Long(param.getRoadId() + ""));
+        streetlight.setVersion(param.getVersion());
+        streetlight.setLng(param.getLng());
+        streetlight.setLat(param.getLat());
+        streetlight.setFullAddress(param.getFullAddress());
+        streetlight.setBrandType(param.getBrandType());
+        streetlight.setHeight(param.getHeight());
+        streetlight.setAreaRelId(iotAreaRel.getId());
+        streetlight.setBuildId(iotBuilder.getId());
+
+        iotStreetlightMapper.updateByPrimaryKeySelective(streetlight);
+
+        // 更新LED
+        // 先删除LED、LED与单灯控制器的关联关系
+        iotStreetlightLedLightsMapper.delByStreetlightId(param.getId());
+        iotSingleLightControllerLedLightsRelMapper.delByStreetlightId(param.getId());
+
+        // 更新单灯控制器与路灯之间的关联关系
+        // 先删除单灯控制器与路灯之间的关联关系
+        iotStreetlightSlcRelMapper.delByStreetlightId(param.getId());
+
+        // LED列表
+        List<IotStreetlightLedLights> streetlightLedLights = param.getStreetlightLedLights();
+        // 单灯控制器ID列表
+        List<Integer> singleLightControllerIds = param.getSingleLightControllerIds();
+
+        // 批量增加LED灯信息
+        iotStreetlightLedLightsMapper.insertBatch(streetlightLedLights);
+
+        List<IotSingleLightControllerLedLightsRel> iotSingleLightControllerLedLightsRels = new ArrayList<>();
+        List<IotStreetlightSlcRel> iotStreetlightSlcRels = new ArrayList<>();
+
+        for (int i = 0; i < singleLightControllerIds.size(); i++) {
+
+            // LED、单灯控制器顺序一一对应！
+            IotSingleLightControllerLedLightsRel iotSingleLightControllerLedLightsRel = new IotSingleLightControllerLedLightsRel();
+            iotSingleLightControllerLedLightsRel.setLetLightsId(streetlightLedLights.get(i).getId());
+            iotSingleLightControllerLedLightsRel.setSlcId(singleLightControllerIds.get(i));
+            iotSingleLightControllerLedLightsRels.add(iotSingleLightControllerLedLightsRel);
+
+            IotStreetlightSlcRel iotStreetlightSlcRel = new IotStreetlightSlcRel();
+            iotStreetlightSlcRel.setStreetlightId(streetlight.getId());
+            iotStreetlightSlcRel.setSlcId(singleLightControllerIds.get(i));
+            iotStreetlightSlcRels.add(iotStreetlightSlcRel);
+        }
+
+        // 批量插入LED与单灯控制器的关联关系
+        iotSingleLightControllerLedLightsRelMapper.insertBatch(iotSingleLightControllerLedLightsRels);
+
+        // 批量插入路灯与单灯控制器之间的关联关系
+        iotStreetlightSlcRelMapper.insertBatch(iotStreetlightSlcRels);
+
+        // 更新挂载设备
+        // 先删除，再增加
+        iotStreetlightInstallDevRelMapper.delByStreetlightId(param.getId());
+        List<IotStreetlightInstallDevRel> installDevs = param.getInstallDevs();
+        for (IotStreetlightInstallDevRel item : installDevs) {
+            item.setStreetlightId(streetlight.getId());
+            item.setId(null);
+        }
+        iotStreetlightInstallDevRelMapper.insertBatch(installDevs);
+
+        // 更新施工图
+        // 先删除再插入
+        iotBuilderPicMapper.delByBusinessId(param.getId(), RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT);
+        //批量增加施工图片
+        List<IotBuilderPic> pics = new ArrayList<>();
+        for(String url : param.getBuilderPics()) {
+            IotBuilderPic iotBuilderPic = new IotBuilderPic();
+            iotBuilderPic.setUserId(userInfo.getId());
+            iotBuilderPic.setBusinessId(streetlight.getId());
+            iotBuilderPic.setBusinessType(RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT);
+            iotBuilderPic.setUrl(url);
+            pics.add(iotBuilderPic);
+        }
+        if (pics != null && pics.size() > 0) {
+            iotBuilderPicMapper.insertBatch(pics);
+        }
+
+        return result;
+    }
+
+    /**
+     * excel导出
+     * @param response
+     */
+    @Override
+    public void exportExl(HttpServletResponse response) {
+
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+        try(OutputStream out = response.getOutputStream()) {
+
+            String fileName = new String(("IotStreetLight " + new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
+                    .getBytes(), "UTF-8");
+            response.setContentType("multipart/form-data");
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
+
+            List<IotStreetlightShowList> list = iotStreetlightMapper.findAll(userInfo.getId(), new IotStreetlightListQueryParam());
+
+            List<IotStreetlightExportModel> data = new ArrayList<>();
+            for (IotStreetlightShowList item : list) {
+                IotStreetlightExportModel iotStreetlightExportModel = new IotStreetlightExportModel();
+                iotStreetlightExportModel.setId(item.getId() + "");
+                iotStreetlightExportModel.setName(item.getName());
+                iotStreetlightExportModel.setSn(item.getSn());
+                iotStreetlightExportModel.setBrandType(item.getBrandType() + "");
+                iotStreetlightExportModel.setDevType(item.getDevType() + "");
+                data.add(iotStreetlightExportModel);
+            }
+
+            ExcelUtils.writeExl(out, data, 3, 5000, IotStreetlightExportModel.class);
+
+            out.flush();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
+    }
+
+    /**
+     * excel批量导入
+     * @param file
+     * @return
+     */
+    @Override
+    public Result importExl(MultipartFile file) {
+
+        Result result = new Result();
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        try {
+            List<IotStreetlightExportModel> data = ExcelUtils.readExl(file.getInputStream(), 3, IotStreetlightExportModel.class);
+
+            if (data == null || data.size() == 0) {
+                return result;
+            }
+            List<IotStreetlight> streetlights = new ArrayList<>();
+            for (IotStreetlightExportModel item : data) {
+                IotStreetlight streetlight = new IotStreetlight();
+                streetlight.setName(item.getName());
+                streetlight.setSn(item.getSn());
+                streetlight.setDevType(new Integer(item.getDevType()));
+                streetlight.setBrandType(new Integer(item.getBrandType()));
+                streetlights.add(streetlight);
+            }
+
+            // 导入路灯
+            iotStreetlightMapper.insertBatch(streetlights);
+
+            // 增加路灯用户关联关系
+            List<IotBusinessUserRel> iotBusinessUserRels = new ArrayList<>();
+            for (IotStreetlight streetlight : streetlights) {
+                IotBusinessUserRel iotBusinessUserRel = new IotBusinessUserRel();
+                iotBusinessUserRel.setUserId(userInfo.getId());
+                iotBusinessUserRel.setBusinessId(streetlight.getId());
+                iotBusinessUserRel.setBusinessType(RzIotDBConstParam.BUSSINESS_TYPE_OF_STREETLIGHT);
+                iotBusinessUserRels.add(iotBusinessUserRel);
+            }
+            iotBusinessUserRelMapper.insertBatch(iotBusinessUserRels);
+
+            result.setData(streetlights);
+            return result;
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            log.error("excel解析失败");
+        }
+        result.setCode(RzIotErrMessage.EXCEPTION);
+        return result;
+    }
+
+    /**
+     * excel导入模板下载
+     * @param response
+     */
+    @Override
+    public void templateDownload(HttpServletResponse response) {
+
+        try(OutputStream out = response.getOutputStream()) {
+
+            response.setContentType("multipart/form-data");
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-disposition", "attachment;filename=" + "template.xlsx");
+
+            ExcelUtils.writeExl(out, null, 3, 5000, IotStreetlightExportModel.class);
+
+            out.flush();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 查询地图上的路灯信息
+     * @param param 查询参数
+     * @return GISStreetlightShowList 查询结果
+     */
+    @Override
+    public List<GISStreetlightShowList> getStreetlightInGis(HashMap param) {
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        List<GISStreetlightShowList> streetlightInGis;
+        if(!param.containsKey("switchStatus"))
+            streetlightInGis = iotStreetlightMapper.getStreetlightInGis(param, userInfo.getId());
+        else
+            if(param.get("switchStatus").equals(1))
+                streetlightInGis = iotStreetlightMapper.getStreetlightInGisOpen(param, userInfo.getId());
+            else
+                streetlightInGis = iotStreetlightMapper.getStreetlightInGisOff(param, userInfo.getId());
+        return streetlightInGis;
+    }
+
+    /**
+     * 查询某片区域的集中器信息，查询参数与
+     * @see IotStreetlightServiceImpl#getStreetlightInGis( HashMap param) 一致
+     * @param param 查询参数
+     * @return 返回查询结果
+     */
+    @Override
+    public List<GISConcentratorList> getConcentratorListInGIS(HashMap param) {
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        List<GISConcentratorList> concentratorList = iotStreetlightMapper.getConcentratorListInGis(param, userInfo.getId());
+        return concentratorList;
+    }
+
+    /**
+     * 通过id查询详细的路灯信息
+     * @param streetlightId 路灯id
+     * @return 查询结果
+     */
+    @Override
+    public IotStreetlightShowDetail findById(Integer streetlightId) {
+        return iotStreetlightMapper.findById(streetlightId);
+    }
+
+    /**
+     * 查询区id和道路id
+     * @return 返回查询结果
+     */
+    @Override
+    public HashMap getDistrictIdAndRoadId() {
+        HashMap<String, Object> map = new HashMap<>();
+        //获取街道id和名称
+        List<HashMap> r = iotStreetlightMapper.getRoadIds();
+        map.put("road", r);
+        //获取区名称和id
+        List<HashMap> d = iotStreetlightMapper.getDistrictIds();
+        map.put("district", d);
+        return map;
+    }
+
+    /**
+     * 获取路灯挂载的故障设备的信息列表
+     *
+     * @return 返回查询结果
+     */
+    @Override
+    public List<HashMap> getStreetlightFaults() {
+
+        return iotStreetlightMapper.getStreetlightFaults();
+    }
+
+    /**
+     * 查找未与路灯绑定的单灯控制器
+     * @return
+     */
+    @Override
+    public Result findNoBindingWithStreetLight() {
+
+        Result result = new Result();
+        List<IotSingleLightController> controllers = iotSingleLightControllerMapper.findNoBindingWithStreetLight();
+        result.setData(controllers);
+        return result;
+    }
+}

@@ -1,0 +1,192 @@
+package com.rz.iot.think.utils;
+
+import com.rz.iot.utils.RzIotString;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbFile;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
+@Log4j2
+@Component
+public class RzIotFileUtils {
+
+    @Value("${file.ftp_name}")
+    public String FTP_USERNAME;
+
+    @Value("${file.ftp_password}")
+    public String FTP_PASSWORD;
+
+    @Value("${file.screen_video_path}")
+    public String SCREEN_VIDEO_PATH;
+
+
+
+    private boolean delete(File file) {
+        if (file.exists()) {
+            if (file.isFile()) {
+                file.delete();
+            } else if (file.isDirectory()) {
+                File files[] = file.listFiles();
+                for (int i=0; i<files.length; i++) {
+                    delete(files[i]);
+                }
+            }
+            file.delete();
+        } else {
+            log.debug("要删除的文件[{}]不存在！", file.getName());
+        }
+        return true;
+    }
+
+    // 删除指定的文件或指定文件夹下的所有文件
+    public boolean delete(String filePathAndName) {
+        try {
+            if (filePathAndName.startsWith("smb")) {
+//                String ftpUserName = ConfigureUtils.getStringValue("ftp_username");
+//                String ftpPassword = ConfigureUtils.getStringValue("ftp_password");
+
+                SmbFile smbFile = new SmbFile(filePathAndName,
+                        new NtlmPasswordAuthentication("", FTP_USERNAME, FTP_PASSWORD));
+                if (smbFile.exists()) {
+                    smbFile.delete();
+                }
+            } else {
+                File file = new File(filePathAndName);
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    // 删除指定的文件或指定文件夹下的所有文件
+    public boolean delete(HttpServletRequest request, String folder) {
+//        String path = request.getSession().getServletContext().getRealPath("/upload/"+folder);
+//        delete(new File(path));
+        return true;
+    }
+
+    // 删除指定的文件或指定文件夹下的指定文件
+    public boolean deletes(HttpServletRequest request, String folder) {
+//        String path = request.getSession().getServletContext().getRealPath("/upload/"+folder);
+//        delete(new File(path));
+        return true;
+    }
+
+    public boolean mkdir(String path) {
+        boolean isSuccess = false;
+
+        try {
+            if (path.startsWith("smb:") || RzIotString.startsWidthNumeric(path)) {
+
+//                String ftpUserName = ConfigureUtils.getStringValue("ftp_username");
+//                String ftpPassword = ConfigureUtils.getStringValue("ftp_password");
+
+                NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("",
+                        FTP_USERNAME,
+                        FTP_PASSWORD);
+                SmbFile dir = new SmbFile(path, auth);
+                if (!dir.exists()) {
+                    dir.mkdirs();                 // 可创建多级目录，而mkdir()只能创建一级目录
+                    isSuccess = true;
+                }
+            } else {
+                File dir = new File(path);
+                if (!dir.exists()) {
+                    isSuccess = dir.mkdirs();                    // 可创建多级目录，而mkdir()只能创建一级目录
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
+    }
+
+    private static int getFileNameStartPosition(String pathAndName) {
+        int start = pathAndName.lastIndexOf('/');
+        if (start<0) {
+            start = pathAndName.lastIndexOf('\\');
+            if (start<0) {
+                start = 0;
+            } else {
+                start += 1;
+            }
+        } else {
+            start += 1;
+        }
+        return start;
+    }
+    // 重命名
+    public static String fileRename(String pathAndName, String fileName) {
+        int start = getFileNameStartPosition(pathAndName);
+        int end = pathAndName.lastIndexOf('.');
+        if (end<0) {
+            end = pathAndName.length();
+        }
+        return pathAndName.replace(pathAndName.substring(start,end), fileName);
+    }
+
+    public static String getName(String pathAndName) {
+        int start = getFileNameStartPosition(pathAndName);
+        int end = pathAndName.lastIndexOf('.');
+        if (end<0) {
+            end = pathAndName.length();
+        }
+        return pathAndName.substring(start,end);
+    }
+
+    public static String getFileName(String pathAndName) {
+        return pathAndName.substring(getFileNameStartPosition(pathAndName));
+    }
+
+    public static String getFilePath(String pathAndName) {
+        int end = pathAndName.lastIndexOf('/');
+        if (end<0) {
+            end = pathAndName.lastIndexOf('\\');
+            if (end<0) {
+                return "";
+            }
+        }
+        return pathAndName.substring(0, end);
+    }
+
+    public static String getExtName(String fileName) {
+        int end = fileName.lastIndexOf('.');
+        if (end>=0) {
+            return fileName.substring(end+1);
+        }
+        return null;
+    }
+
+    public static boolean write(String pathAndName, String content) throws IOException {
+        File file = new File(pathAndName);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
+        FileWriter fw = new FileWriter(file.getAbsoluteFile());
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(content);
+        bw.close();
+
+        return true;
+    }
+}

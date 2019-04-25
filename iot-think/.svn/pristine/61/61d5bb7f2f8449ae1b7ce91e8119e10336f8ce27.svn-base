@@ -1,0 +1,193 @@
+package com.rz.iot.think.service.impl;
+
+import com.rz.iot.think.mapper.alarm.IotAlarmBoxMapper;
+import com.rz.iot.think.model.alarm.IotAlarmBox;
+import com.rz.iot.think.model.param.IotAlarmBoxRecorderSelectParam;
+import com.rz.iot.think.model.param.IotAlarmBoxRecorderStatusUpdateParam;
+import com.rz.iot.think.service.AggregationAlarmService;
+import com.rz.iot.think.aggregation.warn.HCNetSDK;
+import com.sun.jna.NativeLong;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by qinxian on 2019/4/17 0017.
+ */
+@Service("aggregationAlarmService")
+public class AggregationAlarmServiceImpl implements AggregationAlarmService {
+    @Resource
+    private IotAlarmBoxMapper iotAlarmBoxMapper;//报警盒
+
+    private HCNetSDK hcNetSDK = HCNetSDK.INSTANCE;//海康威视SDK
+
+    @Override
+    public IotAlarmBoxRecorderStatusUpdateParam findAlarmWorkInfo(Integer id) {
+
+        if(id == null)
+            return null;
+
+        NativeLong lUserID  = this.alarmLogin(id);//注册
+
+        HCNetSDK.NET_DVR_WORKSTATE_V30 lpWorkState = new HCNetSDK.NET_DVR_WORKSTATE_V30();//SDK中的工作状态实体类
+
+        if(lUserID.longValue() > -1)//注册成功
+            hcNetSDK.NET_DVR_GetDVRWorkState_V30(lUserID, lpWorkState);
+        else//注册失败
+            lpWorkState.dwDeviceStatic = -1;//判定为离线
+
+        this.alarmLogout(lUserID);//注销
+
+        return this.dataFormatAlarmWorkStatus(lpWorkState,id);
+    }
+
+    @Override
+    public List<IotAlarmBoxRecorderSelectParam> findAlarmLog(Integer id, Integer type, Date struStartTime, Date struEndTime, Integer wMajorType, Integer wMinorType) {
+
+        if(id == null || (type > 3 && type < 0))
+            return null;
+
+        NativeLong lUserID  = this.alarmLogin(id);//注册
+
+        HCNetSDK.NET_DVR_ALARMHOST_SEARCH_LOG_PARAM lpSearchParam = new HCNetSDK.NET_DVR_ALARMHOST_SEARCH_LOG_PARAM();//查询条件的实体
+        lpSearchParam.struStartTime  = this.dateFormatToNVRdate(struStartTime);//开始时间
+        lpSearchParam.struEndTime = this.dateFormatToNVRdate(struEndTime);//结束时间
+        lpSearchParam.wMajorType = wMajorType.shortValue();//主类型 1:报警2:异常3:操作4:事件
+        lpSearchParam.wMinorType = wMinorType.shortValue();//次类型 推荐为0,类型过多不做考虑
+
+        NativeLong lFindHandle = hcNetSDK.NET_DVR_FindAlarmHostLog(lUserID, type, lpSearchParam);//根据查询条件获取日志句柄
+
+        if (lFindHandle.longValue() == -1) {
+            //待补充，查询失败
+            return null;
+        }
+        List<IotAlarmBoxRecorderSelectParam> list  = this.findNextAlarmLog(lFindHandle,id);//查找数据
+
+        hcNetSDK.NET_DVR_FindAlarmHostLogClose(lFindHandle);//结束查找
+        this.alarmLogout(lUserID);//注销
+
+        return list;
+    }
+
+    /**
+     * 循环通过日志查询句柄查询数据，并将数据格式从HCNetSDK.NET_DVR_ALARMHOST_LOG_RET转为IotAlarmBoxRecorderSelectParam
+     * @param lFindHandle
+     * @param id
+     * @return
+     */
+    public List<IotAlarmBoxRecorderSelectParam> findNextAlarmLog(NativeLong lFindHandle,int id){
+        List<IotAlarmBoxRecorderSelectParam> info = new ArrayList();//日志记录信息list
+        HCNetSDK.NET_DVR_ALARMHOST_LOG_RET lpFindData = new HCNetSDK.NET_DVR_ALARMHOST_LOG_RET();//日志记录信息 单例
+
+        NativeLong next = hcNetSDK.NET_DVR_FindNextAlarmHostLog(lFindHandle, lpFindData);
+
+        while (next.longValue() != 1001 && next.longValue() != 1003 && next.longValue() != 1004){
+            if(next.longValue() != 1000) {//查询成功
+                info.add(dataFormatAlarmlog(lpFindData,id));//日志格式转换
+                lpFindData.clear();//初始化
+            }
+            else if(next.longValue() != 1002){//正在查找请等待
+                //不做任何处理，继续查询。计划加个线程等待
+            }
+
+            next = hcNetSDK.NET_DVR_FindNextAlarmHostLog(lFindHandle, lpFindData);//继续查询数据
+        }
+
+        return info;
+    }
+
+    /**
+     * 初始化SDK，并注册，返回注册后的ID
+     * @param id
+     * @return
+     */
+    public NativeLong alarmLogin(Integer id){
+        NativeLong lUserID = null;
+        IotAlarmBox box = iotAlarmBoxMapper.selectByPrimaryKey(id);
+
+        HCNetSDK.NET_DVR_DEVICEINFO_V30 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V30();//注册返回的数据实体
+        boolean initSuc = hcNetSDK.NET_DVR_Init();//初始化SDK
+        lUserID = hcNetSDK.NET_DVR_Login_V30(box.getIp(), (short) box.getPort().intValue(), "admin", "Rz123456", m_strDeviceInfo);//注册
+
+        return lUserID;
+    }
+
+    /**
+     * 根据ID注销，并释放SDK资源
+     * @param lUserID
+     * @return
+     */
+    public void alarmLogout(NativeLong lUserID){
+        if(lUserID.longValue() <= -1){
+            return;
+        }
+
+        boolean temp1 = hcNetSDK.NET_DVR_Logout(lUserID);//注销
+
+        boolean temp2 = hcNetSDK.NET_DVR_Cleanup();//释放SDK资源
+
+       /* //当返回值为false使用
+        int error = hcNetSDK.NET_DVR_GetLastError();//若报错，获取错误值*/
+
+    }
+
+    /**
+     * 将Date转Calendar，取出年与日时分秒转为HCNetSDK.NET_DVR_TIME类
+     * @param time
+     * @return
+     */
+    public HCNetSDK.NET_DVR_TIME dateFormatToNVRdate(Date time){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time);
+        return new HCNetSDK.NET_DVR_TIME(
+                calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.HOUR),calendar.get(Calendar.MONTH),calendar.get(Calendar.SECOND));
+    }
+
+    /**
+     * 取出HCNetSDK.NET_DVR_TIME类中的年与日时分秒转为Calendar类，再转换为Date
+     * @param time
+     * @return
+     */
+    public Date dateFormatToDate(HCNetSDK.NET_DVR_TIME time){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(time.dwYear,time.dwMonth,time.dwDay,time.dwHour,time.dwMinute,time.dwSecond);
+        return calendar.getTime();
+    }
+
+    /**
+     * HCNetSDK.NET_DVR_ALARMHOST_LOG_RET报警盒日志类转本地java类。数据转换
+     * @param info
+     * @return
+     */
+    public IotAlarmBoxRecorderSelectParam dataFormatAlarmlog(HCNetSDK.NET_DVR_ALARMHOST_LOG_RET info,int id){
+        IotAlarmBoxRecorderSelectParam temp = new IotAlarmBoxRecorderSelectParam();
+        temp.setId(id);
+        if(info.wMinorType == 48) {//MINOR_ALARMHOST_EMERGENCY_CALL_HELP_ALARM 0x30 紧急呼叫求助报警
+            temp.setCreateTime(this.dateFormatToDate(info.struLogTime));
+            temp.setStatus(0);//报警处理状态；0：未接警；1：已接警
+        }
+        else if(info.wMinorType == 49) {//MINOR_ALARMHOST_EMERGENCY_CALL_HELP_ALARM_RESTORE 0x31 紧急呼叫求助报警恢复
+            temp.setAnswerTime(this.dateFormatToDate(info.struLogTime));
+            temp.setStatus(1);//报警处理状态；0：未接警；1：已接警
+        }
+        return temp;
+    }
+
+    public IotAlarmBoxRecorderStatusUpdateParam dataFormatAlarmWorkStatus(HCNetSDK.NET_DVR_WORKSTATE_V30 info,int id){
+        IotAlarmBoxRecorderStatusUpdateParam temp = new IotAlarmBoxRecorderStatusUpdateParam();
+        temp.setBoxId(id);
+        if(info.dwDeviceStatic == 0)//设备的状态：0－正常；1－CPU占用率太高，超过85%；2－硬件错误，例如串口异常
+            temp.setStatus(1);
+        else if(info.dwDeviceStatic == 1 || info.dwDeviceStatic == 2)
+            temp.setStatus(3);
+        else
+            temp.setStatus(2);
+        return temp;
+    }
+
+}

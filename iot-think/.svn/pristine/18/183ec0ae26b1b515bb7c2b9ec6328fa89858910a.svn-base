@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.screen.IotScreenProgramInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.screen.IotScreenProgramInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="height" property="height" jdbcType="INTEGER" />
+    <result column="width" property="width" jdbcType="INTEGER" />
+    <result column="total_size" property="totalSize" jdbcType="INTEGER" />
+    <result column="program_length" property="programLength" jdbcType="INTEGER" />
+    <result column="resolution" property="resolution" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="create_admin" property="createAdmin" jdbcType="INTEGER" />
+    <result column="verify" property="verify" jdbcType="INTEGER" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, height, width, total_size, program_length, resolution, type, create_admin, 
+    verify, `describe`, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_screen_program_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_screen_program_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.screen.IotScreenProgramInfo" >
+    insert into iot_screen_program_info (id, name, height, 
+      width, total_size, program_length, 
+      resolution, type, create_admin, 
+      verify, `describe`, status,
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{height,jdbcType=INTEGER}, 
+      #{width,jdbcType=INTEGER}, #{totalSize,jdbcType=INTEGER}, #{programLength,jdbcType=INTEGER}, 
+      #{resolution,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{createAdmin,jdbcType=INTEGER}, 
+      #{verify,jdbcType=INTEGER}, #{describe,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.screen.IotScreenProgramInfo" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
+    insert into iot_screen_program_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="height != null" >
+        height,
+      </if>
+      <if test="width != null" >
+        width,
+      </if>
+      <if test="totalSize != null" >
+        total_size,
+      </if>
+      <if test="programLength != null" >
+        program_length,
+      </if>
+      <if test="resolution != null" >
+        resolution,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="createAdmin != null" >
+        create_admin,
+      </if>
+      <if test="verify != null" >
+        verify,
+      </if>
+      <if test="describe != null" >
+        `describe`,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="height != null" >
+        #{height,jdbcType=INTEGER},
+      </if>
+      <if test="width != null" >
+        #{width,jdbcType=INTEGER},
+      </if>
+      <if test="totalSize != null" >
+        #{totalSize,jdbcType=INTEGER},
+      </if>
+      <if test="programLength != null" >
+        #{programLength,jdbcType=INTEGER},
+      </if>
+      <if test="resolution != null" >
+        #{resolution,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="createAdmin != null" >
+        #{createAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="verify != null" >
+        #{verify,jdbcType=INTEGER},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.screen.IotScreenProgramInfo" >
+    update iot_screen_program_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="height != null" >
+        height = #{height,jdbcType=INTEGER},
+      </if>
+      <if test="width != null" >
+        width = #{width,jdbcType=INTEGER},
+      </if>
+      <if test="totalSize != null" >
+        total_size = #{totalSize,jdbcType=INTEGER},
+      </if>
+      <if test="programLength != null" >
+        program_length = #{programLength,jdbcType=INTEGER},
+      </if>
+      <if test="resolution != null" >
+        resolution = #{resolution,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="createAdmin != null" >
+        create_admin = #{createAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="verify != null" >
+        verify = #{verify,jdbcType=INTEGER},
+      </if>
+      <if test="describe != null" >
+        `describe` = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.screen.IotScreenProgramInfo" >
+    update iot_screen_program_info
+    set name = #{name,jdbcType=VARCHAR},
+      height = #{height,jdbcType=INTEGER},
+      width = #{width,jdbcType=INTEGER},
+      total_size = #{totalSize,jdbcType=INTEGER},
+      program_length = #{programLength,jdbcType=INTEGER},
+      resolution = #{resolution,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      create_admin = #{createAdmin,jdbcType=INTEGER},
+      verify = #{verify,jdbcType=INTEGER},
+      `describe` = #{describe,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <resultMap id="ResultMapFindList" type="com.rz.iot.think.model.show.IotScreenProgramInfoShowList" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="height" property="height" jdbcType="INTEGER" />
+    <result column="width" property="width" jdbcType="INTEGER" />
+    <result column="resolution" property="resolution" jdbcType="VARCHAR" />
+    <result column="create_user" property="createUser"/>
+    <result column="verify" property="verify" jdbcType="INTEGER" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <!--信息屏节目列表-->
+  <select id="findList" resultMap="ResultMapFindList">
+    SELECT
+      *
+    FROM
+      (
+        SELECT
+          program_info.id,
+          program_info.name,
+          program_info.`describe`,
+          user.name create_user,
+          program_info.status,
+          program_info.verify,
+          program_info.width,
+          program_info.height,
+          program_info.resolution,
+          program_info.update_time
+        FROM
+          iot_screen_program_info program_info
+        LEFT JOIN iot_business_user_rel business_user_rel ON business_user_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL} AND business_user_rel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_SCREEN_PROGRAM}
+        LEFT JOIN user_info user ON program_info.create_admin = user.id AND user.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+        WHERE
+          program_info.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+        AND
+          (
+            CASE
+            (
+              SELECT type
+              FROM user_info
+              WHERE id = #{userId}
+            )
+            WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+              THEN
+                business_user_rel.user_id = #{userId} AND business_user_rel.business_id = program_info.id
+            WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+              THEN
+                true
+            END
+          )
+        GROUP BY program_info.id
+      ) t
+    <where>
+      <if test="param.name != null and param.name != ''">
+        AND t.name LIKE CONCAT("%",#{param.name},"%")
+      </if>
+      <if test="param.status != null">
+        AND t.status = #{param.status}
+      </if>
+      <if test="param.userId != null">
+        AND t.create_admin = #{param.userId}
+      </if>
+    </where>
+  </select>
+
+  <!--审核节目通过或不通过-->
+  <update id="verifyProgram">
+    UPDATE iot_screen_program_info SET verify = #{param.verify}
+    WHERE id IN
+    <foreach collection="param.programIds" item="programId" open="(" separator="," close=")">
+      #{programId}
+    </foreach>
+  </update>
+</mapper>

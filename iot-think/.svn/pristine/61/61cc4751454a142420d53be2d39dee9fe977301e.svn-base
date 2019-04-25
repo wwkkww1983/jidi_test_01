@@ -1,0 +1,26 @@
+package com.rz.iot.think.mapper;
+
+import com.rz.iot.think.model.IotMonitor;
+import com.rz.iot.think.model.show.IotStreetlightInstallDevForNoBinding;
+
+import java.util.List;
+
+public interface IotMonitorMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(IotMonitor record);
+
+    int insertSelective(IotMonitor record);
+
+    IotMonitor selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(IotMonitor record);
+
+    int updateByPrimaryKey(IotMonitor record);
+
+    /**
+     * 查找未与路灯绑定的摄像头
+     * @return
+     */
+    List<IotStreetlightInstallDevForNoBinding> findNoBinding();
+}

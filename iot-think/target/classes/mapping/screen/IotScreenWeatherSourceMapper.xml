@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.screen.IotScreenWeatherSourceMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.screen.IotScreenWeatherSource" >
+    <id column="pk_id" property="pkId" jdbcType="INTEGER" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="html" property="html" jdbcType="VARCHAR" />
+    <result column="line_height" property="lineHeight" jdbcType="DOUBLE" />
+    <result column="left" property="left" jdbcType="INTEGER" />
+    <result column="top" property="top" jdbcType="INTEGER" />
+    <result column="width" property="width" jdbcType="INTEGER" />
+    <result column="height" property="height" jdbcType="INTEGER" />
+    <result column="play_time" property="playTime" jdbcType="INTEGER" />
+    <result column="time_span" property="timeSpan" jdbcType="INTEGER" />
+    <result column="entry_effect_str" property="entryEffectStr" jdbcType="VARCHAR" />
+    <result column="exit_effect_str" property="exitEffectStr" jdbcType="VARCHAR" />
+    <result column="entry_effect_time_span" property="entryEffectTimeSpan" jdbcType="INTEGER" />
+    <result column="exit_effect_time_span" property="exitEffectTimeSpan" jdbcType="INTEGER" />
+    <result column="_type" property="type" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    pk_id, id, city, code, name, html, line_height, left, top, width, height, play_time, 
+    time_span, entry_effect_str, exit_effect_str, entry_effect_time_span, exit_effect_time_span, 
+    _type, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_screen_weather_source
+    where pk_id = #{pkId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_screen_weather_source
+    where pk_id = #{pkId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.screen.IotScreenWeatherSource" >
+    insert into iot_screen_weather_source (pk_id, id, city, 
+      code, name, html, line_height, 
+      left, top, width, height, 
+      play_time, time_span, entry_effect_str, 
+      exit_effect_str, entry_effect_time_span, exit_effect_time_span, 
+      _type, status, create_time, 
+      update_time)
+    values (#{pkId,jdbcType=INTEGER}, #{id,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
+      #{code,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{html,jdbcType=VARCHAR}, #{lineHeight,jdbcType=DOUBLE}, 
+      #{left,jdbcType=INTEGER}, #{top,jdbcType=INTEGER}, #{width,jdbcType=INTEGER}, #{height,jdbcType=INTEGER}, 
+      #{playTime,jdbcType=INTEGER}, #{timeSpan,jdbcType=INTEGER}, #{entryEffectStr,jdbcType=VARCHAR}, 
+      #{exitEffectStr,jdbcType=VARCHAR}, #{entryEffectTimeSpan,jdbcType=INTEGER}, #{exitEffectTimeSpan,jdbcType=INTEGER}, 
+      #{type,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.screen.IotScreenWeatherSource" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    insert into iot_screen_weather_source
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pkId != null" >
+        pk_id,
+      </if>
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="city != null" >
+        city,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="html != null" >
+        html,
+      </if>
+      <if test="lineHeight != null" >
+        line_height,
+      </if>
+      <if test="left != null" >
+        left,
+      </if>
+      <if test="top != null" >
+        top,
+      </if>
+      <if test="width != null" >
+        width,
+      </if>
+      <if test="height != null" >
+        height,
+      </if>
+      <if test="playTime != null" >
+        play_time,
+      </if>
+      <if test="timeSpan != null" >
+        time_span,
+      </if>
+      <if test="entryEffectStr != null" >
+        entry_effect_str,
+      </if>
+      <if test="exitEffectStr != null" >
+        exit_effect_str,
+      </if>
+      <if test="entryEffectTimeSpan != null" >
+        entry_effect_time_span,
+      </if>
+      <if test="exitEffectTimeSpan != null" >
+        exit_effect_time_span,
+      </if>
+      <if test="type != null" >
+        _type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pkId != null" >
+        #{pkId,jdbcType=INTEGER},
+      </if>
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="html != null" >
+        #{html,jdbcType=VARCHAR},
+      </if>
+      <if test="lineHeight != null" >
+        #{lineHeight,jdbcType=DOUBLE},
+      </if>
+      <if test="left != null" >
+        #{left,jdbcType=INTEGER},
+      </if>
+      <if test="top != null" >
+        #{top,jdbcType=INTEGER},
+      </if>
+      <if test="width != null" >
+        #{width,jdbcType=INTEGER},
+      </if>
+      <if test="height != null" >
+        #{height,jdbcType=INTEGER},
+      </if>
+      <if test="playTime != null" >
+        #{playTime,jdbcType=INTEGER},
+      </if>
+      <if test="timeSpan != null" >
+        #{timeSpan,jdbcType=INTEGER},
+      </if>
+      <if test="entryEffectStr != null" >
+        #{entryEffectStr,jdbcType=VARCHAR},
+      </if>
+      <if test="exitEffectStr != null" >
+        #{exitEffectStr,jdbcType=VARCHAR},
+      </if>
+      <if test="entryEffectTimeSpan != null" >
+        #{entryEffectTimeSpan,jdbcType=INTEGER},
+      </if>
+      <if test="exitEffectTimeSpan != null" >
+        #{exitEffectTimeSpan,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.screen.IotScreenWeatherSource" >
+    update iot_screen_weather_source
+    <set >
+      <if test="id != null" >
+        id = #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="html != null" >
+        html = #{html,jdbcType=VARCHAR},
+      </if>
+      <if test="lineHeight != null" >
+        line_height = #{lineHeight,jdbcType=DOUBLE},
+      </if>
+      <if test="left != null" >
+        left = #{left,jdbcType=INTEGER},
+      </if>
+      <if test="top != null" >
+        top = #{top,jdbcType=INTEGER},
+      </if>
+      <if test="width != null" >
+        width = #{width,jdbcType=INTEGER},
+      </if>
+      <if test="height != null" >
+        height = #{height,jdbcType=INTEGER},
+      </if>
+      <if test="playTime != null" >
+        play_time = #{playTime,jdbcType=INTEGER},
+      </if>
+      <if test="timeSpan != null" >
+        time_span = #{timeSpan,jdbcType=INTEGER},
+      </if>
+      <if test="entryEffectStr != null" >
+        entry_effect_str = #{entryEffectStr,jdbcType=VARCHAR},
+      </if>
+      <if test="exitEffectStr != null" >
+        exit_effect_str = #{exitEffectStr,jdbcType=VARCHAR},
+      </if>
+      <if test="entryEffectTimeSpan != null" >
+        entry_effect_time_span = #{entryEffectTimeSpan,jdbcType=INTEGER},
+      </if>
+      <if test="exitEffectTimeSpan != null" >
+        exit_effect_time_span = #{exitEffectTimeSpan,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        _type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where pk_id = #{pkId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.screen.IotScreenWeatherSource" >
+    update iot_screen_weather_source
+    set id = #{id,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      code = #{code,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      html = #{html,jdbcType=VARCHAR},
+      line_height = #{lineHeight,jdbcType=DOUBLE},
+      left = #{left,jdbcType=INTEGER},
+      top = #{top,jdbcType=INTEGER},
+      width = #{width,jdbcType=INTEGER},
+      height = #{height,jdbcType=INTEGER},
+      play_time = #{playTime,jdbcType=INTEGER},
+      time_span = #{timeSpan,jdbcType=INTEGER},
+      entry_effect_str = #{entryEffectStr,jdbcType=VARCHAR},
+      exit_effect_str = #{exitEffectStr,jdbcType=VARCHAR},
+      entry_effect_time_span = #{entryEffectTimeSpan,jdbcType=INTEGER},
+      exit_effect_time_span = #{exitEffectTimeSpan,jdbcType=INTEGER},
+      _type = #{type,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where pk_id = #{pkId,jdbcType=INTEGER}
+  </update>
+
+  <!--根据节目id删除布局-->
+  <update id="delByProgramId">
+    UPDATE iot_screen_weather_source SET status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETA}
+    WHERE id IN
+    (
+      SELECT
+        program_source_rel.source_id
+      FROM
+        iot_screen_program_source_rel program_source_rel
+      WHERE
+        program_source_rel.program_id = #{programId}
+        AND program_source_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    )
+  </update>
+</mapper>

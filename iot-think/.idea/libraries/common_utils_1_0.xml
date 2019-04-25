@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="common-utils-1.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/main/resources/lib/common-utils-1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/main/resources/lib/fastdfs-client-java-1.27-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/main/resources/lib/jave-1.0.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

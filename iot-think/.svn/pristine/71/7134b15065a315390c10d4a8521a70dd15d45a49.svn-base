@@ -1,0 +1,36 @@
+package com.rz.iot.think.configuration;
+
+
+import com.rz.iot.think.websocket.screen.ScreenHeartbeat;
+import com.rz.iot.think.websocket.screen.ScreenWebSocketHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+
+/**
+ * @Auther: yyjuan
+ * @Date: 2019/3/20 0020 10:49
+ * @Description: 定时任务
+ */
+@Component
+@Slf4j
+public class IOTTask {
+
+    @Resource
+    private ScreenHeartbeat screenheartbeat;
+
+    /**
+     *     信息屏心跳
+     *     每隔60秒循环发送心跳信息
+     */
+    @Scheduled(cron = "0/60 * * * * ?")
+    public void screen_HeartbeatStart(){
+        log.debug("Heartbeat update start of screen ");
+
+            for(String key : ScreenWebSocketHandler.socketSessionMap.keySet()){
+                screenheartbeat.heartbeatSend(key);
+            }
+    }
+}

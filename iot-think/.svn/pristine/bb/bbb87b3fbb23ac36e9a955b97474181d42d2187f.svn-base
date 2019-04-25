@@ -1,0 +1,175 @@
+package com.rz.iot.think.service.impl;
+
+import com.drew.imaging.ImageProcessingException;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rz.iot.think.mapper.screen.IotScreenPicInfoMapper;
+import com.rz.iot.think.model.Page;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.screen.IotScreenPicInfo;
+import com.rz.iot.think.service.IotScreenPicInfoService;
+import com.rz.iot.think.utils.FastDFSUtils;
+import com.rz.iot.think.utils.ImageUtil;
+import com.rz.iot.think.utils.PropertiesUtil;
+import com.rz.iot.utils.MD5;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.csource.common.MyException;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import java.io.*;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Author:jidi
+ * @Date:2019/04/01 16:11
+ * @Description:屏幕播放素材（图片）操作实现类
+ **/
+@Log4j2
+@Service("lotScreenPicInfoService")
+public class IotScreenPicInfoImpl implements IotScreenPicInfoService {
+
+    @Resource
+    private IotScreenPicInfoMapper iotScreenPicInfoMapper;
+
+    /**
+     * @Desc:分页查询所有的未被删除的屏幕播放素材（视频）
+     */
+    @Override
+    public Result findAll(Page<IotScreenPicInfo> page) {
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<IotScreenPicInfo> list = iotScreenPicInfoMapper.findAll();
+        PageInfo<IotScreenPicInfo> pageInfo = new PageInfo<>(list);
+        page.setOtherParam(pageInfo);
+        Result result = new Result();
+        result.setData(page);
+        return result;
+    }
+
+    /**
+     * @Desc:根据素材名和上传者分页查询所有的未被删除的屏幕播放素材（视频）
+     */
+    @Override
+    public Result findAllByCondition(Page<IotScreenPicInfo> page, IotScreenPicInfo iotScreenPicInfo) {
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<IotScreenPicInfo> list = iotScreenPicInfoMapper.findAllByCondition(iotScreenPicInfo);
+        PageInfo<IotScreenPicInfo> pageInfo = new PageInfo<>(list);
+        page.setOtherParam(pageInfo);
+        Result result = new Result();
+        result.setData(page);
+        return result;
+    }
+
+    /**
+     * @Desc:查询在图片来源表（iot_screen_image_source）中的图片素材
+     */
+    @Override
+    public Result findById(List<Integer> iotScreenMaterialIds) {
+        Result result = new Result();
+
+        List<IotScreenPicInfo> iotScreenPicInfoList = iotScreenPicInfoMapper.findById();
+        for(int i=0; i<iotScreenMaterialIds.size(); i++){
+            for (int j=0; j<iotScreenPicInfoList.size(); j++){
+                if(iotScreenMaterialIds.get(i) == iotScreenPicInfoList.get(j).getId()){
+                    result.setData(iotScreenPicInfoList.get(j));
+                    return result;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @Desc:批量删除记录
+     */
+    @Override
+    public Result delByIds(List<Integer> iotScreenMaterialIds) {
+        Result result = new Result();
+
+        for(Integer id:iotScreenMaterialIds){
+            iotScreenPicInfoMapper.delById(id);
+        }
+        result.setMessage("删除图片素材成功！");
+        return result;
+    }
+
+    /**
+     * @Desc:增加图片素材
+     * @param  userId 创建者id
+     * @param  file 文件
+     */
+    @Override
+    public Result addIotScreenPicInfo(Integer userId, MultipartFile file){
+        Result res = new Result();
+        IotScreenPicInfo iotScreenPicInfo = new IotScreenPicInfo();
+        //获得原始文件名
+        String originalFilename = file.getOriginalFilename();
+        //获得文件后缀名
+        String extName = originalFilename.substring(originalFilename.lastIndexOf(".") + 1, originalFilename.length());
+        //设置文件名
+        iotScreenPicInfo.setName(originalFilename);
+       try{
+           //图片上传到服务器
+           BufferedInputStream bis = new BufferedInputStream(file.getInputStream());
+           ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+           byte[] temp = new byte[1024];
+           int len = -1;
+           while((len = bis.read(temp)) != -1) {
+               baos.write(temp, 0, len);
+           }
+           FastDFSUtils fastDFSUtils = new FastDFSUtils("classpath:FastDFS.properties");
+           String path = fastDFSUtils.uploadFile(baos.toByteArray(), extName);
+           String fdfsNginxServer = PropertiesUtil.getProperty("FastDFS.properties", "fdfs_nginx_server");
+           String url = fdfsNginxServer + "/" + path;
+           iotScreenPicInfo.setPicUrl(url);
+       }catch (IOException e) {
+           log.error(e.getMessage(), e);
+       } catch (MyException e) {
+           log.error(e.getMessage(), e);
+       }
+        //图片的hash_key值
+        try {
+            String hashKey = MD5.getMd5(file.getInputStream());
+            iotScreenPicInfo.setHashKey(hashKey);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //文件大小
+        String fileSize = file.getSize()+"";
+        iotScreenPicInfo.setFileSize(Integer.parseInt(fileSize.trim()));
+        //获取图片信息
+        try {
+            Map<String, Object> picMap = ImageUtil.getImgInfo(file.getInputStream());
+            //图片高
+            Integer height = (Integer) picMap.get("imgHeight");
+            iotScreenPicInfo.setHeight(height);
+            //图片宽
+            Integer width = (Integer) picMap.get("imgWidth");
+            iotScreenPicInfo.setWidth(width);
+            //图片分辨率
+            iotScreenPicInfo.setResolution(width+"*"+height);
+        } catch (ImageProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //图片素材创建者
+        iotScreenPicInfo.setCreateAdmin(userId);
+        //增加记录
+        iotScreenPicInfoMapper.insertSelective(iotScreenPicInfo);
+        res.setData(iotScreenPicInfo);
+        res.setMessage("添加图片素材成功！");
+        return res;
+    }
+
+    /**
+     * @Desc:根据name，hashKey，createAdmin查询图片素材ID
+     */
+    @Override
+    public Integer selectIdByCondition(IotScreenPicInfo iotScreenPicInfo) {
+        return iotScreenPicInfoMapper.selectIdByCondition(iotScreenPicInfo);
+    }
+}

@@ -1,0 +1,119 @@
+
+/*
+  使用xixunplay播放器
+  json格式预览
+*/
+
+
+
+{
+  //使用熙讯播放器
+  "type": "commandXixunPlayer",
+  "command": {
+    //熙讯播放接口
+    "_type": "PlayXixunTask",
+    //使用UUID生成随机id
+    "id": "9f0f789d-6bca-40b1-86c3-560cb4f122a0",
+    //素材下载的根目录
+    "preDownloadURL": "http://192.168.3.134/",
+    //下载进度回调地址
+    "notificationURL": "http://192.168.3.134:8090/screen/getTask",
+    "task": {
+      //节目名
+      "name": "MyTask2",
+      //使用UUID生成随机id
+      "_id": "cbc3de2f-794f-46bc-9c42-13fa9e59be24",
+
+      //播放节目属性
+      "items": [{
+        "_id": "8d51fc54-e941-4d1b-9a4d-b6a74d122b97",
+        "repeatTimes": 5,
+
+        //过滤
+        "schedules":null,
+
+        //显示屏尺寸
+        "_program": {
+          "height": 512,
+          "width": 1280,
+
+          //节目名
+          "name": "MyProgram1",
+
+          //下载文件的总大小，计算错误会下载失败
+          "totalSize": 3198647,
+          "_id": "960d3df7-dc2e-4242-910b-a149fe2ca7d9",
+
+          //播放素材
+          "layers": [
+
+            //sources代表一个层级
+            //详细属性查看文档
+            {
+            "sources": [{
+              "exitEffectTimeSpan": 0,
+              "entryEffectTimeSpan": 0,
+              "exitEffect": "None",
+              "entryEffect": "None",
+              "height": 57,
+              "width": 202,
+              "top": 0,
+              "left": 661,
+              "timeSpan": 30,
+              "playTime": 0,
+              "language": "en",
+              "timezone": 8,
+              "lineHeight": 1.4,
+              "html": "%w, %Mw %d %y<br />\n%h:%m:%s %am",
+              "_type": "DigitalClock",
+              "name": "DigitalClock",
+              "id": ""
+            },
+              {
+                "exitEffectTimeSpan": 0,
+                "entryEffectTimeSpan": 0,
+                "exitEffect": "None",
+                "entryEffect": "None",
+                "height": 256,
+                "width": 640,
+                "top": 10,
+                "left": 100,
+                "timeSpan": 10,
+                "playTime": 40,
+                "html": "Please write something..单行文本.",
+                "speed": 20,
+                "lineHeight": 1.4,
+                "_type": "SingleLineText",
+                "name": "SingleText",
+                "id": ""
+              }
+
+            ],
+            "repeat": false
+          },
+            {
+              "sources": [{
+                "exitEffectTimeSpan": 0,
+                "entryEffectTimeSpan": 0,
+                "exitEffect": "None",
+                "entryEffect": "None",
+                "height": 400,
+                "width": 600,
+                "top": 9,
+                "left": 50,
+                "timeSpan": 25,
+                "playTime": 0,
+                "id": "0315-1.mp4",
+                "size": 3198647,
+                "name": "0315-1.mp4",
+                "md5": "fd36f087d2b2829bb40c4d40838a2389",
+                "_type": "Video"
+              }],
+              "repeat": false
+            }
+          ]
+        }
+      }]
+    }
+  }
+}

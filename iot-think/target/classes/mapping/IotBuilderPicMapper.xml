@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotBuilderPicMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotBuilderPic" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="business_id" property="businessId" jdbcType="INTEGER" />
+    <result column="business_type" property="businessType" jdbcType="INTEGER" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.rz.iot.think.model.IotBuilderPic" extends="BaseResultMap" >
+    <result column="url" property="url" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, business_id, business_type, ip, user_id, status, create_time, update_time
+  </sql>
+  <sql id="Blob_Column_List" >
+    url
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from iot_builder_pic
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_builder_pic
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotBuilderPic" >
+    insert into iot_builder_pic (id, business_id, business_type, 
+      ip, user_id, status, 
+      create_time, update_time, url
+      )
+    values (#{id,jdbcType=INTEGER}, #{businessId,jdbcType=INTEGER}, #{businessType,jdbcType=INTEGER}, 
+      #{ip,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{url,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotBuilderPic" >
+    insert into iot_builder_pic
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="businessId != null" >
+        business_id,
+      </if>
+      <if test="businessType != null" >
+        business_type,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="businessId != null" >
+        #{businessId,jdbcType=INTEGER},
+      </if>
+      <if test="businessType != null" >
+        #{businessType,jdbcType=INTEGER},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <insert id="batchInsert" parameterType="java.util.List">
+    insert into iot_builder_pic
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="list[0].id != null">
+        id,
+      </if>
+      <if test="list[0].businessId != null">
+        business_id,
+      </if>
+      <if test="list[0].businessType != null">
+        business_type,
+      </if>
+      <if test="list[0].ip != null">
+        ip,
+      </if>
+      <if test="list[0].userId != null">
+        user_id,
+      </if>
+      <if test="list[0].status != null">
+        status,
+      </if>
+      <if test="list[0].createTime != null">
+        create_time,
+      </if>
+      <if test="list[0].updateTime != null">
+        update_time,
+      </if>
+      <if test="list[0].url != null">
+        url,
+      </if>
+    </trim>
+    VALUES
+    <foreach collection="list" item="item" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="item.id != null">
+          #{item.id,jdbcType=INTEGER},
+        </if>
+        <if test="item.businessId != null">
+          #{item.businessId,jdbcType=INTEGER},
+        </if>
+        <if test="item.businessType != null">
+          #{item.businessType,jdbcType=INTEGER},
+        </if>
+        <if test="item.ip != null">
+          #{item.ip,jdbcType=VARCHAR},
+        </if>
+        <if test="item.userId != null">
+          #{item.userId,jdbcType=INTEGER},
+        </if>
+        <if test="item.status != null">
+          #{item.status,jdbcType=INTEGER},
+        </if>
+        <if test="item.createTime != null">
+          #{item.createTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="item.updateTime != null">
+          #{item.updateTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="item.url != null">
+          #{item.url,jdbcType=LONGVARCHAR},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotBuilderPic" >
+    update iot_builder_pic
+    <set >
+      <if test="businessId != null" >
+        business_id = #{businessId,jdbcType=INTEGER},
+      </if>
+      <if test="businessType != null" >
+        business_type = #{businessType,jdbcType=INTEGER},
+      </if>
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.rz.iot.think.model.IotBuilderPic" >
+    update iot_builder_pic
+    set business_id = #{businessId,jdbcType=INTEGER},
+      business_type = #{businessType,jdbcType=INTEGER},
+      ip = #{ip,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      url = #{url,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotBuilderPic" >
+    update iot_builder_pic
+    set business_id = #{businessId,jdbcType=INTEGER},
+      business_type = #{businessType,jdbcType=INTEGER},
+      ip = #{ip,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findByBusinessId" resultType="string">
+    select
+    url
+    from iot_builder_pic
+    where business_id = #{businessId}
+    AND status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND business_type = #{businessType}
+  </select>
+
+  <!--批量插入-->
+  <insert id="insertBatch" useGeneratedKeys="true" keyColumn="id" keyProperty="id" parameterType="list">
+    insert into iot_builder_pic
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="list[0].id != null" >
+        id,
+      </if>
+      <if test="list[0].businessId != null" >
+        business_id,
+      </if>
+      <if test="list[0].businessType != null" >
+        business_type,
+      </if>
+      <if test="list[0].ip != null" >
+        ip,
+      </if>
+      <if test="list[0].userId != null" >
+        user_id,
+      </if>
+      <if test="list[0].status != null" >
+        status,
+      </if>
+      <if test="list[0].url != null" >
+        url,
+      </if>
+    </trim>
+    values
+    <foreach collection="list" item="item" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+        <if test="list[0].id != null" >
+          #{list[0].id,jdbcType=INTEGER},
+        </if>
+        <if test="list[0].businessId != null" >
+          #{list[0].businessId,jdbcType=INTEGER},
+        </if>
+        <if test="list[0].businessType != null" >
+          #{list[0].businessType,jdbcType=INTEGER},
+        </if>
+        <if test="list[0].ip != null" >
+          #{list[0].ip,jdbcType=VARCHAR},
+        </if>
+        <if test="list[0].userId != null" >
+          #{list[0].userId,jdbcType=INTEGER},
+        </if>
+        <if test="list[0].status != null" >
+          #{list[0].status,jdbcType=INTEGER},
+        </if>
+        <if test="list[0].url != null" >
+          #{list[0].url,jdbcType=LONGVARCHAR},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+
+  <!--根据业务id、业务类型删除-->
+  <update id="delByBusinessId">
+    UPDATE iot_builder_pic SET status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE} WHERE business_id = #{businessId} AND business_type = #{businessType}
+  </update>
+</mapper>

@@ -1,0 +1,34 @@
+package com.rz.iot.think.service;
+
+import com.rz.iot.think.model.Result;
+
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * @Auther: yyjuan
+ * @Date: 2019/3/22 0022 11:08
+ * @Description:
+ */
+public interface IotScreenPlayStrategyService {
+
+    /**
+     * 信息屏播放详情
+     * @param playStrategyId 策略id
+     * @return
+     */
+    Result detail(Integer playStrategyId);
+
+    /**
+     * 下发信息屏播放策略
+     * @param playStrategyId 播放策略id
+     * @return
+     */
+    Result sendStrategy(Integer playStrategyId, String cardId);
+
+    /**
+     * 信息屏下载素材的接口
+     * @param key
+     * @param response
+     */
+    void downloadMaterial(String key, HttpServletResponse response);
+}

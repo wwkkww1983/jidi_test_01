@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotMonitorMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotMonitor" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sn" property="sn" jdbcType="VARCHAR" />
+    <result column="serial_number" property="serialNumber" jdbcType="VARCHAR" />
+    <result column="model_number" property="modelNumber" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="net_type" property="netType" jdbcType="INTEGER" />
+    <result column="firmware_version" property="firmwareVersion" jdbcType="VARCHAR" />
+    <result column="code_version" property="codeVersion" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="INTEGER" />
+    <result column="mac" property="mac" jdbcType="VARCHAR" />
+    <result column="manufacturer" property="manufacturer" jdbcType="VARCHAR" />
+    <result column="install_place" property="installPlace" jdbcType="REAL" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, sn, serial_number, model_number, status, net_type, firmware_version, code_version, 
+    ip, port, mac, manufacturer, install_place, `describe`, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_monitor
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_monitor
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotMonitor" >
+    insert into iot_monitor (id, name, sn, 
+      serial_number, model_number, status, 
+      net_type, firmware_version, code_version, 
+      ip, port, mac, manufacturer, 
+      install_place, `describe`, create_time,
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{sn,jdbcType=VARCHAR}, 
+      #{serialNumber,jdbcType=VARCHAR}, #{modelNumber,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{netType,jdbcType=INTEGER}, #{firmwareVersion,jdbcType=VARCHAR}, #{codeVersion,jdbcType=VARCHAR}, 
+      #{ip,jdbcType=VARCHAR}, #{port,jdbcType=INTEGER}, #{mac,jdbcType=VARCHAR}, #{manufacturer,jdbcType=VARCHAR}, 
+      #{installPlace,jdbcType=REAL}, #{describe,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotMonitor" >
+    insert into iot_monitor
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="sn != null" >
+        sn,
+      </if>
+      <if test="serialNumber != null" >
+        serial_number,
+      </if>
+      <if test="modelNumber != null" >
+        model_number,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="netType != null" >
+        net_type,
+      </if>
+      <if test="firmwareVersion != null" >
+        firmware_version,
+      </if>
+      <if test="codeVersion != null" >
+        code_version,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="port != null" >
+        port,
+      </if>
+      <if test="mac != null" >
+        mac,
+      </if>
+      <if test="manufacturer != null" >
+        manufacturer,
+      </if>
+      <if test="installPlace != null" >
+        install_place,
+      </if>
+      <if test="describe != null" >
+        `describe`,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        #{sn,jdbcType=VARCHAR},
+      </if>
+      <if test="serialNumber != null" >
+        #{serialNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="modelNumber != null" >
+        #{modelNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="netType != null" >
+        #{netType,jdbcType=INTEGER},
+      </if>
+      <if test="firmwareVersion != null" >
+        #{firmwareVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="codeVersion != null" >
+        #{codeVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null" >
+        #{port,jdbcType=INTEGER},
+      </if>
+      <if test="mac != null" >
+        #{mac,jdbcType=VARCHAR},
+      </if>
+      <if test="manufacturer != null" >
+        #{manufacturer,jdbcType=VARCHAR},
+      </if>
+      <if test="installPlace != null" >
+        #{installPlace,jdbcType=REAL},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotMonitor" >
+    update iot_monitor
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        sn = #{sn,jdbcType=VARCHAR},
+      </if>
+      <if test="serialNumber != null" >
+        serial_number = #{serialNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="modelNumber != null" >
+        model_number = #{modelNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="netType != null" >
+        net_type = #{netType,jdbcType=INTEGER},
+      </if>
+      <if test="firmwareVersion != null" >
+        firmware_version = #{firmwareVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="codeVersion != null" >
+        code_version = #{codeVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null" >
+        port = #{port,jdbcType=INTEGER},
+      </if>
+      <if test="mac != null" >
+        mac = #{mac,jdbcType=VARCHAR},
+      </if>
+      <if test="manufacturer != null" >
+        manufacturer = #{manufacturer,jdbcType=VARCHAR},
+      </if>
+      <if test="installPlace != null" >
+        install_place = #{installPlace,jdbcType=REAL},
+      </if>
+      <if test="describe != null" >
+        `describe` = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotMonitor" >
+    update iot_monitor
+    set name = #{name,jdbcType=VARCHAR},
+      sn = #{sn,jdbcType=VARCHAR},
+      serial_number = #{serialNumber,jdbcType=VARCHAR},
+      model_number = #{modelNumber,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      net_type = #{netType,jdbcType=INTEGER},
+      firmware_version = #{firmwareVersion,jdbcType=VARCHAR},
+      code_version = #{codeVersion,jdbcType=VARCHAR},
+      ip = #{ip,jdbcType=VARCHAR},
+      port = #{port,jdbcType=INTEGER},
+      mac = #{mac,jdbcType=VARCHAR},
+      manufacturer = #{manufacturer,jdbcType=VARCHAR},
+      install_place = #{installPlace,jdbcType=REAL},
+      `describe` = #{describe,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <resultMap id="ResultMapNoBinding" type="com.rz.iot.think.model.show.IotStreetlightInstallDevForNoBinding">
+    <result column="id" property="id" ></result>
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sn" property="sn" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="net_type" property="netType" jdbcType="INTEGER" />
+    <result column="firmware_version" property="version" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="INTEGER" />
+    <result column="mac" property="mac" jdbcType="VARCHAR" />
+    <result column="manufacturer" property="manufacturer" jdbcType="VARCHAR" />
+    <result column="install_place" property="installPlace" jdbcType="REAL" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!--查找未与路灯绑定的摄像头-->
+  <select id="findNoBinding" resultMap="ResultMapNoBinding">
+    SELECT
+      t1.id id,
+      t1.name name,
+      t1.sn sn,
+      t1.status status,
+      t1.net_type net_type,
+      t1.firmware_version version,
+      t1.ip ip,
+      t1.port port,
+      t1.mac mac,
+      t1.manufacturer manufacturer,
+      t1.install_place install_place,
+      t1.`describe` `describe`
+    FROM
+      (
+        SELECT monitor.*
+        FROM
+          iot_monitor monitor
+        WHERE monitor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+      ) t1
+        LEFT JOIN
+      (
+        SELECT monitor.*
+        FROM
+          iot_monitor monitor
+          LEFT JOIN iot_streetlight_install_dev_rel install_dev_rel
+            ON install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL} AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_CAMERA}
+        WHERE
+          monitor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+          AND monitor.id = install_dev_rel.dev_id
+      ) t2
+      ON t1.id = t2.id
+    WHERE
+      t2.id IS NULL
+  </select>
+
+  <!--获取摄像头信息列表-->
+  <select id="getMonitorList" resultType="com.rz.iot.think.model.show.MonitorList">
+    SELECT monitor.name monitorName,
+           monitor.sn   monitorSn,
+           monitor.model_number monitorModelNumber,
+           monitor.status monitorStatus,
+           monitor.update_time,
+           monitor.manufacturer,
+           streetlight.name streetlightName
+    FROM iot_monitor monitor
+    LEFT JOIN iot_streetlight_install_dev_rel dev ON dev.dev_id = monitor.id AND dev_type=1
+    LEFT JOIN iot_streetlight streetlight ON dev.streetlight_id = streetlight.id
+    LEFT JOIN iot_business_user_rel business_user_rel ON business_user_rel.business_type = 2
+    WHERE monitor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+      AND
+      (
+        CASE
+          (
+            SELECT type
+            FROM user_info
+            WHERE id = #{userId}
+          )
+          WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+            THEN
+              business_user_rel.user_id = #{userId} AND business_user_rel.business_id = streetlight.id
+          WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+            THEN
+            true
+          END
+        )
+    <if test="param.monitorName != null">
+      AND monitor.name LIKE CONCAT('%', #{param.monitorName}, '%')
+    </if>
+    <if test="param.monitorModelName != null">
+      AND monitor.model_number = #{param.modelName}
+    </if>
+    <if test="param.monitorStatus != null">
+      AND monitor.status = #{param.monitorStatus}
+    </if>
+    <if test="param.monitorStatus != null">
+      AND monitor.sn = #{param.monitorSn}
+    </if>
+  </select>
+
+  <!--根据摄像头sn获取摄像头详细信息-->
+  <select id="getDetailBySn" resultType="com.rz.iot.think.model.show.MonitorDetail">
+    SELECT monitor.name          monitorName,
+           monitor.sn            monitorSn,
+           monitor.status        monitorStatus,
+           monitor.ip            monitorIp,
+           monitor.model_number  modelNumber,
+           monitor.manufacturer  manufacturer,
+           monitor.install_place installPlace,
+           monitor.code_version  version,
+           monitor.net_type      netType,
+           streetlight.name      streetlightName,
+           streetlight.lng       lng,
+           streetlight.lat       lat,
+           areaRel.district_name districtName,
+           road.road_name        roadName
+    FROM iot_monitor monitor
+           LEFT JOIN iot_streetlight_install_dev_rel dev ON dev.dev_id = monitor.id AND dev_type = 1
+           LEFT JOIN iot_streetlight streetlight ON streetlight.id = dev.streetlight_id
+           LEFT JOIN iot_area_rel areaRel ON streetlight.area_rel_id = areaRel.id
+           LEFT JOIN iot_area_city_road road ON road.id = streetlight.road_id
+           LEFT JOIN iot_business_user_rel business_user_rel ON business_user_rel.business_type = 2
+    WHERE monitor.sn = #{monitorSn}
+      AND monitor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+      AND (
+      CASE
+        (
+          SELECT type
+          FROM user_info
+          WHERE id = #{userId}
+        )
+        WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+          THEN
+            business_user_rel.user_id = #{userId} AND business_user_rel.business_id = streetlight.id
+        WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+          THEN
+          true
+        END
+      )
+  </select>
+
+  <!--更新摄像头名称-->
+  <update id="updateMonitorInfo " >
+    UPDATE iot_monitor
+    <set>
+      <if test="param.monitorName != null">
+        name = #{param.monitorName},
+      </if>
+      <if test="param.installPlace != null">
+        install_place = #{param.installPlace}
+      </if>
+    </set>
+
+    WHERE sn = #{param.monitorSn}
+  </update>
+
+  <resultMap id="ResultMapDetailForStreetLight" type="com.rz.iot.think.model.show.IotStreetlightInstallDevShowDetail">
+    <result property="id" column="id"></result>
+    <result property="name" column="name"></result>
+    <result property="sn" column="sn"></result>
+    <result property="provinceId" column="province_id"></result>
+    <result property="provinceName" column="province_name"></result>
+    <result property="cityId" column="city_id"></result>
+    <result property="cityName" column="city_name"></result>
+    <result property="districtId" column="district_id"></result>
+    <result property="districtName" column="district_name"></result>
+    <result property="roadId" column="road_id"></result>
+    <result property="roadName" column="road_name"></result>
+    <result property="netType" column="net_type"></result>
+    <result property="version" column="code_version"></result>
+    <result property="modelNumber" column="model_number"></result>
+    <result property="streetLightName" column="streetlight_name"></result>
+    <result property="status" column="status"></result>
+    <result property="installPlace" column="install_place"></result>
+    <result property="manufacturer" column="manufacturer"></result>
+  </resultMap>
+
+  <!--摄像头详情（路灯管理）-->
+  <select id="detailForStreetLight" resultMap="ResultMapDetailForStreetLight">
+    SELECT
+      monitor.id,
+      monitor.name,
+      monitor.sn,
+      area_rel.province_id,
+      area_rel.province_name,
+      area_rel.city_id,
+      area_rel.city_name,
+      area_rel.district_id,
+      area_rel.district_name,
+      road.id road_id,
+      road.road_name,
+      monitor.net_type,
+      monitor.code_version,
+      monitor.model_number,
+      t.streetlight_name,
+      monitor.status,
+      monitor.install_place,
+      monitor.manufacturer
+    FROM
+      iot_monitor monitor
+      LEFT JOIN
+      (
+        SELECT
+          streetlight_install_dev_rel.dev_id,
+          streetlight.name streetlight_name,
+          streetlight.area_rel_id,
+          streetlight.road_id
+        FROM
+          iot_streetlight_install_dev_rel streetlight_install_dev_rel,
+          iot_streetlight streetlight
+        WHERE
+          streetlight.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+          AND streetlight_install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND streetlight_install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_CAMERA}
+          AND streetlight.id = streetlight_install_dev_rel.streetlight_id
+      ) t
+        ON t.dev_id = monitor.id
+      LEFT JOIN iot_area_rel area_rel ON area_rel.id = t.area_rel_id AND area_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      LEFT JOIN iot_area_city_road road ON road.id = t.road_id
+    WHERE
+      monitor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+      AND monitor.id = #{monitorId}
+  </select>
+
+</mapper>

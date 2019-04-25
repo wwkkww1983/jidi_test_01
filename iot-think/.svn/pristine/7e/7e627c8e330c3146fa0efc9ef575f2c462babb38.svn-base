@@ -1,0 +1,38 @@
+package com.rz.iot.think;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+@SpringBootApplication
+@MapperScan("com.rz.iot.think.mapper")
+@EnableTransactionManagement
+@EnableScheduling
+@EnableAsync
+public class IotThinkApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(IotThinkApplication.class, args);
+    }
+
+
+    /**
+     * 设置定时任务默认线程数
+     * @return
+     */
+    @Bean
+    public TaskScheduler taskScheduler(){
+
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(50);
+        taskScheduler.initialize();
+        return taskScheduler;
+    }
+
+}

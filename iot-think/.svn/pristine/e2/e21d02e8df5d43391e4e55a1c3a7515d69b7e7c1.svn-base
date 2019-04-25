@@ -1,0 +1,169 @@
+package com.rz.iot.think.configuration;
+
+
+import com.rz.iot.think.model.alarm.IotAlarmBox;
+import com.rz.iot.think.model.alarm.IotAlarmBoxRecord;
+import com.rz.iot.think.model.alarm.IotAlarmBoxRecordLog;
+import com.rz.iot.think.model.param.IotAlarmBoxRecorderSelectParam;
+import com.rz.iot.think.model.param.IotAlarmBoxRecorderStatusUpdateParam;
+import com.rz.iot.think.service.AggregationAlarmService;
+import com.rz.iot.think.service.IotAlarmBoxRecordLogService;
+import com.rz.iot.think.service.IotAlarmBoxRecordService;
+import com.rz.iot.think.service.IotAlarmBoxService;
+import com.rz.iot.think.utils.RzIotDBConstParam;
+import com.rz.iot.think.websocket.screen.ScreenHeartbeat;
+import com.rz.iot.think.websocket.screen.ScreenWebSocketHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.time.DateUtils;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @Auther: yyjuan
+ * @Date: 2019/3/20 0020 10:49
+ * @Description: 定时任务
+ */
+@Component
+@Slf4j
+public class IOTTask {
+
+    @Resource
+    private ScreenHeartbeat screenheartbeat;
+    @Resource
+    private IotAlarmBoxService iotAlarmBoxService;
+    @Resource
+    private AggregationAlarmService aggregationAlarmService;
+    @Resource
+    IotAlarmBoxRecordLogService iotAlarmBoxRecordLogService;
+    @Resource
+    IotAlarmBoxRecordService iotAlarmBoxRecordService;
+
+
+    /**
+     *     信息屏心跳
+     *     每隔60秒循环发送心跳信息
+     */
+    @Scheduled(cron = "0/60 * * * * ?")
+    public void screen_HeartbeatStart(){
+        log.debug("Heartbeat update start of screen ");
+
+            for(String key : ScreenWebSocketHandler.socketSessionMap.keySet()){
+                screenheartbeat.heartbeatSend(key);
+            }
+    }
+
+    /***
+     * 更新报警箱状态信息
+     * 每隔一小时更新
+     */
+    @Scheduled(cron = "0 0 * * * ?")
+    public void alarmBoxStatus(){
+        //查询报警箱id集合
+        List<Integer> boxIdList = iotAlarmBoxService.findBoxIds();
+        for(Integer boxId : boxIdList){
+            //查询报警箱工作状态
+            IotAlarmBoxRecorderStatusUpdateParam iotAlarmBoxRecorderStatusUpdateParam = aggregationAlarmService.findAlarmWorkInfo(boxId);
+            //更新报警箱工作状态
+            IotAlarmBox iotAlarmBox = new IotAlarmBox();
+            iotAlarmBox.setId(boxId);
+            iotAlarmBox.setStatus(iotAlarmBoxRecorderStatusUpdateParam.getStatus());
+            iotAlarmBoxService.updateAlarmbox(iotAlarmBox);
+        }
+    }
+
+    /***
+     * 更新报警箱报警记录
+     * 每隔一小时更新
+     */
+    @Scheduled(cron = "0 0 * * * ?")
+    public void alarmBoxRecordLog(){
+        //查询报警箱id集合
+        List<Integer> boxIdList = iotAlarmBoxService.findBoxIds();
+        //结束日期
+        Date endTime = new Date();
+        //起始日期
+        Date startTime = DateUtils.addDays(endTime,-30);
+        //查询出日志表中最近的一条产生报警信息记录
+        IotAlarmBoxRecordLog iotAlarmBoxRecordLogProduce = iotAlarmBoxRecordLogService.findIotAlarmBoxRecordLogProduce();
+        //查询出日志表中最近的一条恢复报警信息记录
+        IotAlarmBoxRecordLog iotAlarmBoxRecordLogDisappear = iotAlarmBoxRecordLogService.findIotAlarmBoxRecordLogDisappear();
+        if(boxIdList != null){
+            for(Integer boxId : boxIdList){
+                //查询报警箱报警日志信息，默认查询过去一个月的日志记录
+                List<IotAlarmBoxRecorderSelectParam> iotAlarmBoxRecorderSelectParamList = aggregationAlarmService.findAlarmLog(boxId,
+                        RzIotDBConstParam.SELECT_ALARM_BOX_LOG_TYPE_THREE,
+                        endTime, startTime,
+                        RzIotDBConstParam.SELECT_ALARM_BOX_LOG_PARAM_WMAJORTYPE_CALL,
+                        RzIotDBConstParam.SELECT_ALARM_BOX_LOG_PARAM_WMINORTYPE);
+                if(iotAlarmBoxRecorderSelectParamList != null){//有该报警箱的报警日志信息
+                    if(iotAlarmBoxRecorderSelectParamList.size() > RzIotDBConstParam.ALARM_BOX_LOG_NONE){
+                        //查询报警箱报警实时记录表中是否存在该报警箱信息
+                        IotAlarmBoxRecord iotAlarmBoxRecord = iotAlarmBoxRecordService.findIotAlarmBoxRecord(boxId);
+                        if(iotAlarmBoxRecord == null){//不存在添加最新的记录
+                            iotAlarmBoxRecord = new IotAlarmBoxRecord();
+                            //报警箱id
+                            iotAlarmBoxRecord.setBoxId(boxId);
+                            //报警类型为接收报警
+                            iotAlarmBoxRecord.setType(RzIotDBConstParam.ALARM_BOX_RECORD_TYPE_PASSIVE);
+                            //向报警信息实时记录表添加一条记录
+                            iotAlarmBoxRecordService.addIotAlarmBoxRecord(iotAlarmBoxRecord);
+                        }
+                        //报警箱报警信息实时记录表存在该报警箱信息，修改信息
+                        //得到最近一条数据的报警处理状态
+                        int status = iotAlarmBoxRecorderSelectParamList.get(0).getStatus() + 1;
+                        iotAlarmBoxRecord.setStatus(status);
+                        if(status == RzIotDBConstParam.ALARM_BOX_RECORD_HANDLER_TYPE_PRODUCE){//产生报警
+                            iotAlarmBoxRecord.setCreateTime(iotAlarmBoxRecorderSelectParamList.get(0).getCreateTime());
+                        }
+                        if(status == RzIotDBConstParam.ALARM_BOX_RECORD_HANDELER_TYPE_DISAPPEAR){//恢复报警
+                            iotAlarmBoxRecord.setCreateTime(iotAlarmBoxRecorderSelectParamList.get(1).getCreateTime());
+                            iotAlarmBoxRecord.setAnswerTime(iotAlarmBoxRecorderSelectParamList.get(0).getAnswerTime());
+                        }
+                        //修改为最新的记录
+                        iotAlarmBoxRecordService.updateIotAlarmBoxRecord(iotAlarmBoxRecord);
+
+                        //报警信息日志记录表数据处理
+                        for(IotAlarmBoxRecorderSelectParam alarmBoxRecorderSelectParam : iotAlarmBoxRecorderSelectParamList){
+                            //得到查询得到数据的状态
+                            int i = alarmBoxRecorderSelectParam.getStatus()+1;
+                            if(i == RzIotDBConstParam.ALARM_BOX_RECORD_HANDLER_TYPE_PRODUCE){//产生报警
+                                //如果日志记录中最近一条产生报警信息记录产生报警时间再查询得到数据产生报警时间之前，向数据库添加一条产生报警记录
+                                if(iotAlarmBoxRecordLogProduce.getCreateTime().getTime() < alarmBoxRecorderSelectParam.getCreateTime().getTime()){
+                                    IotAlarmBoxRecordLog recordLog = new IotAlarmBoxRecordLog();
+                                    recordLog.setCreateTime(alarmBoxRecorderSelectParam.getCreateTime());
+                                    recordLog.setType(RzIotDBConstParam.ALARM_BOX_RECORD_TYPE_PASSIVE);
+                                    recordLog.setBoxId(boxId);
+                                    recordLog.setRecordId(iotAlarmBoxRecord.getId());
+                                    recordLog.setStatus(RzIotDBConstParam.ALARM_BOX_RECORD_HANDLER_TYPE_PRODUCE);
+                                    recordLog.setAnswerTime(alarmBoxRecorderSelectParam.getCreateTime());
+                                    //添加一条产生报警记录
+                                    iotAlarmBoxRecordLogService.addIotAlarmBoxRecorderLog(recordLog);
+                                    System.err.println("添加一条产生报警记录");
+                                }
+                            }
+                            if(i == RzIotDBConstParam.ALARM_BOX_RECORD_HANDELER_TYPE_DISAPPEAR){//恢复报警
+                                //如果日志记录中最近的一条恢复报警记录的恢复报警时间再查询得到数据的恢复报警时间之前，向数据库中添加一条恢复报警记录
+                                if(iotAlarmBoxRecordLogDisappear.getAnswerTime().getTime() < alarmBoxRecorderSelectParam.getAnswerTime().getTime()){
+                                    IotAlarmBoxRecordLog recordLog = new IotAlarmBoxRecordLog();
+                                    recordLog.setCreateTime(alarmBoxRecorderSelectParam.getAnswerTime());
+                                    recordLog.setType(RzIotDBConstParam.ALARM_BOX_RECORD_TYPE_PASSIVE);
+                                    recordLog.setBoxId(boxId);
+                                    recordLog.setRecordId(iotAlarmBoxRecord.getId());
+                                    recordLog.setStatus(RzIotDBConstParam.ALARM_BOX_RECORD_HANDELER_TYPE_DISAPPEAR);
+                                    recordLog.setAnswerTime(alarmBoxRecorderSelectParam.getAnswerTime());
+                                    //添加一条恢复报警记录
+                                    iotAlarmBoxRecordLogService.addIotAlarmBoxRecorderLog(recordLog);
+                                    System.err.println("添加一条恢复报警记录");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

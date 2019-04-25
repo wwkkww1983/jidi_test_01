@@ -1,0 +1,55 @@
+package com.rz.iot.think.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rz.iot.think.mapper.SysUserLoginRecordMapper;
+import com.rz.iot.think.model.*;
+import com.rz.iot.think.model.show.SysUserLoginRecordShowList;
+import com.rz.iot.think.service.SysUserLoginRecordService;
+import com.rz.iot.think.utils.CommonFunctions;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+/**
+ * Author by zhangxd, Date on 2019/3/27.
+ * PS: Not easy to write code, please indicate.
+ * Description：
+ */
+@Service("sysUserLoginRecordService")
+public class SysUserLoginRecordServiceImpl implements SysUserLoginRecordService {
+
+    @Autowired
+    private HttpServletRequest request;
+    @Resource
+    private SysUserLoginRecordMapper sysUserLoginRecordMapper;
+
+    @Override
+    public void insertSelective(Integer LoginMode,Integer loginType, Object content) {
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        SysUserLoginRecord sysUserLoginRecord = new SysUserLoginRecord();
+        sysUserLoginRecord.setClientIp(CommonFunctions.getIpAddress(request));
+        sysUserLoginRecord.setClientMac("");
+        sysUserLoginRecord.setUserId(userInfo.getId());
+        sysUserLoginRecord.setLoginType(loginType);
+        sysUserLoginRecord.setLoginMode(0);
+        sysUserLoginRecordMapper.insertSelective(sysUserLoginRecord);
+
+    }
+
+    //获取日志列表
+    @Override
+    public Result findAll(Page<SysUserLoginRecordShowList> page, SysUserLoginRecordShowList sysUserLoginRecordShowList) {
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<SysUserLoginRecordShowList> list =  sysUserLoginRecordMapper.findAll(sysUserLoginRecordShowList);
+        PageInfo<SysUserLoginRecordShowList> pageInfo = new PageInfo<>(list);
+        page.setOtherParam(pageInfo);
+        Result result = new Result();
+        result.setData(page);
+        return result;
+    }
+}

@@ -1,0 +1,52 @@
+package com.rz.iot.think.mqtt.model;
+
+import lombok.Data;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Author by xuxiake, Date on 2019/4/16.
+ * PS: Not easy to write code, please indicate.
+ * Description：集中器开关策略
+ */
+@Data
+public class ConcentratorSwitchStrategy {
+    //编号
+    private int no;
+    //起始日期
+    private Date startDate;
+    //结束日期
+    private Date endDate;
+    //开灯时间
+    private Date startTime;
+    //关灯时间
+    private Date endTime;
+    //调光开始时间
+    private Date startMoveLight;
+    //调光结束时间
+    private Date endMoveLight;
+    //调光百分比
+    private int percent;
+    /**隔杆模式
+     * 0x00：全亮；
+     * 0x01：隔一亮一；
+     * 0x02：隔二亮一；
+     * 0x03：隔一亮二；
+     * 0x04：隔二亮二；
+     */
+    private int intervalType;
+    //隔杆
+    private List<Pole> poleList;
+    //输出标识
+    private int outTag;
+    //星期标识
+    private int week;
+    //开关编号
+    private int switchNo;
+    //偏移时段
+    private int offset;
+
+
+
+}

@@ -1,0 +1,10 @@
+package com.rz.iot.think.model.screen;
+
+/**
+ * @Auther: yyjuan
+ * @Date: 2019/3/22 0022 10:02
+ * @Description:
+ */
+
+public interface ScreenSource {
+}

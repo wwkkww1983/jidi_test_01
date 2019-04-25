@@ -1,0 +1,44 @@
+package com.rz.iot.think.mqtt.model.report;
+
+import com.rz.iot.think.mqtt.model.ConcentratorElectricQuantity;
+import com.rz.iot.think.mqtt.model.SingleLightControllerElectricQuantity;
+import com.rz.iot.think.mqtt.util.RzIotConcentratorConstParam;
+import com.rz.iot.utils.RzIotDigit;
+import lombok.Data;
+
+/**
+ * Author by xuxiake, Date on 2019/4/12.
+ * PS: Not easy to write code, please indicate.
+ * Description：集中器电量上报
+ */
+@Data
+public class ConcentratorElectricQuantityReport {
+
+    // 集中器电量
+    private ConcentratorElectricQuantity concentratorElectricQuantity = new ConcentratorElectricQuantity();
+    // 单灯控制器电量
+    private SingleLightControllerElectricQuantity slcElectricQuantity = new SingleLightControllerElectricQuantity();
+
+    /**
+     * 数据处理
+     * @param data 原始消息报文
+     * @param offset 消息头heard长度
+     * @param length 数据长度
+     */
+    public void setParam(byte[] data, int offset, int length) {
+
+        int type = RzIotDigit.getUnInt(data, offset);
+        if (type == RzIotConcentratorConstParam.ELECTRIC_QUANTITY_OF_CONCENTRATOR) {
+            // 集中器
+            long value = RzIotDigit.getUnInt32(data, offset + 1);
+            this.concentratorElectricQuantity.setValue(value);
+        } else if (type == RzIotConcentratorConstParam.ELECTRIC_QUANTITY_OF_SINGLE_LIGHT_CONTROLLER) {
+            // 单灯控制器
+            int no = RzIotDigit.getUnInt(data, offset + 1);
+            long value = RzIotDigit.getUnInt32(data, offset + 2);
+            this.slcElectricQuantity.setNo(no);
+            this.slcElectricQuantity.setValue(value);
+        }
+
+    }
+}

@@ -1,0 +1,76 @@
+package com.rz.iot.think.mapper;
+
+import com.rz.iot.think.model.IotScreen;
+import com.rz.iot.think.model.param.ScreenParam;
+import com.rz.iot.think.model.show.IotStreetlightInstallDevForNoBinding;
+import com.rz.iot.think.model.show.ScreenDetail;
+import com.rz.iot.think.model.show.ScreenShowList;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.HashMap;
+import java.util.List;
+
+public interface IotScreenMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(IotScreen record);
+
+    int insertSelective(IotScreen record);
+
+    IotScreen selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(IotScreen record);
+
+    int updateByPrimaryKey(IotScreen record);
+
+    /**
+     * 查找未与路灯绑定的信息屏
+     * @return
+     */
+    List<IotStreetlightInstallDevForNoBinding> findNoBinding();
+
+    IotScreen findScreenByCardId(String cardId);
+
+    /**
+     * 根据sn更新状态
+     * @param iotScreen
+     */
+    void updateScreenBySn(IotScreen iotScreen);
+
+    /**
+     * 根据查询参数获取显示屏信息列表
+     * @param param 查询参数
+     * @return 返回查询结果
+     */
+    List<ScreenShowList> getScreenList(@Param("param") ScreenParam param, @Param("userId") Integer userId);
+
+    /**
+     * 根据显示屏id获取详细的显示屏信息
+     * @param screenId 显示屏id
+     * @param userId 用户id
+     * @return 返回查询结果
+     */
+    ScreenDetail getDetail(@Param("screenId") Integer screenId, @Param("userId") Integer userId);
+
+
+
+    /**
+     * 根据显示屏id更新record表
+     * @param screen 显示屏实体
+     */
+    void updateScreen(IotScreen screen);
+
+    /**
+     * 根据显示屏id更新record表
+     * @param map 要更新的参数
+     */
+    void updateScreenRecord(HashMap map);
+
+    /**
+     * 根据显示屏id获取路灯id
+     * @param screenId 显示屏id
+     * @return 返回路灯id
+     */
+    Integer getStreetlightId(Integer screenId);
+
+}

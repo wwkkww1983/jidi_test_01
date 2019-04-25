@@ -1,0 +1,51 @@
+package com.rz.iot.think.service;
+
+import com.rz.iot.think.model.Page;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.param.IotScreenPicInfoSelectParam;
+import com.rz.iot.think.model.screen.IotScreenPicInfo;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+
+import java.util.List;
+
+/**
+ * @Author:jidi
+ * @Date:2019/04/01 16:00
+ * @Description:屏幕播放素材（图片）操作接口
+ **/
+public interface IotScreenPicInfoService {
+
+    /**
+     * @Desc:分页查询所有的未被删除的屏幕播放素材（图片）
+     */
+    Result findAll(Page<IotScreenPicInfo> page);
+
+    /**
+     * @Desc:根据素材名和上传者分页查询所有的未被删除的屏幕播放素材（图片）
+     */
+    Result findAllByCondition(Page<IotScreenPicInfoSelectParam> page, IotScreenPicInfoSelectParam iotScreenPicInfoSelectParam);
+
+    /**
+     * @Desc:查询在图片来源表（iot_screen_image_source）中的图片素材
+     */
+    Result findById(List<Integer> iotScreenMaterialIds);
+
+    /**
+     * @Desc:批量删除记录
+     */
+    Result delByIds(List<Integer> iotScreenMaterialIds);
+
+    /**
+     * @Desc:增加图片素材
+     * @param  userId 创建者id
+     * @param  file 文件
+     */
+    Result addIotScreenPicInfo(Integer userId, MultipartFile file);
+
+    /**
+     * @Desc：根据name，hashKey，createAdmin查询图片素材ID
+     */
+    Integer selectIdByCondition(IotScreenPicInfo iotScreenPicInfo);
+}

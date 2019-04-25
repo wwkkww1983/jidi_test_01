@@ -1,0 +1,521 @@
+
+package com.rz.iot.think.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rz.iot.think.exception.NullParamException;
+import com.rz.iot.think.mapper.*;
+import com.rz.iot.think.model.*;
+import com.rz.iot.think.model.excel.SlcExportModel;
+import com.rz.iot.think.model.param.AddConcentratorParam;
+import com.rz.iot.think.model.param.IotConcentratorListQueryParam;
+import com.rz.iot.think.model.param.IotPowerParam;
+import com.rz.iot.think.model.show.IotBindConStraShow;
+import com.rz.iot.think.model.show.IotConcentratorLineInInfo;
+import com.rz.iot.think.model.show.IotConcentratorShowList;
+import com.rz.iot.think.model.show.ShowIotPower;
+import com.rz.iot.think.service.IotConcentratorService;
+import com.rz.iot.think.utils.ExcelUtils;
+import com.rz.iot.think.utils.RzIotDBConstParam;
+import lombok.extern.log4j.Log4j2;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static com.rz.iot.think.utils.RzIotDBConstParam.BUSSINESS_TYPE_OF_CONCENTRATOR;
+
+/**
+ * 描述:
+ * 集中器
+ *
+ * @author Zhouyz
+ * @create 2019-03-19 16:34
+ */
+
+@Log4j2
+@Service
+@Transactional
+public class IotConcentratorServiceImpl implements IotConcentratorService {
+    @Resource
+    private IotConcentratorMapper iotConcentratorMapper;
+    @Resource
+    private IotConcentratorLineInMapper iotConcentratorLineInMapper;
+    @Resource
+    private IotConcentratorLineOutMapper iotConcentratorLineOutMapper;
+    @Resource
+    private IotSingleLightControllerMapper iotSingleLightControllerMapper;
+    @Resource
+    private IotBuilderMapper iotBuilderMapper;
+    @Resource
+    private IotBuilderPicMapper iotBuilderPicMapper;
+    @Resource
+    private IotBusinessUserRelMapper iotBusinessUserRelMapper;
+    @Resource
+    private IotConcentratorStrategyRelMapper iotConcentratorStrategyRelMapper;
+    @Resource
+    private IotConcentratorSwitchStrategyMapper iotConcentratorSwitchStrategyMapper;
+
+    /**
+     * 用集中器id获取详细的集中器信息
+     *
+     * @see IotConcentratorMapper#findById(Integer)
+     *
+     * @param concentratorId 集中器id
+     * @return 查询结果
+     */
+    @Override
+    public HashMap getDetailById(Integer concentratorId) {
+        return iotConcentratorMapper.findById(concentratorId);
+    }
+
+    /**
+     * 用集中器id获取单灯控制器信息列表
+     *
+     * @see IotConcentratorMapper#getSlcByConcentratorId(Integer)
+     *
+     * @param concentratorId 集中器id
+     * @return 返回查询结果
+     */
+    @Override
+    public List<HashMap> getSlcInfosByConcentratorId(Integer concentratorId) {
+        return iotConcentratorMapper.getSlcByConcentratorId(concentratorId);
+    }
+
+    /**
+     * 根据集中器id查询详细的集中器信息，给集中器详情页面使用
+     *
+     * @see IotConcentratorMapper#getDetailById(Integer)
+     *
+     * @param concentratorId 集中器页面
+     * @return 查询结果
+     */
+    @Override
+    public HashMap concentratorDetail(Integer concentratorId) {
+        return iotConcentratorMapper.getDetailById(concentratorId);
+    }
+
+    /**
+     * 根据开关和集中器绑定类修改集中器
+     * @param iotSwitchBindConcentrator
+     */
+    @Override
+    public void updateConcentrators(IotSwitchBindConcentrator iotSwitchBindConcentrator) {
+        iotConcentratorMapper.updateConcentrators(iotSwitchBindConcentrator);
+    }
+
+    /**
+     * 为集中器详情页获取单灯控制器和路灯的相关信息
+     * @param concentratorId 集中器id
+     * @return 返回查询结果
+     */
+    @Override
+    public List<HashMap> getSlcForConcentrator(Integer concentratorId) {
+        return iotConcentratorMapper.getSlcForConcentrator(concentratorId);
+    }
+
+    /**
+     * 获取进出线信息
+     * @param concentrator 集中器id
+     * @return 返回查询结果
+     */
+    @Override
+    public HashMap getLineInAndOut(Integer concentrator) {
+        List<HashMap> lineIn = iotConcentratorMapper.getLineIn(concentrator);
+        List<HashMap> lineOut = iotConcentratorMapper.getLineOut(concentrator);
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("lineIn", lineIn);
+        map.put("lineOut", lineOut);
+
+        return map;
+    }
+
+    /**
+     * 根据集中器的序列号查询单灯控制器
+     * @param sn 集中器序列号
+     * @return
+     */
+    @Override
+    public Result findSingleLightsByCSN(String sn) {
+        Result result = new Result();
+        //获取当前用户
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+
+        HashMap<String,Object> map = new HashMap();
+        map.put("sn",sn);
+        map.put("userId",userInfo.getId());
+
+        List<IotSingleLightController> list =  iotConcentratorMapper.findSingleLightsByCSN(map);
+
+        result.setData(list);
+        return result;
+    }
+
+    /**
+     * 根据电量参数查询出所有集中器电量情况
+     * @param
+     * @return
+     */
+    @Override
+    public List<ShowIotPower> findPower(IotPowerParam iotPowerParam,Integer id) {
+        return iotConcentratorMapper.findPower(iotPowerParam,id);
+    }
+
+    /**
+     * 查询集中器列表
+     * @param page 分页参数
+     * @param param 查询参数
+     * @return
+     */
+    @Override
+    public Result findAll(Page<IotConcentratorShowList> page, IotConcentratorListQueryParam param) {
+
+        Result result = new Result();
+
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        PageHelper.startPage(page.getPageNum(), page.getPageSize());
+        List<IotConcentratorShowList> list = iotConcentratorMapper.findAll(userInfo.getId(), param);
+        PageInfo<IotConcentratorShowList> pageInfo = new PageInfo<>(list);
+
+        for (IotConcentratorShowList item : list) {
+
+            // 查询输入
+            List<IotConcentratorLineInInfo> lineIns = iotConcentratorLineInMapper.findByConcentratorId(item.getId());
+            // 查询输出
+            List<IotConcentratorLineOut> lineOuts = iotConcentratorLineOutMapper.findByConcentratorId(item.getId());
+            // 查询单灯控制器
+            List<IotSingleLightController> singleLightControllers = iotSingleLightControllerMapper.findByConcentratorId(item.getId());
+
+            item.setLineIns(lineIns);
+            item.setLineOuts(lineOuts);
+            item.setSingleLightControllers(singleLightControllers);
+        }
+        page.setOtherParam(pageInfo);
+        result.setData(page);
+        return result;
+    }
+
+    /**
+     * 查询未分组的集中器
+     * @return
+     */
+    @Override
+    public Result findNoGroup() {
+
+        Result result = new Result();
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        List<IotConcentratorShowList> concentrators = iotConcentratorMapper.findNoGroup(userInfo.getId());
+        result.setData(concentrators);
+        return result;
+    }
+
+    /**
+     * 获取施工方信息
+     * @param concentratorId 集中器id
+     * @return 返回查询结果
+     */
+    @Override
+    public HashMap builderInfos(Integer concentratorId) {
+        return iotConcentratorMapper.builderInfos(concentratorId);
+    }
+
+
+    /**
+     * 新增集中器及集中器相关信息
+     * @param addConcentratorParam 参数
+     * @see AddConcentratorParam
+     * @throws NullParamException 空参数异常
+     */
+    @Transactional
+    @Override
+    public void addConcentratorInfos(AddConcentratorParam addConcentratorParam) throws NullParamException {
+        if(addConcentratorParam.getConcentrator().getSn() == null){
+            throw new NullParamException("sn参数不能为空");
+        }
+        if(addConcentratorParam.getConcentrator().getName() == null){
+            throw new NullParamException("名称参数不能为空");
+        }
+        if(addConcentratorParam.getIotBuilder() == null){
+            throw new NullParamException("建造商信息不能为空！");
+        }
+        if(addConcentratorParam.getLineOutList() == null){
+            throw new NullParamException("出线信息不能为空！");
+        }
+        if(addConcentratorParam.getLineInList() == null){
+            throw new NullParamException("进线信息不能为空！");
+        }
+        if(addConcentratorParam.getSlcList() == null){
+            throw new NullParamException("单灯控制器信息不能为空！");
+        }
+        //插入建造商信息
+        iotBuilderMapper.insertSelective(addConcentratorParam.getIotBuilder());
+        //给集中器加上建造商信息
+        addConcentratorParam.getConcentrator().setBuilderId(addConcentratorParam.getIotBuilder().getId());
+        //插入集中器信息
+        iotConcentratorMapper.insertSelective(addConcentratorParam.getConcentrator());
+        //给单灯控制器设置集中器id
+        for (IotSingleLightController slc : addConcentratorParam.getSlcList()){
+            slc.setConcentratorId(addConcentratorParam.getConcentrator().getId());
+        }
+        //插入单灯控制器信息
+        iotSingleLightControllerMapper.batchInsert(addConcentratorParam.getSlcList());
+        //给进线信息设置集中器id
+        for (IotConcentratorLineIn lineIn : addConcentratorParam.getLineInList()){
+            lineIn.setConcentratorId(addConcentratorParam.getConcentrator().getId());
+        }
+        iotConcentratorLineInMapper.batchInsert(addConcentratorParam.getLineInList());
+        //给出线信息设置集中器id
+        for (IotConcentratorLineOut lineOut : addConcentratorParam.getLineOutList()){
+            lineOut.setConcentratorId(addConcentratorParam.getConcentrator().getId());
+        }
+        iotConcentratorLineOutMapper.batchInsert(addConcentratorParam.getLineOutList());
+        //获取用户id
+        Integer userId = ((UserInfo) SecurityUtils.getSubject().getPrincipal()).getId();
+        //给施工图片添加集中器id和用户id
+        for(IotBuilderPic pic : addConcentratorParam.getIotBuilderPicList()){
+            pic.setBusinessId(addConcentratorParam.getConcentrator().getId());
+            pic.setUserId(userId);
+            pic.setBusinessType(1);
+        }
+        iotBuilderPicMapper.batchInsert(addConcentratorParam.getIotBuilderPicList());
+
+        //插入业务与用户关联关系表
+        IotBusinessUserRel iotBusinessUserRel = new IotBusinessUserRel();
+        iotBusinessUserRel.setBusinessId(addConcentratorParam.getConcentrator().getId());
+        iotBusinessUserRel.setBusinessType(RzIotDBConstParam.BUSSINESS_TYPE_OF_CONCENTRATOR);
+        iotBusinessUserRel.setUserId(userId);
+        iotBusinessUserRelMapper.insertSelective(iotBusinessUserRel);
+
+    }
+
+    @Transactional
+    @Override
+    public void updateConcentratorInfos(AddConcentratorParam addConcentratorParam) throws NullParamException {
+        if (addConcentratorParam.getConcentrator() == null){
+            throw new NullParamException("集中器信息不能为空");
+        }
+        if (addConcentratorParam.getConcentrator().getId() == null){
+            throw new NullParamException("集中器id不能为空");
+        }
+        //根据集中器id查询完整的集中器信息
+        IotConcentrator concentrator= iotConcentratorMapper.selectByPrimaryKey(addConcentratorParam.getConcentrator().getId());
+        //设置建造商id
+        addConcentratorParam.getConcentrator().setBuilderId(concentrator.getBuilderId());
+
+        //若建造商参数不为空
+        if(addConcentratorParam.getIotBuilder() != null){
+            //获取建造商Id
+            Integer builderId = concentrator.getBuilderId();
+            //假删除建造商信息，以便重新插入
+            if(builderId != null)
+                iotBuilderMapper.fakeDelete(builderId);
+            else
+                throw new NullParamException("数据库中集中器信息不完整！");
+            //重新插入建造商信息
+            iotBuilderMapper.insertSelective(addConcentratorParam.getIotBuilder());
+            //建造商信息已更新，重新设置建造商id
+            addConcentratorParam.getConcentrator().setBuilderId(addConcentratorParam.getIotBuilder().getId());
+        }
+        //若单灯控制器信息不为空
+        if(addConcentratorParam.getSlcList() != null){
+            if (addConcentratorParam.getSlcList().size() == 0){
+                throw new NullParamException("单灯控制器列表为空！");
+            }
+            else {
+                //先假删除旧信息
+                iotSingleLightControllerMapper.fakeDelete(concentrator.getId());
+                //给单灯控制器设置集中器id
+                for (IotSingleLightController slc : addConcentratorParam.getSlcList()){
+                    slc.setConcentratorId(addConcentratorParam.getConcentrator().getId());
+                }
+                //再更新
+                iotSingleLightControllerMapper.batchInsert(addConcentratorParam.getSlcList());
+            }
+        }
+        //若进线信息列表不为空
+        if(addConcentratorParam.getLineInList() != null){
+            //先删除旧信息
+            iotConcentratorLineInMapper.fakeDelete(concentrator.getId());
+            //再插入（如果传入的信息列表为空则不进行插入操作）
+            if(addConcentratorParam.getLineInList().size() != 0)
+                //给进线信息设置集中器id
+                for (IotConcentratorLineIn lineIn : addConcentratorParam.getLineInList()){
+                    lineIn.setConcentratorId(addConcentratorParam.getConcentrator().getId());
+                }
+                iotConcentratorLineInMapper.batchInsert(addConcentratorParam.getLineInList());
+        }
+        //若出线信息列表不为空
+        if(addConcentratorParam.getLineOutList() != null){
+            //先删除旧信息
+            iotConcentratorLineOutMapper.fakeDelete(concentrator.getId());
+            //再插入（如果传入的信息列表为空则不进行插入操作）
+            if(addConcentratorParam.getLineOutList().size() != 0)
+                for (IotConcentratorLineOut lineOut : addConcentratorParam.getLineOutList()){
+                    lineOut.setConcentratorId(addConcentratorParam.getConcentrator().getId());
+                }
+                iotConcentratorLineOutMapper.batchInsert(addConcentratorParam.getLineOutList());
+        }
+        //若现场是施工图片信息不为空
+        if(addConcentratorParam.getIotBuilderPicList() != null){
+            //先删除旧信息
+            iotBuilderPicMapper.delByBusinessId(concentrator.getId(), BUSSINESS_TYPE_OF_CONCENTRATOR);
+            //获取用户id
+            Integer userId = ((UserInfo) SecurityUtils.getSubject().getPrincipal()).getId();
+            //给施工图片添加集中器id和用户id
+            for(IotBuilderPic pic : addConcentratorParam.getIotBuilderPicList()){
+                pic.setBusinessType(BUSSINESS_TYPE_OF_CONCENTRATOR);
+                pic.setBusinessId(addConcentratorParam.getConcentrator().getId());
+                pic.setUserId(userId);
+            }
+            //再插入新信息
+            iotBuilderPicMapper.batchInsert(addConcentratorParam.getIotBuilderPicList());
+        }
+        //更新集中器信息
+        iotConcentratorMapper.updateByPrimaryKeySelective(addConcentratorParam.getConcentrator());
+
+
+    }
+
+    /**
+     * 删除集中器信息
+     * @param concentratorId 集中器id
+     * @throws NullParamException 空参数异常
+     */
+    @Transactional
+    @Override
+    public void deleteConcentrator(Integer concentratorId) throws NullParamException {
+        //根据集中器id查询完整的集中器信息
+        IotConcentrator concentrator= iotConcentratorMapper.selectByPrimaryKey(concentratorId);
+
+        //获取建造商Id
+        Integer builderId = concentrator.getBuilderId();
+        //假删除建造商信息，以便重新插入
+        if(builderId != null)
+            iotBuilderMapper.fakeDelete(builderId);
+        else
+            throw new NullParamException("数据库中集中器信息不完整！");
+
+        //删除单灯控制器信息
+        iotSingleLightControllerMapper.fakeDelete(concentratorId);
+
+        //删除进线信息
+        iotConcentratorLineInMapper.fakeDelete(concentratorId);
+
+        //删除出线信息
+        iotConcentratorLineOutMapper.fakeDelete(concentratorId);
+
+        //删除施工图片信息
+        iotBuilderPicMapper.delByBusinessId(concentrator.getId(), BUSSINESS_TYPE_OF_CONCENTRATOR);
+
+        //删除集中器策略
+        iotConcentratorMapper.fakeDeleteStrategy(concentratorId);
+
+        //删除集中器信息
+        iotConcentratorMapper.fakeDelete(concentratorId);
+    }
+
+    /**
+     * 导入单灯控制器信息
+     * @param file 输入文件
+     * @return 返回单灯控制器的sn
+     */
+    @Override
+    public List<HashMap<String, String>> importExcel(MultipartFile file) {
+        List<HashMap<String, String>> slcInfos = new ArrayList<>();
+        try {
+            //读取文件数据
+            List<SlcExportModel> data = ExcelUtils.readExl(file.getInputStream(), 3, SlcExportModel.class);
+            for(SlcExportModel sm : data){
+                HashMap<String, String> map = new HashMap<>();
+                map.put("sn", sm.getSn());
+                map.put("name", sm.getName());
+                slcInfos.add(map);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return slcInfos;
+    }
+
+    /**
+     * 单灯控制器excel导入模板下载
+     * @param response excel文件
+     */
+    @Override
+    public void templateDownload(HttpServletResponse response) {
+
+        try(OutputStream out = response.getOutputStream()) {
+
+            response.setContentType("multipart/form-data");
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-disposition", "attachment;filename=" + "SlcTemplate.xlsx");
+
+            ExcelUtils.writeExl(out, null, 3, 5000, SlcExportModel.class);
+
+            out.flush();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 查询所有与开关策略绑定的集中器
+     * @return
+     */
+    @Override
+    public Result findBindConStrategy(Integer concentratorType) {
+        Result result = new Result();
+
+        //获取当前用户
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+        List<IotBindConStraShow> list = new ArrayList<IotBindConStraShow>();
+
+        if(concentratorType == 1){
+            //为集中器
+            //查询所有与策略绑定的集中器
+            list = iotConcentratorStrategyRelMapper.findBindConStrategy(userInfo.getId());
+            if(list != null && list.size() > 0){
+                for(IotBindConStraShow iotBindConStraShow : list){
+                    //通过集中器id查询到所关联的策略id与名称
+                    IotConcentratorSwitchStrategy iotConcentratorSwitchStrategy = iotConcentratorSwitchStrategyMapper.findSwitchStrategyByConcentratorId(iotBindConStraShow.getId(),userInfo.getId());
+                    if(iotConcentratorSwitchStrategy != null){
+                        iotBindConStraShow.setStrategyId(iotConcentratorSwitchStrategy.getId());
+                        iotBindConStraShow.setStrategyName(iotConcentratorSwitchStrategy.getName());
+                    }
+                }
+            }
+        }else if(concentratorType == 2){
+            //集中器组
+            //为集中器
+            //查询所有与策略绑定的集中器
+            list = iotConcentratorStrategyRelMapper.findBindConGroupStrategy(userInfo.getId());
+            if(list != null && list.size() > 0){
+                for(IotBindConStraShow iotBindConStraShow : list){
+                    //通过集中器id查询到所关联的策略id与名称
+                    IotConcentratorSwitchStrategy iotConcentratorSwitchStrategy = iotConcentratorSwitchStrategyMapper.findSwitchStrategyByConcentratorGroupId(iotBindConStraShow.getId(),userInfo.getId());
+                    if(iotConcentratorSwitchStrategy != null){
+                        iotBindConStraShow.setStrategyId(iotConcentratorSwitchStrategy.getId());
+                        iotBindConStraShow.setStrategyName(iotConcentratorSwitchStrategy.getName());
+                    }
+                }
+            }
+        }
+
+        result.setData(list);
+
+        return result;
+    }
+
+}

@@ -1,0 +1,28 @@
+package com.rz.iot.think.mqtt.handler.publish;
+
+import com.rz.iot.think.mqtt.model.publish.ConcentratorCtrlCmdPublish;
+import com.rz.iot.think.mqtt.model.publish.ConcentratorWarnConfigPublish;
+
+import java.util.List;
+
+/**
+ * Author by xuxiake, Date on 2019/4/13.
+ * PS: Not easy to write code, please indicate.
+ * Description：集中器消息下发入口接口
+ */
+public interface IConcentratorPublishService {
+
+    /**
+     * 服务端输出控制命令下发
+     * @param ctrlCmdPublishes
+     * @param concentratorSn
+     */
+    void publishCtrlCmd(List<ConcentratorCtrlCmdPublish> ctrlCmdPublishes, String concentratorSn);
+
+    /**
+     * 服务端告警参数下发
+     * @param warnConfigPublishes
+     * @param concentratorSn
+     */
+    void warnConfigPublish(List<ConcentratorWarnConfigPublish> warnConfigPublishes, String concentratorSn);
+}

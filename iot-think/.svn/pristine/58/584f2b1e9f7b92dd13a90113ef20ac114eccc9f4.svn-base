@@ -1,0 +1,33 @@
+package com.rz.iot.think.mqtt.model;
+
+import lombok.Data;
+
+import java.util.Date;
+
+/**
+ * @Author:jidi
+ * @Date:2019/04/16 9:07
+ * @Description:星期预约方案
+ **/
+
+@Data
+public class WeekAppoint {
+    //方案名
+    private String name;
+    //星期标记
+    private Integer weekTag;
+    //开灯时间
+    private Date startTime;
+    //关灯时间
+    private Date endTime;
+    //开始调光时间
+    private Date beginMoveLightTime;
+    //结束调光时间
+    private Date endMoveLightTime;
+    //开关标记
+    private Integer switchTag;
+    //调光百分比
+    private Integer moveLightPercent;
+    //隔杆模式
+    private Integer intervalType;
+}

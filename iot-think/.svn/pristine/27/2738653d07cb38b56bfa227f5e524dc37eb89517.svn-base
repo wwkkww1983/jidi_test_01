@@ -1,0 +1,9 @@
+package com.rz.iot.think.mqtt.model;
+
+/**
+ * Author by xuxiake, Date on 2019/4/16.
+ * PS: Not easy to write code, please indicate.
+ * Description：集中器开关策略
+ */
+public class ConcentratorSwitchStrategy {
+}

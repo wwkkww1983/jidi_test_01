@@ -1,0 +1,305 @@
+package com.rz.iot.think.utils;
+
+/**
+ * Author by xuxiake, Date on 2019/3/5.
+ * PS: Not easy to write code, please indicate.
+ * Description：数据库常量
+ */
+public class RzIotDBConstParam {
+
+    /*通用数据状态 1:正常 9:已被删除;*/
+
+    /*通用数据状态-正常*/
+    public static final int DATA_STATUS_OF_NORMAL = 1;
+    /*通用数据状态-已被删除*/
+    public static final int DATA_STATUS_OF_DELETE = 9;
+
+    /*通用设备状态 0：未激活； 1:正常运行；2：离线；3：故障； 9:已被删除;*/
+
+    /*通用设备状态-未激活*/
+    public static final int DEVICE_STATUS_OF_UNABLE = 0;
+    /*通设备状态-正常*/
+    public static final int DEVICE_STATUS_OF_NORMAL = 1;
+    /*通用设备状态-离线*/
+    public static final int DEVICE_STATUS_OF_OFFLINE = 2;
+    /*通用设备状态-故障*/
+    public static final int DEVICE_STATUS_OF_FAULT = 3;
+    /*通用设备状态-删除*/
+    public static final int DEVICE_STATUS_OF_DELETE = 9;
+
+    /*通用网络类型 1：移动4G；2：电信4G；3：联通4G；0：固网；5:5G网络*/
+
+    /*通用网络类型-有线*/
+    public static final int NETWORK_TYPE_OF_WIRED_NETWORK = 0;
+    /*通用网络类型-移动4G*/
+    public static final int NETWORK_TYPE_OF_CHINA_MOBILE_4G = 1;
+    /*通用网络类型-电信4G*/
+    public static final int NETWORK_TYPE_OF_CHINA_TELECOM_4G = 2;
+    /*通用网络类型-联通4G*/
+    public static final int NETWORK_TYPE_OF_CHINA_UNICOM_4G = 3;
+    /*通用网络类型-5G*/
+    public static final int NETWORK_TYPE_OF_5G = 5;
+
+    /*故障*/
+
+    /*故障编号-离线*/
+    public static final int FAULT_CODE_OF_OFFLINE = 0;
+
+    /*故障类型-正常*/
+    public static final int FAULT_TYPE_OF_NORMAL = 1;
+    /*故障类型-故障*/
+    public static final int FAULT_TYPE_OF_FAULT = 2;
+
+    /*故障状态-恢复*/
+    public static final int FAULT_STATUS_OF_RESTORE = 0;
+    /*故障状态-产生*/
+    public static final int FAULT_STATUS_OF_PRODUCE = 1;
+
+    /*故障错误级别：0：故障；1：正常；2：告警；3：保护；4：离线*/
+
+    /*故障错误级别：故障*/
+    public static final int FAULT_LEVEL_OF_FAULT = 0;
+    /*故障错误级别：正常*/
+    public static final int FAULT_LEVEL_OF_NORMAL = 1;
+    /*故障错误级别：告警*/
+    public static final int FAULT_LEVEL_OF_WARNING = 2;
+    /*故障错误级别：保护*/
+    public static final int FAULT_LEVEL_OF_PROTECT = 3;
+    /*故障错误级别：离线*/
+    public static final int FAULT_LEVEL_OF_OFFLINE = 4;
+
+    /*业务类型*/
+
+    /*业务类型-集中器*/
+    public static final int BUSSINESS_TYPE_OF_CONCENTRATOR = 1;
+    /*业务类型-路灯*/
+    public static final int BUSSINESS_TYPE_OF_STREETLIGHT = 2;
+    /*业务类型-集中器组*/
+    public static final int BUSSINESS_TYPE_OF_CONCENTRATOR_GROUP = 3;
+    /*业务类型-开关策略 */
+    public static final int BUSSINESS_TYPE_OF_STRATEGY = 4;
+    /*业务类型-信息屏节目 */
+    public static final int BUSSINESS_TYPE_OF_SCREEN_PROGRAM = 5;
+
+    /*充电桩*/
+
+    /*充电桩-使用状态 0：空闲中；1：充电中；2：充电完成*/
+
+    /*充电桩使用状态-空闲中*/
+    public static final int CHARGING_OPINT_USING_STATUS_OF_FREE = 0;
+    /*充电桩使用状态-充电中*/
+    public static final int CHARGING_OPINT_USING_STATUS_OF_CHARGING = 1;
+    /*充电桩使用状态-充电完成*/
+    public static final int CHARGING_OPINT_USING_STATUS_OF_CHARGING_COMPLETE = 2;
+
+    /*充电桩-电流类型，1：直流；2：交流*/
+
+    /*充电桩电流类型-直流*/
+    public static final int CHARGING_OPINT_CURRENT_TYPE_OF_DC = 1;
+    /*充电桩电流类型-交流*/
+    public static final int CHARGING_OPINT_CURRENT_TYPE_OF_AC = 2;
+
+    /*集中器*/
+
+    /*集中器相数 1：单相；3：三相*/
+
+    /*集中器相数 1：单相*/
+    public static final int CONCENTRATOR_PHASE_TYPE_OF_SINGLE = 1;
+    /*集中器相数 3：三相*/
+    public static final int CONCENTRATOR_PHASE_TYPE_OF_TRIPHARE = 3;
+
+    /*集中器开关状态-关*/
+    public static final int CONCENTRATOR_SWITCH_STATUS_OF_ON = 0;
+    /*集中器开关状态-开*/
+    public static final int CONCENTRATOR_SWITCH_STATUS_OF_OFF = 1;
+
+    /*集中器进线类型 0：单相；1：A相；2：B相；3：C相；4：合相*/
+
+    /*集中器进线类型-单相*/
+    public static final int CONCENTRATOR_LINE_IN_TYPE_OF_SINGLE = 0;
+    /*集中器进线类型-A相*/
+    public static final int CONCENTRATOR_LINE_IN_TYPE_OF_A = 1;
+    /*集中器进线类型-B相*/
+    public static final int CONCENTRATOR_LINE_IN_TYPE_OF_B = 2;
+    /*集中器进线类型-C相*/
+    public static final int CONCENTRATOR_LINE_IN_TYPE_OF_C = 3;
+    /*集中器进线类型-合相*/
+    public static final int CONCENTRATOR_LINE_IN_TYPE_OF_MIX = 4;
+
+    /*集中器回路开关状态 1:开；2：关*/
+
+    /*集中器回路开关状态-开*/
+    public static final int CONCENTRATOR_LINE_OUT_SWTICH_STATUS_OF_ON = 1;
+    /*集中器回路开关状态-关*/
+    public static final int CONCENTRATOR_LINE_OUT_SWTICH_STATUS_OF_OFF = 2;
+
+    /*集中器类型 1：集中器；2：集中器组*/
+
+    /*集中器类型-集中器*/
+    public static final int CONCENTRATOR_TYPE_OF_CONCENTRATOR = 1;
+    /*集中器类型-集中器组*/
+    public static final int CONCENTRATOR_TYPE_OF_CONCENTRATOR_GROUP = 2;
+
+    /*集中器开关策略*/
+
+    /*集中器开关策略模式：1：预约模式；2：经纬度开关；3：光感自动调光开关*/
+
+    /*集中器开关策略模式-预约模式*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_MODE_OF_OPPOINTMENT = 1;
+    /*集中器开关策略模式-经纬度开关*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_MODE_OF_LNG_AND_LAT = 2;
+    /*集中器开关策略模式-光感自动调光开关*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_MODE_OF_LIGHT_SENSOR = 3;
+
+    /*集中器开关策略周期模式：1：日期；2：星期*/
+
+    /*集中器开关策略周期模式：日期*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_CYCLE_MODE_OF_DATE = 1;
+    /*集中器开关策略周期模式：星期*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_CYCLE_MODE_OF_WEEK = 2;
+
+    /*集中器开关策略隔杆类型 0：全亮；1：隔一亮一；2：隔二亮一；3：隔一亮二；4：隔二亮二；*/
+
+    /*集中器开关策略隔杆类型-全亮*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_INTERVAL_TYPE_OF_ALL_BRIGHT = 0;
+    /*集中器开关策略隔杆类型-隔一亮一*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_INTERVAL_TYPE_OF_INTERVAL_ONE_BRIGHT_ONE = 1;
+    /*集中器开关策略隔杆类型-隔二亮一*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_INTERVAL_TYPE_OF_INTERVAL_TWO_BRIGHT_ONE = 2;
+    /*集中器开关策略隔杆类型-隔一亮二*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_INTERVAL_TYPE_OF_INTERVAL_ONE_BRIGHT_TWO = 3;
+    /*集中器开关策略隔杆类型-隔二亮二*/
+    public static final int CONCENTRATOR_SWITCH_STRATEGY_INTERVAL_TYPE_OF_INTERVAL_TWO_BRIGHT_TWO = 4;
+
+    /*文件素材（通用）*/
+
+    /*文件素材状态，1:正常，5：待下载、6：已下载、9:已删除*/
+    public static final int MATERIAL_STATUS_OF_NORMAL = 1; // 1:正常
+    public static final int MATERIAL_STATUS_OF_WATING_FOR_CUT = 4; // 4：待切割
+    public static final int MATERIAL_STATUS_OF_WATING_FOR_DOWNLOAD = 5; // 5：待下载
+    public static final int MATERIAL_STATUS_OF_HAVING_DOWNLOADED = 6; // 6：已下载
+    public static final int MATERIAL_STATUS_OF_DELETE = 9; // 9:已删除
+
+    /*文件素材审核状态 1：未审核；2：审核完成；3：审核不通过；4：文件被篡改；5：未找到文件；*/
+    public static final int MATERIAL_VERIFY_STATUS_OF_NOT_VERIFY = 1; // 1待审核
+    public static final int MATERIAL_VERIFY_STATUS_OF_VERIFY_PASSED = 2; // 2审核通过
+    public static final int MATERIAL_VERIFY_STATUS_OF_VERIFY_REFUSE = 3; // 3审核未通过
+    public static final int MATERIAL_VERIFY_STATUS_OF_VERIFY_FILE_CHANGE = 4; // 4文件被篡改
+    public static final int MATERIAL_VERIFY_STATUS_OF_VERIFY_FILE_NOT_FOUND = 5; // 5未找到文件
+    public static final int MATERIAL_VERIFY_STATUS_OF_VERIFY_TIME_OUT = 6; // 6策略过期
+
+    /*文件素材类型 1：图片；2：视频*/
+    public static final int MATERTAL_TYPE_OF_PICTURE = 1;
+    public static final int MATERTAL_TYPE_OF_VIDEO = 2;
+
+    /*屏幕播放策略*/
+
+    /*发送状态，1:下发成功，2:下发中；3：下发失败；9:已删除*/
+    public static final int SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_SEND_SUCCESS = 1; // 1:下发成功
+    public static final int SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_SENDING = 2; // 2:下发中
+    public static final int SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_SEND_FAILED = 3; // 3：下发失败
+    public static final int SCREEN_PLAY_STRATEGY_SEND_STATUS_OF_DETELE = 9; // 9:已删除
+
+    /*循环模式（1：顺序播放；2:随机播放）*/
+    public static final int SCREEN_PLAY_STRATEGY_LOOP_MODEL_OF_SEQUENCE = 1; // 1：顺序播放
+    public static final int SCREEN_PLAY_STRATEGY_LOOP_MODEL_OF_RANDOM = 2; // 2:随机播放
+
+    /*通用设备开关状态 1：开；0：关*/
+    public static final int DEVICE_SWITCH_STATUS_OF_OFF = 0; // 0：关
+    public static final int DEVICE_SWITCH_STATUS_OF_ON = 1; // 1：开
+
+    /*通用设备网络状态 1：在线；2：离线*/
+    public static final int DEVICE_NETWORK_STATUS_OF_ONLINE = 1; // 1：在线
+    public static final int DEVICE_NETWORK_STATUS_OF_OFFLINE = 2; // 2：离线
+
+    /*屏幕箱门状态；1：打开；0：关闭*/
+    public static final int SCREEN_DOOR_OPEND_STATUS_OF_OPEN = 1; // 1：打开
+    public static final int SCREEN_DOOR_OPEND_STATUS_OF_CLOSE = 0; // 0：关闭
+
+    /*路灯类型 1：普通路灯；2：智慧路灯*/
+    public static final int STREET_LIGHT_DEV_TYPE_OF_NORMAL_STREET = 1; // 1：普通路灯
+    public static final int STREET_LIGHT_DEV_TYPE_OF_SMART_STREET = 2; // 2：智慧路灯
+
+    /*路灯商标 1：think；2：科幻*/
+    public static final int STREET_LIGHT_BRAND_TYPE_OF_THINK = 1; // 1：think
+    public static final int STREET_LIGHT_BRAND_TYPE_OF_KEHUAN = 2; // 2：科幻
+
+    /*路灯挂载设备类型，1：摄像头；2：显示屏；3：WiFi；4：环境传感器*/
+    public static final int STREET_LIGHT_DEV_TYPE_OF_CAMERA = 1; // 1：摄像头
+    public static final int STREET_LIGHT_DEV_TYPE_OF_SCREEN = 2; // 2：显示屏
+    public static final int STREET_LIGHT_DEV_TYPE_OF_WIFI = 3; // 3：WiFi
+    public static final int STREET_LIGHT_DEV_TYPE_OF_ENVIRONMENT_SENSOR = 4; // 4：环境传感器
+    public static final int STREET_LIGHT_DEV_TYPE_OF_EMERGENCY_CALLING = 5; // 5：紧急求助
+    public static final int STREET_LIGHT_DEV_TYPE_OF_CHARGING_POINT = 6; // 6：充电桩
+
+    /*路灯LED灯*/
+
+    /*安装位置 1：顶部；2：中左；3：中右*/
+    public static final int STREET_LIGHT_LED_LIRHTS_INSTALL_LOCATION_OF_TOP = 1; // 1：顶部
+    public static final int STREET_LIGHT_LED_LIRHTS_INSTALL_LOCATION_OF_MIDDLE_LEFT = 2; // 2：中左
+    public static final int STREET_LIGHT_LED_LIRHTS_INSTALL_LOCATION_OF_MIDDLE_RIGHT = 3; // 3：中右
+
+    /*灯具形状，1：球形灯*/
+    public static final int STREET_LIGHT_LED_LIRHT_TYPE_OF_GLOBE_LANTERN = 1; // 1：球形灯
+
+    /*光源型号，1：高压钠灯*/
+    public static final int STREET_LIGHT_LED_LIRHT_SOURCE_TYPE_OF_HPSL = 1; // 1：高压钠灯
+
+    /*设备连接日志-连接类型：1：连接；2：断开*/
+    public static final int DEVICE_CONN_RECORD_CONN_TYPE_OF_CONNECT = 1; // 1：连接
+    public static final int DEVICE_CONN_RECORD_CONN_TYPE_OF_DISCONNECT = 2; // 2：断开
+
+    /*设备连接日志-设备类型：1：摄像头*/
+    public static final int DEVICE_CONN_RECORD_DEVICE_TYPE_OF_CAMERA = 1; // 1：摄像头
+    public static final int DEVICE_CONN_RECORD_DEVICE_TYPE_OF_SCREEN = 2; // 2：信息屏
+
+    /*系统操作日志-操作类型 1：新增；2：修改；3：删除*/
+    public static final int SYS_OPT_RECORD_OPT_TYPE_OF_ADD = 1; // 1：新增
+    public static final int SYS_OPT_RECORD_OPT_TYPE_OF_UPDATE = 2; // 2：修改
+    public static final int SYS_OPT_RECORD_OPT_TYPE_OF_DELETE = 3; // 3：删除
+
+    /*系统操作日志-操作模块：1用户；2组织；3权限*/
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_USER = 1; // 1用户
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_ORG = 2; // 2组织
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_PERMISSION = 3; // 3权限
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_CONCENTRATOR = 4; // 4集中器
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_CONCENTRATOR_STRATEGY = 5; // 5集中器策略
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_STREETLIGHT = 6; // 6路灯
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_SINGLE_LIGHT_CONTROLLER = 7; // 7单灯控制器
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_SCREEN = 8; // 8信息屏
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_SCREEN_PROGRAM = 9; // 9信息屏节目
+    public static final int SYS_OPT_RECORD_OPT_MODULE_OF_SCREEN_STRATEGY = 10; // 10信息屏策略
+
+    /*系统操作日志-操作终端：1：WEB; 2：APP.*/
+    public static final int SYS_OPT_RECORD_OPT_MODE_OF_WEB = 1; // 1：WEB
+    public static final int SYS_OPT_RECORD_OPT_MODE_OF_APP = 2; // 2：APP
+
+    /*系统登录日志-登录类型：1：登录；2：注销*/
+    public static final int SYS_USER_LOGIN_RECORD_LOGIN_TYPE_OF_LOGIN = 1; // 1：登录
+    public static final int SYS_USER_LOGIN_RECORD_LOGIN_TYPE_OF_LOGOUT = 2; // 2：注销
+
+    /*系统登录日志-登录终端：1：WEB; 2：APP.*/
+    public static final int SYS_USER_LOGIN_RECORD_LOGIN_MODE_OF_WEB = 1; // 1：WEB
+    public static final int SYS_USER_LOGIN_RECORD_LOGIN_MODE_OF_APP = 2; // 2：APP
+
+    /*升级包 发布状态：0：未发布；1：已发布；2：下架；9：删除*/
+    public static final int UPDATE_PKG_RELEASE_STATUS_OF_NOT_RELEASED = 0; // 0：未发布
+    public static final int UPDATE_PKG_RELEASE_STATUS_OF_HAVING_BEEN_RELEASED = 1; // 1：已发布
+    public static final int UPDATE_PKG_RELEASE_STATUS_OF_OUT_OF_SHELVES = 2; // 2：下架
+    public static final int UPDATE_PKG_RELEASE_STATUS_OF_DELETE = 9; // 9：删除
+
+    /*用户状态 0：超级管理员；1：普通用户*/
+    public static final int USER_STATUS_OF_ADMIN = 0; //  0：超级管理员
+    public static final int USER_STATUS_OF_NORMAL = 1; // 1：普通用户
+
+    /*信息屏节目布局类型 布局类型 1：视频；2：图片；3：文字；4：数字时钟；5：天气*/
+    public static final int SCREEN_PROGRAM_SOURCE_TYPE_OF_VIDEO = 1; //  1：视频
+    public static final int SCREEN_PROGRAM_SOURCE_TYPE_OF_IMAGE = 2; // 2：图片
+    public static final int SCREEN_PROGRAM_SOURCE_TYPE_OF_SINGLE_LINE_TEXT = 3; // 3：文字
+    public static final int SCREEN_PROGRAM_SOURCE_TYPE_OF_DIGITAL_CLOCK = 4; // 3：数字时钟
+    public static final int SCREEN_PROGRAM_SOURCE_TYPE_OF_WEATHER = 5; // 5：天气
+
+    /*传感器类型 1：环境传感器*/
+    public static final int SENSOR_TYPE_OF_ENVIRONMENTAL_SENSOR = 1; // 1：环境传感器
+
+}

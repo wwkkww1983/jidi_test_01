@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.UserInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.UserInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="company" property="company" jdbcType="VARCHAR" />
+    <result column="office" property="office" jdbcType="VARCHAR" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="avatar" property="avatar" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, type, username, password, mobile, email, company, office, `describe`, create_time,
+    update_time, status, avatar
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from user_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.UserInfo" >
+    insert into user_info (id, name, type, 
+      username, password, mobile, 
+      email, company, office, 
+      `describe`, create_time, update_time,
+      status, avatar)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
+      #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, #{company,jdbcType=VARCHAR}, #{office,jdbcType=VARCHAR}, 
+      #{describe,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{status,jdbcType=INTEGER}, #{avatar,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.UserInfo" >
+    insert into user_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="company != null" >
+        company,
+      </if>
+      <if test="office != null" >
+        office,
+      </if>
+      <if test="describe != null" >
+        `describe`,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="avatar != null" >
+        avatar,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="company != null" >
+        #{company,jdbcType=VARCHAR},
+      </if>
+      <if test="office != null" >
+        #{office,jdbcType=VARCHAR},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="avatar != null" >
+        #{avatar,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.UserInfo" >
+    update user_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="company != null" >
+        company = #{company,jdbcType=VARCHAR},
+      </if>
+      <if test="office != null" >
+        office = #{office,jdbcType=VARCHAR},
+      </if>
+      <if test="describe != null" >
+        `describe` = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="avatar != null" >
+        avatar = #{avatar,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.UserInfo" >
+    update user_info
+    set name = #{name,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      company = #{company,jdbcType=VARCHAR},
+      office = #{office,jdbcType=VARCHAR},
+      `describe` = #{describe,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=INTEGER},
+      avatar = #{avatar,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findByUsername" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from user_info where username=#{username} and status=${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+  </select>
+
+  <resultMap id="ResultMapList" type="com.rz.iot.think.model.show.UserManagerShowList">
+    <result column="id" property="id"></result>
+    <result column="name" property="name"></result>
+    <result column="org_name" property="orgName"></result>
+    <result column="org_id" property="orgId"></result>
+    <result column="user_org_rel_id" property="userOrgRelId"></result>
+    <result column="province_name" property="provinceName"></result>
+    <result column="city_name" property="cityName"></result>
+    <result column="district_name" property="districtName"></result>
+    <result column="area_name" property="areaName"></result>
+    <result column="username" property="username"></result>
+    <result column="email" property="email"></result>
+    <result column="mobile" property="mobile"></result>
+    <result column="type" property="type"></result>
+    <result column="company" property="company"></result>
+    <result column="describe" property="describe"></result>
+    <result column="avatar" property="avatar"></result>
+  </resultMap>
+
+  <!--找到所有的用户-->
+  <select id="findAll" resultMap="ResultMapList">
+    select t.*
+    from
+    (
+    select
+    user_info.id,
+    user_info.name,
+    org.id org_id,
+    user_org_rel.id user_org_rel_id,
+    org.name as org_name,
+    org_parent.name parent_name,
+    area_rel.province_name,
+    area_rel.city_name,
+    area_rel.district_name,
+    concat(area_rel.province_name, area_rel.city_name, area_rel.district_name) area_name,
+    user_info.username,
+    user_info.email,
+    user_info.mobile,
+    user_info.type,
+    user_info.company,
+    user_info.`describe`,
+    user_info.avatar,
+    user_info.status
+    from
+    user_info user_info
+    left join sys_user_org_rel user_org_rel on user_info.id = user_org_rel.user_id
+    left join sys_organization org on user_org_rel.org_id = org.id
+    left join sys_organization org_parent on org.parent_id = org_parent.id
+    left join iot_area_rel area_rel on org.area_rel_id = area_rel.id
+    where user_info.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    ) t
+    <where>
+      <if test="userManagerShowList.type!=null">
+        and t.type = #{userManagerShowList.type}
+      </if>
+      <if test="userManagerShowList.id!=null">
+        and t.id = #{userManagerShowList.id}
+      </if>
+      <if test="userManagerShowList.name!=null and userManagerShowList.name!=''">
+        and t.name like concat('%',#{userManagerShowList.name},'%')
+      </if>
+      <if test="userManagerShowList.areaName!=null and userManagerShowList.areaName!=''">
+        and t.area_name like concat('%',#{userManagerShowList.areaName},'%')
+      </if>
+      <if test="userManagerShowList.orgName!=null and userManagerShowList.orgName!=''">
+        and t.org_name like concat('%',#{userManagerShowList.orgName},'%')
+      </if>
+      <if test="userManagerShowList.type!=null">
+        and t.type = #{userManagerShowList.type}
+      </if>
+    </where>
+  </select>
+
+  <!--用户名远程搜索-->
+  <select id="remote" resultMap="BaseResultMap">
+    SELECT
+      user.id,
+      user.name
+    FROM
+      user_info user
+    WHERE
+      user.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      AND user.name LIKE CONCAT("%",#{name},"%")
+  </select>
+</mapper>

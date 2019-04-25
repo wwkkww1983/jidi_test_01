@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotSingleLightControllerMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotSingleLightController">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="concentrator_id" property="concentratorId" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="switch_status" property="switchStatus" jdbcType="INTEGER"/>
+        <result column="brightness" property="brightness" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, concentrator_id, name, status, switch_status, brightness, create_time, update_time
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from iot_single_light_controller
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from iot_single_light_controller
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.rz.iot.think.model.IotSingleLightController">
+        insert into iot_single_light_controller (id, concentrator_id, name,
+                                                 status, switch_status, brightness,
+                                                 create_time, update_time)
+        values (#{id,jdbcType=INTEGER}, #{concentratorId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
+                #{status,jdbcType=INTEGER}, #{switchStatus,jdbcType=INTEGER}, #{brightness,jdbcType=INTEGER},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotSingleLightController">
+        insert into iot_single_light_controller
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="concentratorId != null">
+                concentrator_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="switchStatus != null">
+                switch_status,
+            </if>
+            <if test="brightness != null">
+                brightness,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="concentratorId != null">
+                #{concentratorId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="switchStatus != null">
+                #{switchStatus,jdbcType=INTEGER},
+            </if>
+            <if test="brightness != null">
+                #{brightness,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotSingleLightController">
+        update iot_single_light_controller
+        <set>
+            <if test="concentratorId != null">
+                concentrator_id = #{concentratorId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="switchStatus != null">
+                switch_status = #{switchStatus,jdbcType=INTEGER},
+            </if>
+            <if test="brightness != null">
+                brightness = #{brightness,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotSingleLightController">
+        update iot_single_light_controller
+        set concentrator_id = #{concentratorId,jdbcType=INTEGER},
+            name            = #{name,jdbcType=VARCHAR},
+            status          = #{status,jdbcType=INTEGER},
+            switch_status   = #{switchStatus,jdbcType=INTEGER},
+            brightness      = #{brightness,jdbcType=INTEGER},
+            create_time     = #{createTime,jdbcType=TIMESTAMP},
+            update_time     = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <resultMap id="ResultMapFindByStreetlightId" type="com.rz.iot.think.model.show.IotSingleLightControllerShowForStreetLightDetail">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="concentrator_id" property="concentratorId" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="switch_status" property="switchStatus" jdbcType="INTEGER"/>
+        <result column="brightness" property="brightness" jdbcType="INTEGER"/>
+        <result column="led_lights_id" property="ledLightsId"></result>
+    </resultMap>
+
+    <!--根据路灯ID查询所有的单灯控制器-->
+    <select id="findByStreetlightId" resultMap="ResultMapFindByStreetlightId">
+        SELECT
+          controller.*,
+          controller_led_lights_rel.led_lights_id
+        FROM iot_single_light_controller controller,
+             iot_streetlight_slc_rel streetlight_slc_rel,
+             iot_single_light_controller_led_lights_rel controller_led_lights_rel
+        WHERE controller.id = streetlight_slc_rel.slc_id
+          AND streetlight_slc_rel.streetlight_id = #{streetlightId}
+          AND controller.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND streetlight_slc_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND controller_led_lights_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND controller.id = controller_led_lights_rel.slc_id
+    </select>
+
+
+    <resultMap id="GisNeededMap" type="java.util.HashMap">
+        <id column="slcId" property="slcId" jdbcType="INTEGER"/>
+        <result column="ledSn" property="ledSn" jdbcType="VARCHAR"/>
+        <result column="slcStatus" property="slcStatus" jdbcType="INTEGER"/>
+        <result column="switch_status" property="switch_status" jdbcType="INTEGER"/>
+        <result column="ledId" property="ledId" jdbcType="INTEGER"/>
+        <result column="installLocation" property="installLocation" jdbcType="INTEGER"/>
+    </resultMap>
+    <!--根据单灯控制器的一串id，获取单灯控制器信息列表-->
+    <select id="getInfosBySlcIds" parameterType="java.util.List" resultMap="GisNeededMap">
+        SELECT
+        slc.id slcId,
+        led.sn ledSn,
+        slc.`status` slcStatus,
+        slc.switch_status switch_status,
+        slcLedRel.let_lights_id ledId,
+        led.install_location installLocation
+        FROM
+        iot_single_light_controller slc
+        LEFT JOIN iot_single_light_controller_led_lights_rel slcLedRel ON slc.id = slcLedRel.slc_id
+        LEFT JOIN iot_streetlight_led_lights led ON led.id = slcLedRel.let_lights_id
+        WHERE
+        slc.id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--根据集中器id查找单灯控制器-->
+    <select id="findByConcentratorId" resultMap="BaseResultMap">
+        SELECT controller.*
+        FROM iot_single_light_controller controller
+        WHERE controller.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND controller.concentrator_id = #{concentratorId}
+    </select>
+
+    <!--批量插入单灯控制器信息-->
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into iot_single_light_controller
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">
+                id,
+            </if>
+            <if test="list[0].sn != null">
+                sn,
+            </if>
+            <if test="list[0].concentratorId != null">
+                concentrator_id,
+            </if>
+            <if test="list[0].name != null">
+                name,
+            </if>
+            <if test="list[0].status != null">
+                status,
+            </if>
+            <if test="list[0].switchStatus != null">
+                switch_status,
+            </if>
+            <if test="list[0].brightness != null">
+                brightness,
+            </if>
+            <if test="list[0].createTime != null">
+                create_time,
+            </if>
+            <if test="list[0].updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        values
+        <foreach collection="list" separator="," item="item">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">
+                    #{item.id,jdbcType=INTEGER},
+                </if>
+                <if test="item.sn != null">
+                    #{item.sn,jdbcType=INTEGER},
+                </if>
+                <if test="item.concentratorId != null">
+                    #{item.concentratorId,jdbcType=INTEGER},
+                </if>
+                <if test="item.name != null">
+                    #{item.name,jdbcType=VARCHAR},
+                </if>
+                <if test="item.status != null">
+                    #{item.status,jdbcType=INTEGER},
+                </if>
+                <if test="item.switchStatus != null">
+                    #{item.switchStatus,jdbcType=INTEGER},
+                </if>
+                <if test="item.brightness != null">
+                    #{item.brightness,jdbcType=INTEGER},
+                </if>
+                <if test="item.createTime != null">
+                    #{item.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="item.updateTime != null">
+                    #{item.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+
+    <update id="fakeDelete" parameterType="java.lang.Integer">
+        UPDATE iot_single_light_controller
+        SET status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+        WHERE concentrator_id = #{concentratorId}
+    </update>
+
+    <!--查找未与路灯绑定的单灯控制器-->
+    <select id="findNoBindingWithStreetLight" resultMap="BaseResultMap">
+        SELECT *
+        FROM
+          (
+            SELECT single_light_controller.*
+            FROM
+              iot_single_light_controller single_light_controller
+            WHERE
+              single_light_controller.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+          ) t1
+          LEFT JOIN
+          (
+            SELECT single_light_controller.*
+            FROM
+              iot_single_light_controller single_light_controller,
+              iot_streetlight_slc_rel streetlight_slc_rel
+            WHERE
+              single_light_controller.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+              AND streetlight_slc_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+              AND streetlight_slc_rel.slc_id = single_light_controller.id
+          ) t2 ON t1.id = t2.id
+        WHERE t2.id IS NULL
+    </select>
+</mapper>

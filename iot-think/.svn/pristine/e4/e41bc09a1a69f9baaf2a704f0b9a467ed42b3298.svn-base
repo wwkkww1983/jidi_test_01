@@ -1,0 +1,241 @@
+package com.rz.iot.think.mqtt.model;
+
+import com.rz.iot.think.mqtt.model.publish.ConcentratorCtrlCmdPublish;
+import com.rz.iot.think.mqtt.model.publish.ConcentratorWarnConfigPublish;
+import com.rz.iot.think.mqtt.model.report.*;
+import com.rz.iot.think.mqtt.util.MsgIdUtils;
+import com.rz.iot.think.mqtt.util.RzIotConcentratorConstParam;
+import com.rz.iot.utils.RzIotDatetime;
+import com.rz.iot.utils.RzIotDigit;
+import com.rz.iot.utils.RzIotString;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Author by xuxiake, Date on 2019/4/11.
+ * PS: Not easy to write code, please indicate.
+ * Description: 集中器消息传输基础类
+ */
+@Data
+@Slf4j
+public class ConcentratorMessageBase {
+
+    // 操作码
+    private int operateCode;
+    // 加密标志
+    private int encryptType;
+    // 消息ID
+    private int msgId;
+    // 时间戳
+    private long timestamp;
+    // 集中器序列号
+    private String serialNo;
+    // 数据长度
+    private int length;
+    // 数据内容
+    private Object object;
+    // 集中器id
+    private int concentratorId;
+
+    // 编码
+    public String encode() {
+
+        StringBuffer sb = new StringBuffer();
+
+        // 操作码
+        sb.append(RzIotDigit.intToHexString(operateCode, 1));
+        // 加密标志
+        sb.append(RzIotDigit.intToHexString(0, 1));
+        // 消息ID
+        sb.append(RzIotDigit.intToHexString(MsgIdUtils.getMsgId(), 2));
+        // 时间戳
+        sb.append(RzIotDigit.longToHexString(RzIotDatetime.getTimestamp(), 4));
+        // 集中器序列号
+        sb.append(RzIotDigit.charArrayToHexString(serialNo.toCharArray(), 16));
+        // 数据内容以及数据长度
+        switch (operateCode) {
+            case RzIotConcentratorConstParam.PUBLISH_COMMON:
+                // 服务端控制命令下发
+
+                break;
+            case RzIotConcentratorConstParam.PUBLISH_CTRL_CMD:
+                // 服务端输出控制命令下发
+                List<ConcentratorCtrlCmdPublish> ctrlCmdPublishes = (List<ConcentratorCtrlCmdPublish>) this.object;
+                sb.append(RzIotDigit.intToHexString(ctrlCmdPublishes.size() * 4, 2));
+                for (ConcentratorCtrlCmdPublish ctrlCmdPublish : ctrlCmdPublishes) {
+                    sb.append(RzIotDigit.intToHexString(ctrlCmdPublish.getType(), 1));
+                    sb.append(RzIotDigit.intToHexString(ctrlCmdPublish.getNo(), 1));
+                    sb.append(RzIotDigit.intToHexString(ctrlCmdPublish.getNc(), 1));
+                    sb.append(RzIotDigit.intToHexString(ctrlCmdPublish.getValue(), 1));
+                }
+                break;
+            case RzIotConcentratorConstParam.PUBLISH_WARN_CONFIG:
+                // 服务端告警参数下发
+                List<ConcentratorWarnConfigPublish> warnConfigPublishes = (List<ConcentratorWarnConfigPublish>) this.object;
+                sb.append(RzIotDigit.intToHexString(warnConfigPublishes.size() * 5, 2));
+                for (ConcentratorWarnConfigPublish warnConfigPublish : warnConfigPublishes) {
+                    sb.append(RzIotDigit.intToHexString(warnConfigPublish.getType(), 1));
+                    sb.append(RzIotDigit.intToHexString(warnConfigPublish.getNo(), 1));
+                    sb.append(RzIotDigit.intToHexString(warnConfigPublish.getNc(), 1));
+                    sb.append(RzIotDigit.intToHexString(warnConfigPublish.getValue(), 2));
+                }
+                break;
+            case RzIotConcentratorConstParam.PUBLISH_SWITCH_STRATEGY:
+                // 服务端预约参数下发
+                break;
+            case RzIotConcentratorConstParam.PUBLISH_TIMING:
+                // 校时命令下发
+
+                Map<String, Integer> datetime = RzIotDatetime.timestampToDateTime(RzIotDatetime.getTimestamp());
+                sb.append(RzIotDigit.intToHexString(7, 2));
+                sb.append(RzIotDigit.intToHexString((Integer)datetime.get("second"), 1));
+                sb.append(RzIotDigit.intToHexString((Integer)datetime.get("minute"), 1));
+                sb.append(RzIotDigit.intToHexString((Integer)datetime.get("hour"), 1));
+                sb.append(RzIotDigit.intToHexString((Integer)datetime.get("week"), 1));
+                sb.append(RzIotDigit.intToHexString((Integer)datetime.get("day"), 1));
+                sb.append(RzIotDigit.intToHexString((Integer)datetime.get("month"), 1));
+                sb.append(RzIotDigit.intToHexString((Integer)datetime.get("year"), 1));
+                break;
+            case RzIotConcentratorConstParam.PUBLISH_ENERGY_REPORT_TIME:
+                // 电量定时上报时间下发
+                break;
+            case RzIotConcentratorConstParam.PUBLISH_REMOTE_UPGRADE:
+                // 服务端升级指令下发
+                break;
+        }
+
+        return null;
+    }
+
+    // 解码
+    public void decode(byte[] data) {
+//        if (data.length < 16)
+//            return false;
+
+        // 操作码
+        operateCode = RzIotDigit.getUnInt(data, 0);
+        // 加密标志
+        encryptType = RzIotDigit.getInt8(data, 1);
+        // 消息ID
+        msgId = RzIotDigit.getUnInt16(data, 2);
+        // 时间戳
+        timestamp = RzIotDigit.getHighUnInt32(data, 4);
+        // 集中器序列号
+        serialNo = RzIotString.getStringFromByteArray(data, 8, 16);
+        // 数据长度
+        length = RzIotDigit.getUnInt16(data, 24);
+        // 消息头长度
+        int offset = RzIotConcentratorConstParam.DATA_HEAD_LENGTH;
+        switch (operateCode) {
+            case RzIotConcentratorConstParam.REPORT_OF_FAULT:
+                // 告警数据上报
+                List<ConcentratorFaultReport> concentratorFaultReports = new ArrayList<>();
+
+                final int numBytesPerPacket = 4;
+                for (int i = 0; i + numBytesPerPacket < length; i += numBytesPerPacket) {
+
+                    Integer faultSource = RzIotDigit.getUnInt(data, offset + i);
+                    Integer faultNumber = RzIotDigit.getUnInt(data, offset + i + 1);
+                    Integer faultContent = RzIotDigit.getUnInt(data, offset + i + 2);
+                    Integer faultValue = RzIotDigit.getUnInt(data, offset + i + 3);
+                    byte[] faultData = Arrays.copyOfRange(data,offset + i, offset + i + 3);
+                    String faultInfo = RzIotDigit.bytes2HexString(faultData);
+
+                    ConcentratorFaultReport concentratorFaultReport = new ConcentratorFaultReport(faultData, faultInfo, faultSource, faultNumber, faultContent, faultValue);
+                    concentratorFaultReports.add(concentratorFaultReport);
+                }
+
+                object = concentratorFaultReports;
+
+                break;
+            case RzIotConcentratorConstParam.REPORT_OF_SWITCH_STATUS:
+                // 输出（开关）状态上报
+
+                List<ConcentratorLineOutReport> concentratorLineOutReports = new ArrayList<>();
+                int lineOuts = (length - offset) >> 2;
+
+                for (int i = 0; i < lineOuts; ++i) {
+
+                    int source = RzIotDigit.getUnInt(data, offset + i * 4);
+                    int number = RzIotDigit.getUnInt(data, offset + i * 4 + 1);
+                    int status = RzIotDigit.getUnInt(data, offset + i * 4 + 3);
+                    ConcentratorLineOutReport concentratorLineOutReport = new ConcentratorLineOutReport(source, number, status);
+                    concentratorLineOutReports.add(concentratorLineOutReport);
+                }
+
+                object = concentratorLineOutReports;
+                break;
+            case RzIotConcentratorConstParam.REPORT_OF_ELECTRIC_PARAM:
+                // 电气参数上报
+
+                ConcentratorElectricParamReport electricParamReport = new ConcentratorElectricParamReport();
+                electricParamReport.setParam(data, offset, length);
+                object = electricParamReport;
+
+                break;
+            case RzIotConcentratorConstParam.REPORT_OF_FAULT_PARAM:
+                // 告警参数上报
+                ConcentratorFaultParamReport concentratorFaultParamReport = new ConcentratorFaultParamReport();
+                concentratorFaultParamReport.setParam(data, offset, length);
+
+                break;
+            case RzIotConcentratorConstParam.REPORT_OF_CONFIG_PARAM:
+                // 配置参数上报
+
+                ConcentratorConfigParamReport concentratorConfigParamReport = new ConcentratorConfigParamReport();
+                concentratorConfigParamReport.setParam(data, offset, length);
+
+                object = concentratorConfigParamReport;
+
+                break;
+            case RzIotConcentratorConstParam.REPORT_OF_CURRENT_TIME:
+                // 当前时间上报
+                ConcentratorDateTimeReport concentratorDateTimeReport = new ConcentratorDateTimeReport();
+                concentratorDateTimeReport.setParam(data, offset, length);
+                object = concentratorDateTimeReport;
+
+                break;
+            case RzIotConcentratorConstParam.REPORT_OF_SWITCH_STRATEGY:
+                // 开关策略（预约方案）上报
+
+                break;
+            case RzIotConcentratorConstParam.REPORT_OF_ENERGY:
+                // RTU电量上报
+
+                ConcentratorElectricQuantityReport concentratorElectricQuantityReport = new ConcentratorElectricQuantityReport();
+                concentratorElectricQuantityReport.setParam(data, offset, length);
+                break;
+            case RzIotConcentratorConstParam.REPORT_OF_ENVIRONMENT_PARAM:
+
+                // RTU环境参数上报
+
+
+                break;
+
+            case RzIotConcentratorConstParam.REPORT_OF_HEARTBEAT_AND_SIGNAL_STRENGTH:
+                // 心跳 && 信号强度上报
+                // 信号强度
+                int signalStrength = RzIotDigit.getInt8(data, offset);
+                ConcentratorHeartbeatReport concentratorHeartbeatReport = new ConcentratorHeartbeatReport();
+                concentratorHeartbeatReport.setSignalStrength(signalStrength);
+                object = concentratorHeartbeatReport;
+
+                break;
+
+            case RzIotConcentratorConstParam.REPORT_OF_AUTH:
+                // 身份认证上报
+                break;
+
+
+            case RzIotConcentratorConstParam.REPORT_OF_REMOTE_UPGRADE:
+                // 升级步骤上报
+
+                break;
+        }
+    }
+}

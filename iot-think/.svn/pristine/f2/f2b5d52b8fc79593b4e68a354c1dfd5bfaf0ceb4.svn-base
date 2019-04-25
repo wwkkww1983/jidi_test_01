@@ -1,0 +1,133 @@
+package com.rz.iot.think.service.impl;
+
+import com.rz.iot.think.mapper.screen.IotScreenPicInfoMapper;
+import com.rz.iot.think.model.Page;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.UserInfo;
+import com.rz.iot.think.model.screen.IotScreenPicInfo;
+import com.rz.iot.think.service.IotScreenPicService;
+import com.rz.iot.think.utils.RzIotErrMessage;
+import com.rz.iot.think.utils.RzIotFileUtils;
+import com.rz.iot.utils.MD5;
+import it.sauronsoftware.jave.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
+
+/**
+ * @Auther: yyjuan
+ * @Date: 2019/3/25 0025 11:29
+ * @Description:
+ */
+@Service
+@Slf4j
+public class IotScreenPicServiceImpl implements IotScreenPicService {
+
+    @Value("${file.screen_pic_path}")
+    private String SCREEN_PIC_PATH;
+//
+//    @Value("${file.protocol_header}")
+//    private String PRPTPCOL_HEADER;
+
+    @Value(("${file.video_path_disc_local}"))
+    public String VIDEO_PATH_DISC_LOCAL;
+
+    @Value("${file.ftp_ip}")
+    public String FTP_IP;
+
+    @Value("${file.protocol_header}")
+    public String PROTOCOL_HEADER;
+
+    @Resource
+    private IotScreenPicInfoMapper iotScreenPicInfoMapper;
+
+    @Override
+    public Result updatePic(MultipartFile[] files, HttpServletRequest request) {
+        Result result = new Result();
+
+        result.setCode(RzIotErrMessage.EXCEPTION);
+        //保存文件
+
+        try {
+            for (MultipartFile file : files) {
+
+                //获得原始文件名
+                String originalFilename = file.getOriginalFilename();
+                //文件大小
+                long fileSize = file.getSize();
+                //获得文件后缀名
+                String extName = originalFilename.substring(originalFilename.lastIndexOf(".") + 1, originalFilename.length());
+
+                //用UUID产生不重复文件名
+                String fileName = UUID.randomUUID().toString() + "." + extName;
+
+                //将视频保存到视频服务器，
+                File destFile = new File(VIDEO_PATH_DISC_LOCAL+SCREEN_PIC_PATH, fileName);
+
+                FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
+                //获得文件md5值
+                String md5 = MD5.getSHA1(destFile);
+                if (md5.length() == 39) {
+                    md5 = "0" + md5;
+                }
+
+                BufferedImage image = ImageIO.read(file.getInputStream());
+                Integer width = image.getWidth();
+                Integer height = image.getHeight();
+
+                String resolution = height + "*" + width;
+                log.debug("视频分辨率：" + resolution);
+
+
+                UserInfo iotUserInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+                IotScreenPicInfo iotScreenPicInfo = new IotScreenPicInfo();
+                iotScreenPicInfo.setName(fileName);
+                iotScreenPicInfo.setHashKey(md5);
+                iotScreenPicInfo.setFileSize((int)fileSize);
+                iotScreenPicInfo.setPicUrl(PROTOCOL_HEADER + FTP_IP + SCREEN_PIC_PATH + fileName);
+                iotScreenPicInfo.setStatus(1);
+                iotScreenPicInfo.setResolution(resolution);
+//                iotScreenPicInfo.setCreateAdmin(iotUserInfo.getId());
+
+                iotScreenPicInfoMapper.insertSelective(iotScreenPicInfo);
+
+
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public Result picDetail(Integer id) {
+        return null;
+    }
+
+    @Override
+    public Result findList(IotScreenPicInfo iotScreenPicInfo, Page<IotScreenPicInfo> page) {
+        return null;
+    }
+
+    @Override
+    public Result delPic(Integer id) {
+        return null;
+    }
+}

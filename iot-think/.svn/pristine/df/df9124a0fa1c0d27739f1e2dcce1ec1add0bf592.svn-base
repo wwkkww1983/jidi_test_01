@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotConcentratorMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotConcentrator" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sn" property="sn" jdbcType="VARCHAR" />
+    <result column="phase_type" property="phaseType" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="switch_status" property="switchStatus" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="INTEGER" />
+    <result column="lng" property="lng" jdbcType="DOUBLE" />
+    <result column="lat" property="lat" jdbcType="DOUBLE" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="builder_id" property="builderId" jdbcType="INTEGER" />
+    <result column="road_id" property="roadId" jdbcType="BIGINT" />
+    <result column="full_address" property="fullAddress" jdbcType="VARCHAR" />
+    <result column="area_rel_id" property="areaRelId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, `name`, sn, phase_type, `status`, switch_status, version, ip, port, lng, lat, `describe`,
+    builder_id, road_id, full_address, area_rel_id, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_concentrator
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="findSingleLightsByCSN" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+      select c.id,c.name from iot_single_light_controller c
+        left join iot_concentrator ic on c.concentrator_id = ic.id and ic.`status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+        left join iot_business_user_rel rel on rel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_CONCENTRATOR}
+      where ic.`status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL} and ic.`sn` = #{sn}
+      AND
+      (
+      CASE
+      (
+      SELECT type
+      FROM user_info
+      WHERE id = #{userId}
+      )
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+      THEN
+      rel.user_id = #{userId}
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+      THEN
+      true
+      END
+      )
+      GROUP BY c.id
+  </select>
+
+  <select id="findPower" resultType="com.rz.iot.think.model.show.ShowIotPower">
+    select con.id as id,con.name as name,con.sn as sn,iar.district_name as districtName,iacr.road_name as roadName,icp.active_power as consumePower,
+    iep.price as elecPrice,icp.update_time as updateTime from iot_concentrator con
+    left join iot_area_rel iar on con.area_rel_id = iar.id
+    left join iot_area_city_road iacr on con.road_id = iacr.id
+    left join iot_concentrator_power icp on con.id = icp.concentrator_id
+    left join iot_energy_price iep on iep.area_rel_id = con.area_rel_id
+    left join iot_business_user_rel rel on rel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_CONCENTRATOR} and rel.business_id = con.id
+    left join iot_single_light_controller islc on islc.concentrator_id =  con.id and islc.`status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    left join iot_streetlight_slc_rel issr on issr.slc_id = islc.id
+    where con.`status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      <if test="iotPowerParam.cycleMode != null">
+        AND (CASE (#{iotPowerParam.cycleMode})
+        WHEN '1'
+        THEN to_days(icp.create_time) = to_days(now())
+        WHEN '2'
+        THEN DATE_FORMAT(icp.create_time,'%Y%m') = DATE_FORMAT(CURDATE(),'%Y%m')
+        WHEN '3'
+        THEN YEAR(icp.create_time)=YEAR(NOW())
+        END
+        )
+      </if>
+      <if test="iotPowerParam.sn != null">
+          and c.sn = #{iotPowerParam.sn}
+      </if>
+      <if test="iotPowerParam.singleLightId != null">
+          and islc.id = #{iotPowerParam.singleLightId}
+      </if>
+      <if test="iotPowerParam.streetLightId != null">
+          and issr.streetlight_id = #{iotPowerParam.streetLightId}
+      </if>
+      <if test="iotPowerParam.streetId != null">
+          and iacr.id = #{iotPowerParam.streetId}
+      </if>
+      <if test="iotPowerParam.areaId != null">
+          and iar.id = #{iotPowerParam.areaId}
+      </if>
+      AND
+      (
+      CASE
+      (
+      SELECT type
+      FROM user_info
+      WHERE id = #{userId}
+      )
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+      THEN
+      rel.user_id = #{userId}
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+      THEN
+      true
+      END
+      )
+    GROUP BY con.id
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_concentrator
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotConcentrator" >
+    insert into iot_concentrator (id, name, sn, 
+      phase_type, status, switch_status, 
+      version, ip, port, 
+      lng, lat, `describe`, builder_id,
+      road_id, full_address, area_rel_id,
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{sn,jdbcType=VARCHAR}, 
+      #{phaseType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{switchStatus,jdbcType=INTEGER}, 
+      #{version,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{port,jdbcType=INTEGER}, 
+      #{lng,jdbcType=DOUBLE}, #{lat,jdbcType=DOUBLE}, #{describe,jdbcType=VARCHAR}, #{builderId,jdbcType=INTEGER}, 
+      #{roadId,jdbcType=BIGINT}, #{fullAddress,jdbcType=VARCHAR}, #{areaRelId,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.rz.iot.think.model.IotConcentrator" >
+    insert into iot_concentrator
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="sn != null" >
+        sn,
+      </if>
+      <if test="phaseType != null" >
+        phase_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="switchStatus != null" >
+        switch_status,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="port != null" >
+        port,
+      </if>
+      <if test="lng != null" >
+        lng,
+      </if>
+      <if test="lat != null" >
+        lat,
+      </if>
+      <if test="describe != null" >
+        describe,
+      </if>
+      <if test="builderId != null" >
+        builder_id,
+      </if>
+      <if test="roadId != null" >
+        road_id,
+      </if>
+      <if test="fullAddress != null" >
+        full_address,
+      </if>
+      <if test="areaRelId != null" >
+        area_rel_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        #{sn,jdbcType=VARCHAR},
+      </if>
+      <if test="phaseType != null" >
+        #{phaseType,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="switchStatus != null" >
+        #{switchStatus,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null" >
+        #{port,jdbcType=INTEGER},
+      </if>
+      <if test="lng != null" >
+        #{lng,jdbcType=DOUBLE},
+      </if>
+      <if test="lat != null" >
+        #{lat,jdbcType=DOUBLE},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="builderId != null" >
+        #{builderId,jdbcType=INTEGER},
+      </if>
+      <if test="roadId != null" >
+        #{roadId,jdbcType=BIGINT},
+      </if>
+      <if test="fullAddress != null" >
+        #{fullAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="areaRelId != null" >
+        #{areaRelId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <!--根据IotSwitchBindConcentrator对集中器进行修改-->
+  <update id="updateConcentrators" parameterType="com.rz.iot.think.model.IotSwitchBindConcentrator">
+      update iot_concentrator SET switch_status = #{switchStatus} where
+       <foreach collection="concentratorId" item="item" separator="or">
+         id = #{item}
+       </foreach>
+  </update>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotConcentrator" >
+    update iot_concentrator
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        sn = #{sn,jdbcType=VARCHAR},
+      </if>
+      <if test="phaseType != null" >
+        phase_type = #{phaseType,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="switchStatus != null" >
+        switch_status = #{switchStatus,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null" >
+        port = #{port,jdbcType=INTEGER},
+      </if>
+      <if test="lng != null" >
+        lng = #{lng,jdbcType=DOUBLE},
+      </if>
+      <if test="lat != null" >
+        lat = #{lat,jdbcType=DOUBLE},
+      </if>
+      <if test="describe != null" >
+        `describe` = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="builderId != null" >
+        builder_id = #{builderId,jdbcType=INTEGER},
+      </if>
+      <if test="roadId != null" >
+        road_id = #{roadId,jdbcType=BIGINT},
+      </if>
+      <if test="fullAddress != null" >
+        full_address = #{fullAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="areaRelId != null" >
+        area_rel_id = #{areaRelId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotConcentrator" >
+    update iot_concentrator
+    set name = #{name,jdbcType=VARCHAR},
+      sn = #{sn,jdbcType=VARCHAR},
+      phase_type = #{phaseType,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      switch_status = #{switchStatus,jdbcType=INTEGER},
+      version = #{version,jdbcType=VARCHAR},
+      ip = #{ip,jdbcType=VARCHAR},
+      port = #{port,jdbcType=INTEGER},
+      lng = #{lng,jdbcType=DOUBLE},
+      lat = #{lat,jdbcType=DOUBLE},
+      `describe` = #{describe,jdbcType=VARCHAR},
+      builder_id = #{builderId,jdbcType=INTEGER},
+      road_id = #{roadId,jdbcType=BIGINT},
+      full_address = #{fullAddress,jdbcType=VARCHAR},
+      area_rel_id = #{areaRelId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!--用id获取集中器信息-->
+  <select id="findById" resultType="java.util.HashMap">
+    SELECT concentrator.id concentratorId,
+           concentrator.name concentratorName,
+           concentrator.sn concentratorSn,
+           concentrator.status concentratorStatus,
+           concentrator.version concentratorVersion,
+           concentrator.ip concentratorIp,
+           confault.type faultType,
+           confaultdesc.`desc` faultDesc,
+           confault.update_time
+    FROM iot_concentrator concentrator
+           LEFT JOIN iot_concentrator_fault confault on concentrator.id = confault.concentrator_id
+           LEFT JOIN iot_concentrator_fault_desc confaultdesc on confault.type = confaultdesc.type
+    WHERE concentrator.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    AND concentrator.id = #{concentratorID}
+  </select>
+
+  <!--获取详细的集中器信息-->
+  <select id="getDetailById" resultType="java.util.HashMap">
+    SELECT DISTINCT concentrator.id concentratorId,
+                    concentrator.name,
+                    concentrator.sn,
+                    areaRel.district_name,
+                    road.road_name,
+                    concentrator.status,
+                    concentrator.lat,
+                    concentrator.lng,
+                    concentrator.phase_type,
+                    power.voltage,
+                    power.electric_current,
+                    lineInNum.lineInNum
+    FROM iot_concentrator concentrator
+           LEFT JOIN (SELECT concentrator_id,
+                             lineIn.id,
+                             lineInPower.voltage,
+                             lineInPower.electric_current
+                      FROM iot_concentrator_line_in lineIn,
+                           iot_concentrator_line_in_power lineInPower WHERE
+                           lineIn.id = lineInPower.line_in_id
+    ) power ON concentrator.id = power.concentrator_id
+           LEFT JOIN iot_area_rel areaRel ON areaRel.id = concentrator.area_rel_id
+           LEFT JOIN iot_area_city_road road ON road.id = concentrator.road_id
+           LEFT JOIN (SELECT concentrator_id,
+                             COUNT(*) lineInNum
+                      FROM iot_concentrator_line_in GROUP BY concentrator_id) lineInNum
+                      ON concentrator.id = lineInNum.concentrator_id
+    WHERE concentrator.id = #{concentratorId}
+           AND concentrator.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+  </select>
+
+  <!--通过集中器id查询单灯控制器信息-->
+  <select id="getSlcByConcentratorId" resultType="java.util.HashMap">
+    SELECT slc.id slcId,
+           slc.status slcStatus,
+           slc.switch_status,
+           slcFault.status fixStatus,
+           slcFault.level faultLevel,
+           faultDesc.`desc`,
+           slcFault.type slcFaultType,
+           slcFault.update_time slcFaultUpdateTime
+    FROM iot_single_light_controller slc
+    LEFT JOIN iot_single_light_controller_fault slcFault ON slc.id = slcFault.slc_id
+    LEFT JOIN iot_concentrator_fault_desc faultDesc ON faultDesc.type = slcFault.type
+    WHERE concentrator_id = #{concentratorId}
+      AND slc.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+  </select>
+
+  <select id="getSlcForConcentrator" resultType="java.util.HashMap">
+    SELECT slc.sn slcSn,
+           streetlight.name streetlightName,
+           streetlight.sn streetlightSn,
+           streetlight.lat,
+           streetlight.lng
+    FROM iot_single_light_controller slc
+           LEFT JOIN iot_streetlight_slc_rel streetlightSlcRel ON slc.id = streetlightSlcRel.slc_id
+           LEFT JOIN iot_streetlight streetlight ON streetlight.id = streetlightSlcRel.streetlight_id
+      WHERE slc.concentrator_id = #{concentratorId}
+  </select>
+
+  <select id="getLineIn" resultType="java.util.HashMap">
+    SELECT lineIn.id,
+           CASE lineIn.type
+             WHEN 0 THEN "单相"
+             WHEN 1 THEN "A相"
+             WHEN 2 THEN "B相"
+             WHEN 3 THEN "C相"
+             WHEN 4 THEN "合相"
+           END AS phase,
+           power.voltage,
+           power.electric_current,
+           power.active_power,
+           power.apparent_power,
+           power.reactive_power,
+           power.power_factor,
+           power.remain_current,
+           power.line_frequency
+    FROM iot_concentrator_line_in lineIn
+    LEFT JOIN iot_concentrator_line_in_power power ON power.line_in_id = lineIn.id
+    WHERE concentrator_id = #{concentratorId}
+  </select>
+
+  <select id="getLineOut" resultType="java.util.HashMap">
+    SELECT id,
+           no
+    FROM iot_concentrator_line_out
+    WHERE concentrator_id = #{concentratorId}
+  </select>
+
+  <resultMap id="ResultMapFindAll" type="com.rz.iot.think.model.show.IotConcentratorShowList">
+    <result column="id" property="id"></result>
+    <result column="name" property="name"></result>
+    <result column="sn" property="sn"></result>
+    <result column="status" property="status"></result>
+    <result column="switch_status" property="switchStatus"></result>
+    <result column="province_id" property="provinceId"></result>
+    <result column="province_name" property="provinceName"></result>
+    <result column="city_id" property="cityId"></result>
+    <result column="city_name" property="cityName"></result>
+    <result column="district_id" property="districtId"></result>
+    <result column="district_name" property="districtName"></result>
+    <result column="road_id" property="roadId"></result>
+    <result column="road_name" property="roadName"></result>
+    <result column="strategy_mode" property="strategyMode"></result>
+    <result column="cycle_mode" property="cycleMode"></result>
+    <result column="start_date" property="startDate"></result>
+    <result column="end_date" property="endDate"></result>
+    <result column="week" property="week"></result>
+    <result column="start_time" property="startTime"></result>
+    <result column="end_time" property="endTime"></result>
+    <result column="ip" property="ip"></result>
+    <result column="port" property="port"></result>
+    <result column="phase_type" property="phaseType"></result>
+    <result column="version" property="version"></result>
+  </resultMap>
+
+  <!--查询集中器列表-->
+  <select id="findAll" resultMap="ResultMapFindAll">
+    SELECT
+      t.*
+    FROM
+    (
+      SELECT
+        concentrator.id,
+        concentrator.name,
+        concentrator.sn,
+        concentrator.status,
+        concentrator.switch_status,
+        area_rel.province_id,
+        area_rel.province_name,
+        area_rel.city_id,
+        area_rel.city_name,
+        area_rel.district_id,
+        area_rel.district_name,
+        city_road.id road_id,
+        city_road.road_name,
+        t1.strategy_mode,
+        t1.cycle_mode,
+        t1.start_date,
+        t1.end_date,
+        t1.week,
+        t1.start_time,
+        t1.end_time,
+        concentrator.ip,
+        concentrator.port,
+        concentrator.phase_type,
+        concentrator.version
+      FROM
+        iot_concentrator concentrator
+        LEFT JOIN iot_area_rel area_rel ON area_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL} AND area_rel.id = concentrator.area_rel_id
+        LEFT JOIN iot_area_city_road city_road ON city_road.area_id = area_rel.id
+        LEFT JOIN
+        (
+          SELECT
+            concentrator_strategy_rel.concentrator_id,
+            concentrator_switch_strategy.strategy_mode,
+            concentrator_switch_strategy.cycle_mode,
+            concentrator_switch_strategy.start_date,
+            concentrator_switch_strategy.end_date,
+            concentrator_switch_strategy.week,
+            concentrator_switch_strategy.start_time,
+            concentrator_switch_strategy.end_time
+          FROM
+            iot_concentrator_switch_strategy concentrator_switch_strategy,
+            iot_concentrator_strategy_rel concentrator_strategy_rel
+          WHERE
+            concentrator_switch_strategy.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+            AND concentrator_strategy_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+            AND concentrator_switch_strategy.id = concentrator_strategy_rel.strategy_id
+            AND concentrator_strategy_rel.concentrator_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@CONCENTRATOR_TYPE_OF_CONCENTRATOR}
+        ) t1
+          ON t1.concentrator_id = concentrator.id
+        LEFT JOIN iot_business_user_rel business_user_rel
+          ON business_user_rel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_CONCENTRATOR} AND business_user_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      WHERE
+        concentrator.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+        AND
+        (
+          CASE
+          (
+            SELECT type
+            FROM user_info
+            WHERE id = #{userId}
+          )
+          WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+            THEN
+              business_user_rel.user_id = #{userId} AND business_user_rel.business_id = concentrator.id
+          WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+            THEN
+              true
+          END
+        )
+      GROUP BY concentrator.id
+    ) t
+    <where>
+      <if test="param.districtId != null">
+        AND t.district_id = #{param.districtId}
+      </if>
+      <if test="param.roadId != null">
+        AND t.roadId = #{param.roadId}
+      </if>
+      <if test="param.name != null and param.name != ''">
+        AND t.name LIKE CONCAT("%", #{param.name}, "%")
+      </if>
+      <if test="param.switchStatus != null">
+        AND t.switchStatus = #{param.switchStatus}
+      </if>
+      <if test="param.status != null">
+        AND t.status = #{param.status}
+      </if>
+    </where>
+  </select>
+
+  <select id="builderInfos" resultType="java.util.HashMap">
+    select builder.*
+    from iot_builder builder,
+         iot_concentrator concentrator
+    WHERE builder.id = concentrator.builder_id
+      AND concentrator.id = #{concentratorId}
+  </select>
+
+  <!--查找集中器组下的集中器-->
+  <select id="findByGroupId" resultMap="ResultMapFindAll">
+    SELECT
+      concentrator.*,
+      area_rel.district_id,
+      area_rel.district_name,
+      road.road_name
+    FROM
+      iot_concentrator_group_list concentrator_group_list,
+      iot_concentrator concentrator
+    LEFT JOIN
+      iot_area_rel area_rel ON area_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL} AND area_rel.id = concentrator.area_rel_id
+    LEFT JOIN
+      iot_area_city_road road ON road.id = concentrator.road_id
+    WHERE
+      concentrator.id = concentrator_group_list.concentrator_id
+    AND concentrator.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+    AND concentrator_group_list.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND concentrator_group_list.group_id = #{groupId}
+  </select>
+
+  <!--查找未分组的集中器-->
+  <select id="findNoGroup" resultMap="ResultMapFindAll">
+    SELECT t1.*
+    FROM
+      (
+        SELECT
+          concentrator.*,
+          area_rel.district_id,
+          area_rel.district_name,
+          road.road_name
+        FROM
+          iot_concentrator concentrator
+        LEFT JOIN
+          iot_area_rel area_rel ON area_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL} AND area_rel.id = concentrator.area_rel_id
+        LEFT JOIN
+          iot_area_city_road road ON road.id = concentrator.road_id
+        WHERE
+          concentrator.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+      ) t1
+      LEFT JOIN
+      (
+        SELECT
+          concentrator.*,
+          area_rel.district_id,
+          area_rel.district_name,
+          road.road_name
+        FROM
+          iot_concentrator_group_list concentrator_group_list,
+          iot_concentrator concentrator
+        LEFT JOIN
+          iot_area_rel area_rel ON area_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL} AND area_rel.id = concentrator.area_rel_id
+        LEFT JOIN
+          iot_area_city_road road ON road.id = concentrator.road_id
+        WHERE
+          concentrator.id = concentrator_group_list.concentrator_id
+          AND concentrator.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+          AND concentrator_group_list.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      ) t2
+        ON t1.id = t2.id
+      LEFT JOIN iot_business_user_rel business_user_rel
+        ON business_user_rel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_CONCENTRATOR} AND business_user_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    WHERE
+      t2.id IS NULL
+      AND
+      (
+        CASE
+        (
+          SELECT type
+          FROM user_info
+          WHERE id = #{userId}
+        )
+        WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+          THEN
+            business_user_rel.user_id = #{userId} AND business_user_rel.business_id = t1.id
+        WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+          THEN
+            true
+        END
+      )
+    GROUP BY t1.id
+  </select>
+
+  <!--根据集中器id列表查询集中器-->
+  <select id="findByIds" resultMap="BaseResultMap" parameterType="list">
+    SELECT
+      *
+    FROM
+      iot_concentrator
+    WHERE
+      id IN
+    <foreach collection="list" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+
+  <update id="fakeDelete" parameterType="java.lang.Integer">
+    UPDATE iot_concentrator
+    SET status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    WHERE id = #{concentratorId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="fakeDeleteStrategy" parameterType="java.lang.Integer">
+    UPDATE iot_concentrator_strategy_rel
+    SET status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+    WHERE concentrator_id = #{concentratorId}
+  </select>
+</mapper>

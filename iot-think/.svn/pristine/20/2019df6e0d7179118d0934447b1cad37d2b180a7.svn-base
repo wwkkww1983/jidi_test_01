@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotConcentratorSwitchStrategyMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotConcentratorSwitchStrategy" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="strategy_mode" property="strategyMode" jdbcType="INTEGER" />
+    <result column="cycle_mode" property="cycleMode" jdbcType="INTEGER" />
+    <result column="offset" property="offset" jdbcType="INTEGER" />
+    <result column="start_date" property="startDate" jdbcType="DATE" />
+    <result column="end_date" property="endDate" jdbcType="DATE" />
+    <result column="week" property="week" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="start_time" property="startTime" jdbcType="TIME" />
+    <result column="end_time" property="endTime" jdbcType="TIME" />
+    <result column="interval_type" property="intervalType" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    s.id as id, s.name as name, s.strategy_mode as strategyMode, s.cycle_mode as cycleMode, s.offset as offset, s.start_date as startDate, s.end_date as endDate, s.week as week,
+     s.status as status,s.create_time as createTime, s.update_time as updateTime, s.start_time as startTime, s.end_time as endTime, s.interval_type as intervalType
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_concentrator_switch_strategy
+    where id = #{id,jdbcType=INTEGER} and status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+  </select>
+  <select id="findSwitchStrategyByConcentratorId" resultType="com.rz.iot.think.model.IotConcentratorSwitchStrategy" >
+    select stra.id as id,stra.name as name from iot_concentrator_switch_strategy stra
+    LEFT JOIN iot_concentrator_strategy_rel rel ON rel.strategy_id = stra.id and rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    LEFT JOIN iot_business_user_rel urel ON urel.business_id = stra.id and urel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_STRATEGY}
+    and urel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    where rel.concentrator_id = #{concentratorId} and stra.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    and rel.concentrator_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@CONCENTRATOR_TYPE_OF_CONCENTRATOR}
+     AND
+    (
+    CASE
+    (
+    SELECT type
+    FROM user_info
+    WHERE id = #{userId}
+    )
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+    THEN
+    urel.user_id = #{userId}
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+    THEN
+    true
+    END
+    )
+  </select>
+
+  <!--查询未绑定的集中器-->
+  <select id="findUnbindConcentrator" parameterType="java.lang.Integer" resultType="com.rz.iot.think.model.IotConcentrator">
+    select con.id as id,con.name as name from iot_concentrator con
+    left join iot_business_user_rel rel on rel.business_id = con.id and rel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_CONCENTRATOR}
+    left join iot_concentrator_strategy_rel srel on con.id = srel.concentrator_id and srel.concentrator_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@CONCENTRATOR_TYPE_OF_CONCENTRATOR}
+    where srel.id is NULL
+    AND
+    (
+    CASE
+    (
+    SELECT type
+    FROM user_info
+    WHERE id = #{userId}
+    )
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+    THEN
+    rel.user_id = #{userId}
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+    THEN
+    true
+    END
+    )
+  </select>
+
+  <!--查询出未绑定的集中器组-->
+  <select id="findUnbindConcentratorGroup" parameterType="java.lang.Integer" resultType="com.rz.iot.think.model.IotConcentratorGroup">
+    select cong.id as id,cong.name as name,srel.id as srel_id from iot_concentrator_group cong
+    left join iot_business_user_rel rel on rel.business_id = cong.id and rel.business_type = 3
+    left join iot_concentrator_strategy_rel srel on cong.id = srel.concentrator_id and srel.concentrator_type = 2
+    where srel.id is NULL
+    AND
+    (
+    CASE
+    (
+    SELECT type
+    FROM user_info
+    WHERE id = #{userId}
+    )
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+    THEN
+    rel.user_id = #{userId}
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+    THEN
+    true
+    END
+    )
+  </select>
+
+  <select id="findSwitchStrategyByConcentratorGroupId" resultType="com.rz.iot.think.model.IotConcentratorSwitchStrategy" >
+    select stra.id as id,stra.name as name from iot_concentrator_switch_strategy stra
+    LEFT JOIN iot_concentrator_strategy_rel rel ON rel.strategy_id = stra.id
+    LEFT JOIN iot_business_user_rel urel ON urel.business_id = stra.id and urel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_STRATEGY}
+    and urel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    where rel.concentrator_id = #{concentratorGroupId} and stra.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    and rel.concentrator_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@CONCENTRATOR_TYPE_OF_CONCENTRATOR_GROUP}
+    AND
+    (
+    CASE
+    (
+    SELECT type
+    FROM user_info
+    WHERE id = #{userId}
+    )
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+    THEN
+    urel.user_id = #{userId}
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+    THEN
+    true
+    END
+    )
+  </select>
+
+  <select id="findLast" resultType="com.rz.iot.think.model.IotConcentratorSwitchStrategy">
+    select * from iot_concentrator_brightness_strategy order by create_time DESC limit 1
+  </select>
+
+  <select id="findIotConcentratorSwitchStrategy" resultType="com.rz.iot.think.model.IotConcentratorSwitchStrategy">
+    select
+    <include refid="Base_Column_List" />
+    from iot_concentrator_switch_strategy s
+    LEFT join iot_business_user_rel rel on rel.business_id = s.id and business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_STRATEGY} and rel.`status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    where s.id = #{id,jdbcType=INTEGER} and s.`status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND
+    (
+    CASE
+    (
+    SELECT type
+    FROM user_info
+    WHERE id = #{userId}
+    )
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+    THEN
+    rel.user_id = #{userId}
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+    THEN
+    true
+    END
+    )
+  </select>
+
+  <!--查询所有的集中器开关策略列表-->
+  <select id="findIotConcentratorSwitchStrategyList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from iot_concentrator_switch_strategy s
+    LEFT JOIN iot_business_user_rel rel on s.id = rel.business_id and rel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_STRATEGY} and rel.`status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    WHERE 1 = 1 and s.`status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND
+    (
+    CASE
+    (
+    SELECT type
+    FROM user_info
+    WHERE id = #{userId}
+    )
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+    THEN
+    rel.user_id = #{userId}
+    WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+    THEN
+    true
+    END
+    )
+    <if test="iotConcentratorSwitchStrategy.id != null" >
+     and id = #{iotConcentratorSwitchStrategy.id}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.name != null" >
+     and name LIKE CONCAT('%',#{name},'%')
+    </if>
+    <if test="iotConcentratorSwitchStrategy.strategyMode != null" >
+     and strategy_mode = #{iotConcentratorSwitchStrategy.strategyMode}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.cycleMode != null" >
+     and cycle_mode = #{iotConcentratorSwitchStrategy.cycleMode}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.offset != null" >
+     and offset = #{iotConcentratorSwitchStrategy.offset}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.startDate != null" >
+     and start_date = #{iotConcentratorSwitchStrategy.startDate}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.endDate != null" >
+     and end_date = #{iotConcentratorSwitchStrategy.endDate}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.week != null" >
+     and week = #{iotConcentratorSwitchStrategy.week}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.createTime != null" >
+     and create_time = #{iotConcentratorSwitchStrategy.createTime}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.updateTime != null" >
+     and update_time = #{iotConcentratorSwitchStrategy.updateTime}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.startTime != null" >
+     and start_time = #{iotConcentratorSwitchStrategy.startTime}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.endTime != null" >
+     and end_time = #{iotConcentratorSwitchStrategy.endTime}
+    </if>
+    <if test="iotConcentratorSwitchStrategy.intervalType != null" >
+    and  interval_type = #{iotConcentratorSwitchStrategy.intervalType}
+    </if>
+
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_concentrator_switch_strategy
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteByPrimaryKeys" parameterType="java.util.List">
+    update iot_concentrator_switch_strategy SET status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    where id IN
+    <foreach collection="list" item="item" open="(" separator="," close=")">
+      #{item,jdbcType=INTEGER}
+    </foreach>
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotConcentratorSwitchStrategy" >
+    insert into iot_concentrator_switch_strategy (id, name, strategy_mode, 
+      cycle_mode, offset, start_date, 
+      end_date, week, status, 
+      create_time, update_time, start_time, 
+      end_time, interval_type)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{strategyMode,jdbcType=INTEGER}, 
+      #{cycleMode,jdbcType=INTEGER}, #{offset,jdbcType=INTEGER}, #{startDate,jdbcType=DATE}, 
+      #{endDate,jdbcType=DATE}, #{week,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{startTime,jdbcType=TIME}, 
+      #{endTime,jdbcType=TIME}, #{intervalType,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotConcentratorSwitchStrategy" >
+    insert into iot_concentrator_switch_strategy
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="strategyMode != null" >
+        strategy_mode,
+      </if>
+      <if test="cycleMode != null" >
+        cycle_mode,
+      </if>
+      <if test="offset != null" >
+        offset,
+      </if>
+      <if test="startDate != null" >
+        start_date,
+      </if>
+      <if test="endDate != null" >
+        end_date,
+      </if>
+      <if test="week != null" >
+        week,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="intervalType != null" >
+        interval_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="strategyMode != null" >
+        #{strategyMode,jdbcType=INTEGER},
+      </if>
+      <if test="cycleMode != null" >
+        #{cycleMode,jdbcType=INTEGER},
+      </if>
+      <if test="offset != null" >
+        #{offset,jdbcType=INTEGER},
+      </if>
+      <if test="startDate != null" >
+        #{startDate,jdbcType=DATE},
+      </if>
+      <if test="endDate != null" >
+        #{endDate,jdbcType=DATE},
+      </if>
+      <if test="week != null" >
+        #{week,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIME},
+      </if>
+      <if test="intervalType != null" >
+        #{intervalType,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotConcentratorSwitchStrategy" >
+    update iot_concentrator_switch_strategy
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="strategyMode != null" >
+        strategy_mode = #{strategyMode,jdbcType=INTEGER},
+      </if>
+      <if test="cycleMode != null" >
+        cycle_mode = #{cycleMode,jdbcType=INTEGER},
+      </if>
+      <if test="offset != null" >
+        offset = #{offset,jdbcType=INTEGER},
+      </if>
+      <if test="startDate != null" >
+        start_date = #{startDate,jdbcType=DATE},
+      </if>
+      <if test="endDate != null" >
+        end_date = #{endDate,jdbcType=DATE},
+      </if>
+      <if test="week != null" >
+        week = #{week,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIME},
+      </if>
+      <if test="intervalType != null" >
+        interval_type = #{intervalType,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotConcentratorSwitchStrategy" >
+    update iot_concentrator_switch_strategy
+    set name = #{name,jdbcType=VARCHAR},
+      strategy_mode = #{strategyMode,jdbcType=INTEGER},
+      cycle_mode = #{cycleMode,jdbcType=INTEGER},
+      offset = #{offset,jdbcType=INTEGER},
+      start_date = #{startDate,jdbcType=DATE},
+      end_date = #{endDate,jdbcType=DATE},
+      week = #{week,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      start_time = #{startTime,jdbcType=TIME},
+      end_time = #{endTime,jdbcType=TIME},
+      interval_type = #{intervalType,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

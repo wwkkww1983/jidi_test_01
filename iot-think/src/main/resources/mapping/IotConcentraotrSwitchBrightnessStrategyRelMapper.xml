@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rz.iot.think.mapper.IotConcentratorSwitchBrightnessStrategyRelMapper">
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotConcentratorSwitchBrightnessStrategyRel">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="switch_id" jdbcType="INTEGER" property="switchId" />
+    <result column="brightness_id" jdbcType="INTEGER" property="brightnessId" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap id="SwitchStrategyMap" type="com.rz.iot.think.model.IotConcentratorBrightnessStrategy">
+      <id column="brightnessId" property="id"></id>
+      <result column="brightName" property="name"></result>
+      <result column="brightStartTime" property="startTime"></result>
+      <result column="brightEndtime" property="endTime"></result>
+      <result column="brightness" property="brightness"></result>
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, switch_id, brightness_id, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from iot_concentrator_switch_brightness_strategy_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="findBySwitchId" parameterType="java.lang.Integer" resultType="IotConcentratorSwitchBrightnessStrategyRel">
+      select id,switch_id as switchId,brightness_id as brightnessId from iot_concentrator_switch_brightness_strategy_rel WHERE
+      switch_id = #{switchId} and `status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+  </select>
+
+  <select id="findIotSwitchStrategyShowDetail" parameterType="java.lang.Integer" resultMap="SwitchStrategyMap">
+    select icbs.id as brightnessId,icbs.name as brightName,icbs.start_time as brightStartTime,icbs.end_time as brightEndtime,icbs.brightness as
+    brightness
+    from iot_concentrator_switch_brightness_strategy_rel rel
+    left join iot_concentrator_brightness_strategy icbs on icbs.id = rel.brightness_id
+    where rel.switch_id = #{id}
+    and rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    and icbs.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from iot_concentrator_switch_brightness_strategy_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteBySwitchId" parameterType="java.util.List">
+    UPDATE iot_concentrator_switch_brightness_strategy_rel SET `status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    where switch_id IN
+    <foreach collection="switchIds" item="switchId" open="(" separator="," close=")">
+      #{switchId}
+    </foreach>
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotConcentratorSwitchBrightnessStrategyRel">
+    insert into iot_concentrator_switch_brightness_strategy_rel (id, switch_id, brightness_id, 
+      status, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{switchId,jdbcType=INTEGER}, #{brightnessId,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertIotConcentratorSwitchBrightnessStrategyRel" parameterType="java.lang.Integer">
+    insert into iot_concentrator_switch_brightness_strategy_rel(switch_id,brightness_id)VALUES
+    <foreach collection="ids" item="item" separator=",">
+      (#{switchId},#{item})
+    </foreach>
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotConcentratorSwitchBrightnessStrategyRel">
+    insert into iot_concentrator_switch_brightness_strategy_rel
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="switchId != null">
+        switch_id,
+      </if>
+      <if test="brightnessId != null">
+        brightness_id,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="switchId != null">
+        #{switchId,jdbcType=INTEGER},
+      </if>
+      <if test="brightnessId != null">
+        #{brightnessId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotConcentratorSwitchBrightnessStrategyRel">
+    update iot_concentrator_switch_brightness_strategy_rel
+    <set>
+      <if test="switchId != null">
+        switch_id = #{switchId,jdbcType=INTEGER},
+      </if>
+      <if test="brightnessId != null">
+        brightness_id = #{brightnessId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotConcentratorSwitchBrightnessStrategyRel">
+    update iot_concentrator_switch_brightness_strategy_rel
+    set switch_id = #{switchId,jdbcType=INTEGER},
+      brightness_id = #{brightnessId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
