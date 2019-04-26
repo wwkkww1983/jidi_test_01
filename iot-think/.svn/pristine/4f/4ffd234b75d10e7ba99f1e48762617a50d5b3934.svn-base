@@ -1,0 +1,286 @@
+package com.rz.iot.think.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rz.iot.think.handler.IotScreenMaterialUploadThread;
+import com.rz.iot.think.mapper.screen.IotScreenVideoInfoMapper;
+import com.rz.iot.think.model.Page;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.screen.IotScreenVideoInfo;
+import com.rz.iot.think.service.IotScreenVideoInfoService;
+import com.rz.iot.think.utils.FastDFSUtils;
+import com.rz.iot.think.utils.PropertiesUtil;
+import com.rz.iot.think.utils.ffmpeg.ConvertVideo;
+import com.rz.iot.think.utils.ffmpeg.VideoThumbnail;
+import com.rz.iot.utils.MD5;
+import it.sauronsoftware.jave.*;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.csource.common.MyException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * @Author:jidi
+ * @Date:2019/04/01 17:26
+ * @Description:屏幕播放素材（视频）操作实现类
+ **/
+@Log4j2
+@Service("iotScreenVideoInfoService")
+public class IotScreenVideoInfoImpl implements IotScreenVideoInfoService {
+
+    @Resource
+    private IotScreenVideoInfoMapper iotScreenVideoInfoMapper;
+    @Resource
+    private VideoThumbnail videoThumbnail;
+    @Resource
+    private ConvertVideo convertVideo;
+
+    /**
+     * @Desc:分页查询所有的未被删除的屏幕播放素材（视频）
+     */
+    @Override
+    public Result findAll(Page<IotScreenVideoInfo> page) {
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<IotScreenVideoInfo> list = iotScreenVideoInfoMapper.findAll();
+        PageInfo<IotScreenVideoInfo> pageInfo = new PageInfo<>(list);
+        page.setOtherParam(pageInfo);
+        Result result = new Result();
+        result.setData(page);
+        return result;
+    }
+
+
+    /**
+     * @Desc:根据素材名和上传者分页查询所有的未被删除的屏幕播放素材（视频）
+     */
+    @Override
+    public Result findAllByCondition(Page<IotScreenVideoInfo> page, IotScreenVideoInfo iotScreenVideoInfo) {
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<IotScreenVideoInfo> list = iotScreenVideoInfoMapper.findAllByCondition(iotScreenVideoInfo);
+        PageInfo<IotScreenVideoInfo> pageInfo = new PageInfo<>(list);
+        page.setOtherParam(pageInfo);
+        Result result = new Result();
+        result.setData(page);
+        return result;
+    }
+
+    /**
+     * @Desc:查询在视频来源表（iot_screen_video_source）中的视频素材
+     */
+    @Override
+    public Result findById(List<Integer> iotScreenMaterialIds) {
+        Result result = new Result();
+
+        List<IotScreenVideoInfo> iotScreenVideoInfoList = iotScreenVideoInfoMapper.findById();
+        for(int i=0; i<iotScreenMaterialIds.size(); i++){
+            for (int j=0; j<iotScreenVideoInfoList.size(); j++){
+                if(iotScreenMaterialIds.get(i) == iotScreenVideoInfoList.get(j).getId()){
+                    result.setData(iotScreenVideoInfoList.get(j));
+                    return result;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @Desc:批量删除记录
+     */
+    @Override
+    public Result delByIds(List<Integer> iotScreenMaterialIds) {
+        Result result = new Result();
+
+        for(Integer id:iotScreenMaterialIds){
+            iotScreenVideoInfoMapper.delById(id);
+        }
+        result.setMessage("删除视频素材成功！");
+        return result;
+    }
+
+    /**
+     * @Desc:增加视频素材
+     */
+    @Override
+    public Result addIotScreenVideoInfo(HttpServletRequest request, Integer userId, MultipartFile file)  {
+        Result res = new Result();
+        IotScreenVideoInfo iotScreenVideoInfo = new IotScreenVideoInfo();
+
+        //原始文件名
+        String originalFilename = file.getOriginalFilename();
+        //文件大小
+        long fileSize = file.getSize();
+        //获得文件后缀名
+        String extName = originalFilename.substring(originalFilename.lastIndexOf(".") + 1, originalFilename.length());
+        //用UUID产生不重复文件名（保存到本地）
+        String fileName = UUID.randomUUID().toString() + "." + extName;
+        //转码后的文件名
+        String fileNameConvert = UUID.randomUUID().toString() + ".mp4";
+        //缩率图文件名
+        String thumbnailName = UUID.randomUUID().toString() + ".jpg";
+
+        //源视频，缩略图，转码视频本地保存地址
+        String realPath = request.getServletContext().getRealPath("/temp");
+        String localConvertUrl = realPath+"/"+fileNameConvert;
+        String localThumbnailUrl = realPath+"/"+thumbnailName;
+
+
+        File tempFile1 = new File(realPath);
+        if (!tempFile1.exists()) {
+            tempFile1.mkdirs();
+        }
+        try{
+            //文件上传到服务器
+            BufferedInputStream bis = new BufferedInputStream(file.getInputStream());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+
+            //文件保存到本地
+            File tempFile = new File(realPath+"/"+fileName);
+            OutputStream outputStream = new FileOutputStream(tempFile);
+            BufferedOutputStream bfout = new BufferedOutputStream(outputStream);
+
+            byte[] temp = new byte[1024*1024];
+            int len = -1;
+            while((len = bis.read(temp)) != -1) {
+                baos.write(temp, 0, len);
+                bfout.write(temp,0, len);
+            }
+            FastDFSUtils fastDFSUtils1 = new FastDFSUtils("classpath:FastDFS.properties");
+            String path = fastDFSUtils1.uploadFile(baos.toByteArray(), extName);
+            String fdfsNginxServer = PropertiesUtil.getProperty("FastDFS.properties", "fdfs_nginx_server");
+            String videoUrl = fdfsNginxServer + "/" + path;
+            //关闭流
+            bis.close();
+            baos.close();
+            outputStream.close();
+            bfout.close();
+
+            //文件转码
+            convertVideo.convert(realPath+"/"+fileName, localConvertUrl);
+            //获取视频缩略图
+            videoThumbnail.thumbnail(realPath+"/"+fileName, localThumbnailUrl);
+
+            //hashKey值
+            String hashKey = MD5.getMd5(file.getInputStream());
+
+            // 获取多媒体信息对象
+            MultimediaInfo mi = new Encoder().getInfo(tempFile);
+            long duration = mi.getDuration();
+            VideoInfo videoInfo = mi.getVideo();
+            int height = videoInfo.getSize().getHeight();
+            int width = videoInfo.getSize().getWidth();
+            String resolution = width + "*" + height;
+
+            //缩略图上传到服务器
+            File humbnailFile = new File(localThumbnailUrl);
+            //缩略图的名字
+            String humbnailFileName = humbnailFile.getName();
+            //缩略图的后缀名
+            String humbnailFileExtName = humbnailFileName.substring(humbnailFileName.lastIndexOf(".") + 1, humbnailFileName.length());
+            FileInputStream in = new FileInputStream(humbnailFile);
+            BufferedInputStream b = new BufferedInputStream(in);
+            ByteArrayOutputStream bao = new ByteArrayOutputStream(1024);
+            byte[] byt = new byte[1024];
+            int length = -1;
+            while((length = b.read(byt)) != -1) {
+                bao.write(byt, 0, length);
+            }
+            FastDFSUtils fastDFSUtils2 = new FastDFSUtils("classpath:FastDFS.properties");
+            String path2 = fastDFSUtils2.uploadFile(bao.toByteArray(), humbnailFileExtName);
+            String fdfsNginxServer2 = PropertiesUtil.getProperty("FastDFS.properties", "fdfs_nginx_server");
+            String thumbnailUrl = fdfsNginxServer2 + "/" + path2;
+
+            //关闭流
+            in.close();
+            b.close();
+            bao.close();
+
+            //素材添加者id
+            iotScreenVideoInfo.setCreateAdmin(userId);
+            //素材名
+            iotScreenVideoInfo.setName(originalFilename);
+            //素材地址
+            iotScreenVideoInfo.setVideoUrl(videoUrl);
+            //素材缩略图地址
+            iotScreenVideoInfo.setThumbnailUrl(thumbnailUrl);
+            //时长
+            iotScreenVideoInfo.setDuration((int) (duration/1000));
+            //分辨率
+            iotScreenVideoInfo.setResolution(resolution);
+            //宽
+            iotScreenVideoInfo.setWidth(width);
+            //高
+            iotScreenVideoInfo.setHeight(height);
+            //hash值
+            iotScreenVideoInfo.setHashKey(hashKey);
+            //素材添加者id
+            iotScreenVideoInfo.setCreateAdmin(userId);
+            //视频大小
+            iotScreenVideoInfo.setFileSize((int)fileSize);
+
+            //转码后的视频上传到服务器
+            IotScreenMaterialUploadThread iotScreenMaterialUploadThread = new IotScreenMaterialUploadThread(iotScreenVideoInfoMapper, iotScreenVideoInfo, localConvertUrl);
+            Thread t = new Thread(iotScreenMaterialUploadThread);
+            t.start();
+
+        }catch (IOException e) {
+            log.error(e.getMessage(), e);
+        } catch (MyException e) {
+            log.error(e.getMessage(), e);
+        } catch (InputFormatException e) {
+            log.error(e.getMessage(), e);
+        } catch (EncoderException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        //增加记录
+        iotScreenVideoInfoMapper.insertSelective(iotScreenVideoInfo);
+
+        //文件从本地删除
+        deleteFile(realPath);
+
+        res.setData(iotScreenVideoInfo);
+        res.setMessage("添加视频素材成功！");
+        return res;
+    }
+
+    /**
+     * @Desc:根据name，hash_key，creatAdmin查询id
+     */
+    @Override
+    public Integer selectIdByCondition(IotScreenVideoInfo iotScreenVideoInfo) {
+        return iotScreenVideoInfoMapper.selectIdByCondition(iotScreenVideoInfo);
+    }
+
+
+    /**
+     * @Desc:递归删除文件
+     */
+    public void deleteFile(String path) {
+        File file = new File(path);
+        if(!file.exists()){
+            return ;
+        }
+        if(file.isFile()){
+          System.err.println("删除文件："+file.getName()+"是否成功？"+file.delete());
+        }else{
+            File files[] = file.listFiles();
+            for(int i=0; i<files.length; i++){
+                String childPath = files[i].getAbsolutePath();
+                deleteFile(childPath);
+            }
+            file.delete();
+        }
+    }
+
+
+
+
+}

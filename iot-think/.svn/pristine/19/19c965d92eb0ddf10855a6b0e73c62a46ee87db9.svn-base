@@ -1,0 +1,80 @@
+package com.rz.iot.think.mqtt.handler.report;
+
+import com.rz.iot.think.mapper.IotConcentratorMapper;
+import com.rz.iot.think.model.IotConcentrator;
+import com.rz.iot.think.mqtt.model.ConcentratorMessageBase;
+import com.rz.iot.think.mqtt.model.report.ConcentratorConfigParamReport;
+import com.rz.iot.think.mqtt.util.RzIotConcentratorConstParam;
+import com.rz.iot.think.utils.RzIotDBConstParam;
+import com.rz.iot.utils.RzIotString;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+
+/**
+ * Author by xuxiake, Date on 2019/4/13.
+ * PS: Not easy to write code, please indicate.
+ * Description：集中器配置参数上报处理器
+ */
+@Log4j2
+@Component("concentratorConfigParamReportHandler")
+public class ConcentratorConfigParamReportHandler implements IConcentratorReportHandlerService {
+
+    @Resource
+    private IotConcentratorMapper iotConcentratorMapper;
+
+    @Override
+    public void parse(ConcentratorMessageBase messageBase) {
+
+        ConcentratorConfigParamReport configParamReport = (ConcentratorConfigParamReport) messageBase.getObject();
+
+        // 相数
+        int phaseType = configParamReport.getPhaseType();
+        // 协议版本号
+        int protocolVersion = configParamReport.getProtocolVersion();
+        // 软件版本号
+        int softwareVersion = configParamReport.getSoftwareVersion();
+        // 硬件版本号
+        int hardwareVersion = configParamReport.getHardwareVersion();
+        // ip
+        String ip = configParamReport.getIp();
+        // 端口
+        int port = configParamReport.getPort();
+        // 服务器ip
+        String serviceIp = configParamReport.getServiceIp();
+        // apn
+        String apn = configParamReport.getApn();
+        // 用户名
+        String account = configParamReport.getAccount();
+        // 密码
+        String accountPassword = configParamReport.getAccountPassword();
+
+        // 网络类型：1：移动4G；2：电信4G；3：联通4G；4:固网
+        int netType = 0;
+        apn = RzIotString.rTrim(apn);
+        if (apn.compareToIgnoreCase("CMNET") == 0) {
+            netType = 1;
+        }
+        else if (apn.compareToIgnoreCase("UNINET") == 0) {
+            netType = 3;
+        }
+        else if (apn.compareToIgnoreCase("CTNET") == 0) {
+            netType = 2;
+        }
+
+        String version = protocolVersion + "|" + softwareVersion + "|" + hardwareVersion;
+
+        // 更新集中器
+        log.debug("更新集中器");
+        IotConcentrator concentrator = new IotConcentrator();
+        concentrator.setId(messageBase.getConcentratorId());
+        concentrator.setPhaseType(phaseType);
+        concentrator.setStatus(RzIotDBConstParam.DEVICE_STATUS_OF_NORMAL);
+        concentrator.setVersion(version);
+        concentrator.setIp(ip);
+        concentrator.setPort(port);
+        concentrator.setNetType(netType);
+        iotConcentratorMapper.updateByPrimaryKeySelective(concentrator);
+    }
+}

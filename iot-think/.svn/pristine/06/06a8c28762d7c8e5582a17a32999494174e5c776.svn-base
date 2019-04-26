@@ -1,0 +1,754 @@
+package com.rz.iot.think.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rz.iot.think.mapper.IotBusinessUserRelMapper;
+import com.rz.iot.think.model.IotBusinessUserRel;
+import com.rz.iot.think.model.param.IotScreenProgramDelParam;
+import com.rz.iot.think.mapper.screen.*;
+import com.rz.iot.think.model.Page;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.UserInfo;
+import com.rz.iot.think.model.param.*;
+import com.rz.iot.think.model.screen.*;
+import com.rz.iot.think.model.show.*;
+import com.rz.iot.think.service.IotBusinessUserRelService;
+import com.rz.iot.think.service.IotScreenProgramService;
+import com.rz.iot.think.utils.FastDFSUtils;
+import com.rz.iot.think.utils.PropertiesUtil;
+import com.rz.iot.think.utils.RzIotDBConstParam;
+import com.rz.iot.think.utils.RzIotErrMessage;
+import com.rz.iot.utils.MD5;
+import lombok.extern.log4j.Log4j2;
+import org.apache.shiro.SecurityUtils;
+import org.csource.common.MyException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+
+/**
+ * Author by xuxiake, Date on 2019/3/29.
+ * PS: Not easy to write code, please indicate.
+ * Description：
+ */
+@Log4j2
+@Service("iotScreenProgramService")
+public class IotScreenProgramServiceImpl implements IotScreenProgramService {
+
+
+    @Resource
+    private IotScreenProgramSourceRelMapper iotScreenProgramSourceRelMapper;
+    @Resource
+    private IotScreenProgramInfoMapper iotScreenProgramInfoMapper;
+    @Resource
+    private IotBusinessUserRelService iotBusinessUserRelService;
+    @Resource
+    private IotScreenVideoInfoMapper iotScreenVideoInfoMapper;
+    @Resource
+    private IotScreenPicInfoMapper iotScreenPicInfoMapper;
+    @Resource
+    private IotScreenMaterialKeyRelMapper iotScreenMaterialKeyRelMapper;
+    @Resource
+    private IotScreenVideoSourceMapper iotScreenVideoSourceMapper;
+    @Resource
+    private IotScreenImageSourceMapper iotScreenImageSourceMapper;
+    @Resource
+    private IotScreenLineTextSourceMapper iotScreenLineTextSourceMapper;
+    @Resource
+    private IotScreenDigitalClockSourceMapper iotScreenDigitalClockSourceMapper;
+    @Resource
+    private IotScreenWeatherSourceMapper iotScreenWeatherSourceMapper;
+    @Resource
+    private IotScreenPlayStrategyMapper iotScreenPlayStrategyMapper;
+    @Resource
+    private IotBusinessUserRelMapper iotBusinessUserRelMapper;
+
+    /**
+     * 节目详细信息
+     * @param programId
+     * @return
+     */
+    @Override
+    public Result programDetail(Integer programId) {
+        Result result = new Result();
+        if (programId == null) {
+            return Result.paramNull(result);
+        }
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+        // 鉴权
+        iotBusinessUserRelService.isAuthorized(programId, RzIotDBConstParam.BUSSINESS_TYPE_OF_SCREEN_PROGRAM, userInfo.getId());
+
+        // 信息屏节目视频布局详细信息（包含层级信息）
+        List<IotScreenProgramLayer> programVideoLayers = iotScreenProgramSourceRelMapper.findProgramVideoLayer(programId);
+        // 信息屏节目图片布局详细信息（包含层级信息）
+
+        List<IotScreenProgramLayer> programImageLayers = iotScreenProgramSourceRelMapper.findProgramImageLayer(programId);
+        // 信息屏节目单行文本布局详细信息（包含层级信息）
+        List<IotScreenProgramLayer> programLineTextLayers = iotScreenProgramSourceRelMapper.findProgramLineTextLayer(programId);
+        // 信息屏节目数字时钟布局详细信息（包含层级信息）
+        List<IotScreenProgramLayer> programDigitalClockLayers = iotScreenProgramSourceRelMapper.findProgramDigitalClockLayer(programId);
+        // 信息屏节目天气布局详细信息（包含层级信息）
+        List<IotScreenProgramLayer> programWeatherLayers = iotScreenProgramSourceRelMapper.findProgramWeatherLayer(programId);
+
+        // 节目布局信息（包含层级信息）
+        List<IotScreenProgramLayer> programLayers = new ArrayList<>();
+        programLayers.addAll(programVideoLayers);
+        programLayers.addAll(programImageLayers);
+        programLayers.addAll(programLineTextLayers);
+        programLayers.addAll(programDigitalClockLayers);
+        programLayers.addAll(programWeatherLayers);
+
+        Collections.sort(programLayers, new Comparator<IotScreenProgramLayer>() {
+            @Override
+            public int compare(IotScreenProgramLayer o1, IotScreenProgramLayer o2) {
+                return o1.getzIndex() - o2.getzIndex();
+            }
+        });
+
+        // 节目详细信息
+        IotScreenProgramInfo iotScreenProgramInfo = iotScreenProgramInfoMapper.selectByPrimaryKey(programId);
+        IotScreenProgramInfoShowDetail programInfoShowDetail = new IotScreenProgramInfoShowDetail(
+                iotScreenProgramInfo.getId(),
+                iotScreenProgramInfo.getName(),
+                iotScreenProgramInfo.getHeight(),
+                iotScreenProgramInfo.getWidth(),
+                iotScreenProgramInfo.getTotalSize(),
+                iotScreenProgramInfo.getProgramLength(),
+                iotScreenProgramInfo.getResolution(),
+                iotScreenProgramInfo.getType(),
+                iotScreenProgramInfo.getCreateAdmin(),
+                iotScreenProgramInfo.getVerify(),
+                iotScreenProgramInfo.getDescribe(),
+                iotScreenProgramInfo.getStatus());
+
+        programInfoShowDetail.setProgramLayers(programLayers);
+
+        result.setData(programInfoShowDetail);
+        return result;
+    }
+
+    /**
+     * 信息屏节目列表
+     * @param page 分页参数
+     * @param param 查询参数
+     * @return
+     */
+    @Override
+    public Result findList(Page page, IotScreenProgramInfoListQueryParam param) {
+
+        Result result = new Result();
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+        PageHelper.startPage(page.getPageNum(), page.getPageSize());
+        List<IotScreenProgramInfoShowList> list = iotScreenProgramInfoMapper.findList(param, userInfo.getId());
+        PageInfo<IotScreenProgramInfoShowList> pageInfo = new PageInfo<>(list);
+        page.setOtherParam(pageInfo);
+        result.setData(page);
+        return result;
+    }
+
+    /**
+     * 添加节目
+     * @param param
+     * @return
+     */
+    @Transactional
+    @Override
+    public Result add(IotScreenProgramAddParam param) {
+
+        Result result = new Result();
+
+        List<IotScreenProgramSourceRel> programSourceRels = new ArrayList<>();
+        List<IotScreenProgramAddParamLayer> programLayers = param.getProgramLayers();
+
+        Integer totalSize = null;
+        for (IotScreenProgramAddParamLayer programLayer : programLayers) {
+
+            IotScreenProgramAddParamSource source = programLayer.getSource();
+            Integer sourceType = programLayer.getSourceType();
+
+            // 素材id
+            Integer materialId = source.getMaterialId();
+            IotScreenMaterialKeyRel iotScreenMaterialKeyRel = null;
+
+            IotScreenProgramSourceRel iotScreenProgramSourceRel = new IotScreenProgramSourceRel();
+            iotScreenProgramSourceRel.setzIndex(programLayer.getZIndex());
+            iotScreenProgramSourceRel.setType(sourceType);
+
+            switch (sourceType) {
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_VIDEO:
+                    // 视频
+                    iotScreenMaterialKeyRel = iotScreenMaterialKeyRelMapper.selectByMaterialId(materialId, RzIotDBConstParam.MATERTAL_TYPE_OF_VIDEO);
+                    IotScreenVideoInfo video = iotScreenVideoInfoMapper.selectByPrimaryKey(materialId);
+                    IotScreenVideoSource iotScreenVideoSource = new IotScreenVideoSource(
+                            iotScreenMaterialKeyRel.getKey(),
+                            video.getHashKey(),
+                            video.getName(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            new Long(video.getFileSize() + ""),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.Video.name(),
+                            materialId);
+                    totalSize += video.getFileSize();
+                    iotScreenVideoSourceMapper.insertSelective(iotScreenVideoSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenVideoSource.getPkId());
+                    break;
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_IMAGE:
+                    // 图片
+                    iotScreenMaterialKeyRel = iotScreenMaterialKeyRelMapper.selectByMaterialId(materialId, RzIotDBConstParam.MATERTAL_TYPE_OF_PICTURE);
+                    IotScreenPicInfo iotScreenPicInfo = iotScreenPicInfoMapper.selectByPrimaryKey(materialId);
+                    IotScreenImageSource iotScreenImageSource = new IotScreenImageSource(
+                            iotScreenMaterialKeyRel.getKey(),
+                            iotScreenPicInfo.getHashKey(),
+                            iotScreenPicInfo.getName(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            new Long(iotScreenPicInfo.getFileSize() + ""),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.Image.name(),
+                            materialId
+                    );
+                    totalSize += iotScreenPicInfo.getFileSize();
+                    iotScreenImageSourceMapper.insertSelective(iotScreenImageSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenImageSource.getPkId());
+                    break;
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_SINGLE_LINE_TEXT:
+                    // 文字
+                    IotScreenLineTextSource iotScreenLineTextSource = new IotScreenLineTextSource(
+                            source.getHtml(),
+                            source.getLineHeight(),
+                            source.getSpeed(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.SingleLineText.name()
+                    );
+                    iotScreenLineTextSourceMapper.insertSelective(iotScreenLineTextSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenLineTextSource.getPkId());
+                    break;
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_DIGITAL_CLOCK:
+                    // 时钟
+                    IotScreenDigitalClockSource iotScreenDigitalClockSource = new IotScreenDigitalClockSource(
+                            source.getHtml(),
+                            source.getLineHeight(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.DigitalClock.name()
+                    );
+                    iotScreenDigitalClockSourceMapper.insertSelective(iotScreenDigitalClockSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenDigitalClockSource.getPkId());
+                    break;
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_WEATHER:
+                    // 天气
+                    IotScreenWeatherSource iotScreenWeatherSource = new IotScreenWeatherSource(
+                            source.getCity(),
+                            source.getCode(),
+                            source.getHtml(),
+                            source.getLineHeight(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.Weather.name()
+                    );
+                    iotScreenWeatherSourceMapper.insertSelective(iotScreenWeatherSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenWeatherSource.getPkId());
+                    break;
+            }
+            programSourceRels.add(iotScreenProgramSourceRel);
+        }
+
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+        IotScreenProgramInfo iotScreenProgramInfo = new IotScreenProgramInfo(
+                null,
+                param.getName(),
+                param.getHeight(),
+                param.getWidth(),
+                totalSize,
+                param.getProgramLength(),
+                param.getResolution(),
+                null,
+                userInfo.getId(),
+                param.getDescribe()
+        );
+        // 增加节目
+        iotScreenProgramInfoMapper.insertSelective(iotScreenProgramInfo);
+
+        for (IotScreenProgramSourceRel programSourceRel : programSourceRels) {
+            programSourceRel.setProgramId(iotScreenProgramInfo.getId());
+        }
+        // 批量增加节目布局关系
+        iotScreenProgramSourceRelMapper.insertBatch(programSourceRels);
+
+        // 增加节目用户关联关系
+        if (userInfo.getStatus() == RzIotDBConstParam.USER_STATUS_OF_NORMAL) {
+            IotBusinessUserRel iotBusinessUserRel = new IotBusinessUserRel();
+            iotBusinessUserRel.setBusinessType(RzIotDBConstParam.BUSSINESS_TYPE_OF_SCREEN_PROGRAM);
+            iotBusinessUserRel.setBusinessId(iotScreenProgramInfo.getId());
+            iotBusinessUserRel.setUserId(userInfo.getId());
+            iotBusinessUserRelMapper.insertSelective(iotBusinessUserRel);
+        }
+
+        return result;
+    }
+
+    /**
+     * 节目审批
+     * @param param
+     * @return
+     */
+    @Transactional
+    @Override
+    public Result verifyProgram(IotScreenProgramVerifyParam param) {
+
+        Result result = new Result();
+        if (param.getProgramIds() == null
+                || param.getVerify() == null
+                || (param.getVerify() != RzIotDBConstParam.MATERIAL_VERIFY_STATUS_OF_VERIFY_PASSED && param.getVerify() != RzIotDBConstParam.MATERIAL_VERIFY_STATUS_OF_VERIFY_REFUSE)) {
+            return Result.paramNull(result);
+        }
+
+        List<Integer> programIds = param.getProgramIds();
+        try {
+            for (Integer programId : programIds) {
+
+                IotScreenProgramInfoShowDetail programInfo = (IotScreenProgramInfoShowDetail) this.programDetail(programId).getData();
+                List<IotScreenProgramLayer> programLayers = programInfo.getProgramLayers();
+
+                for (IotScreenProgramLayer programLayer : programLayers) {
+
+                    // 检查文件
+                    String fdfsNginxServer = PropertiesUtil.getProperty("FastDFS.properties", "fdfs_nginx_server");
+                    String filePath = null;
+                    String hashKey = null;
+                    if (programLayer instanceof IotScreenProgramVideoLayer) {
+
+                        IotScreenProgramVideoLayer programVideoLayer = (IotScreenProgramVideoLayer) programLayer;
+                        IotScreenVideoSource videoSource = programVideoLayer.getSource();
+                        IotScreenVideoInfo iotScreenVideoInfo = iotScreenVideoInfoMapper.selectByPrimaryKey(videoSource.getVideoId());
+                        String videoUrl = iotScreenVideoInfo.getVideoUrl();
+                        filePath = videoUrl.split(fdfsNginxServer + "/")[1];
+                        hashKey = iotScreenVideoInfo.getHashKey();
+                    } else if (programLayer instanceof IotScreenProgramImageLayer) {
+
+                        IotScreenProgramImageLayer programImageLayer = (IotScreenProgramImageLayer) programLayer;
+                        IotScreenImageSource imageSource = programImageLayer.getSource();
+                        Integer picId = imageSource.getPicId();
+                        IotScreenPicInfo iotScreenPicInfo = iotScreenPicInfoMapper.selectByPrimaryKey(picId);
+                        String picUrl = iotScreenPicInfo.getPicUrl();
+                        filePath = picUrl.split(fdfsNginxServer + "/")[1];
+                        hashKey = iotScreenPicInfo.getHashKey();
+                    }
+
+                    InputStream is = FastDFSUtils.getInputStream(filePath);
+                    if (is == null) {
+                        // 文件未找到
+                        result.setCode(RzIotErrMessage.VERIFY_SCREEN_PROGRAM_RESOURCES_NOT_FOUND);
+                        return result;
+                    }
+                    String md5 = MD5.getMd5(is);
+                    if (!hashKey.equals(md5)) {
+                        // 文件被篡改
+                        result.setCode(RzIotErrMessage.VERIFY_SCREEN_PROGRAM_FILE_CHANGE);
+                        return result;
+                    }
+                }
+            }
+            iotScreenProgramInfoMapper.verifyProgram(param);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        } catch (MyException e) {
+            log.error(e.getMessage(), e);
+        }
+        // 审核失败
+        result.setCode(RzIotErrMessage.VERIFY_SCREEN_PROGRAM_FAILED);
+        return result;
+    }
+
+    /**
+     * 更新节目
+     * @param param
+     * @return
+     */
+    @Transactional
+    @Override
+    public Result update(IotScreenProgramAddParam param) {
+
+        Result result = new Result();
+        Integer programId = param.getId();
+        if (programId == null) {
+            return Result.paramNull(result);
+        }
+
+        // 先删除布局再增加
+        iotScreenVideoSourceMapper.delByProgramId(programId);
+        iotScreenImageSourceMapper.delByProgramId(programId);
+        iotScreenLineTextSourceMapper.delByProgramId(programId);
+        iotScreenDigitalClockSourceMapper.delByProgramId(programId);
+        iotScreenWeatherSourceMapper.delByProgramId(programId);
+
+        // 删除节目布局关系
+        iotScreenProgramSourceRelMapper.delByProgramId(programId);
+
+        List<IotScreenProgramSourceRel> programSourceRels = new ArrayList<>();
+        List<IotScreenProgramAddParamLayer> programLayers = param.getProgramLayers();
+
+        Integer totalSize = null;
+        for (IotScreenProgramAddParamLayer programLayer : programLayers) {
+
+            IotScreenProgramAddParamSource source = programLayer.getSource();
+            Integer sourceType = programLayer.getSourceType();
+
+            // 素材id
+            Integer materialId = source.getMaterialId();
+            IotScreenMaterialKeyRel iotScreenMaterialKeyRel = null;
+
+            IotScreenProgramSourceRel iotScreenProgramSourceRel = new IotScreenProgramSourceRel();
+            iotScreenProgramSourceRel.setzIndex(programLayer.getZIndex());
+            iotScreenProgramSourceRel.setType(sourceType);
+            iotScreenProgramSourceRel.setProgramId(programId);
+
+            switch (sourceType) {
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_VIDEO:
+                    // 视频
+                    iotScreenMaterialKeyRel = iotScreenMaterialKeyRelMapper.selectByMaterialId(materialId, RzIotDBConstParam.MATERTAL_TYPE_OF_VIDEO);
+                    IotScreenVideoInfo video = iotScreenVideoInfoMapper.selectByPrimaryKey(materialId);
+                    IotScreenVideoSource iotScreenVideoSource = new IotScreenVideoSource(
+                            iotScreenMaterialKeyRel.getKey(),
+                            video.getHashKey(),
+                            video.getName(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            new Long(video.getFileSize() + ""),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.Video.name(),
+                            materialId);
+                    totalSize += video.getFileSize();
+                    iotScreenVideoSourceMapper.insertSelective(iotScreenVideoSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenVideoSource.getPkId());
+                    break;
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_IMAGE:
+                    // 图片
+                    iotScreenMaterialKeyRel = iotScreenMaterialKeyRelMapper.selectByMaterialId(materialId, RzIotDBConstParam.MATERTAL_TYPE_OF_PICTURE);
+                    IotScreenPicInfo iotScreenPicInfo = iotScreenPicInfoMapper.selectByPrimaryKey(materialId);
+                    IotScreenImageSource iotScreenImageSource = new IotScreenImageSource(
+                            iotScreenMaterialKeyRel.getKey(),
+                            iotScreenPicInfo.getHashKey(),
+                            iotScreenPicInfo.getName(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            new Long(iotScreenPicInfo.getFileSize() + ""),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.Image.name(),
+                            materialId
+                    );
+                    totalSize += iotScreenPicInfo.getFileSize();
+                    iotScreenImageSourceMapper.insertSelective(iotScreenImageSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenImageSource.getPkId());
+                    break;
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_SINGLE_LINE_TEXT:
+                    // 文字
+                    IotScreenLineTextSource iotScreenLineTextSource = new IotScreenLineTextSource(
+                            source.getHtml(),
+                            source.getLineHeight(),
+                            source.getSpeed(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.SingleLineText.name()
+                    );
+                    iotScreenLineTextSourceMapper.insertSelective(iotScreenLineTextSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenLineTextSource.getPkId());
+                    break;
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_DIGITAL_CLOCK:
+                    // 时钟
+                    IotScreenDigitalClockSource iotScreenDigitalClockSource = new IotScreenDigitalClockSource(
+                            source.getHtml(),
+                            source.getLineHeight(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.DigitalClock.name()
+                    );
+                    iotScreenDigitalClockSourceMapper.insertSelective(iotScreenDigitalClockSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenDigitalClockSource.getPkId());
+                    break;
+                case RzIotDBConstParam.SCREEN_PROGRAM_SOURCE_TYPE_OF_WEATHER:
+                    // 天气
+                    IotScreenWeatherSource iotScreenWeatherSource = new IotScreenWeatherSource(
+                            source.getCity(),
+                            source.getCode(),
+                            source.getHtml(),
+                            source.getLineHeight(),
+                            source.getLeft(),
+                            source.getTop(),
+                            source.getWidth(),
+                            source.getHeight(),
+                            source.getPlayTime(),
+                            source.getTimeSpan(),
+                            source.getEntryEffectStr(),
+                            source.getExitEffectStr(),
+                            source.getEntryEffectTimeSpan(),
+                            source.getExitEffectTimeSpan(),
+                            SourceType.Weather.name()
+                    );
+                    iotScreenWeatherSourceMapper.insertSelective(iotScreenWeatherSource);
+                    iotScreenProgramSourceRel.setSourceId(iotScreenWeatherSource.getPkId());
+                    break;
+            }
+            programSourceRels.add(iotScreenProgramSourceRel);
+        }
+
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+        IotScreenProgramInfo iotScreenProgramInfo = new IotScreenProgramInfo(
+                programId,
+                param.getName(),
+                param.getHeight(),
+                param.getWidth(),
+                totalSize,
+                param.getProgramLength(),
+                param.getResolution(),
+                null,
+                userInfo.getId(),
+                param.getDescribe()
+        );
+        // 更新节目
+        iotScreenProgramInfoMapper.updateByPrimaryKeySelective(iotScreenProgramInfo);
+
+        // 批量增加节目布局关系
+        iotScreenProgramSourceRelMapper.insertBatch(programSourceRels);
+
+        return result;
+    }
+
+    /**
+     * 节目删除
+     * @param param
+     * @return
+     */
+    @Transactional
+    @Override
+    public Result del(IotScreenProgramDelParam param) {
+
+        Result result = new Result();
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+        List<Integer> programIds = param.getProgramIds();
+        if (programIds == null || programIds.size() == 0) {
+            return Result.paramNull(result);
+        }
+        for (Integer programId : programIds) {
+
+            // 鉴权
+            boolean authorized = iotBusinessUserRelService.isAuthorized(programId, RzIotDBConstParam.BUSSINESS_TYPE_OF_SCREEN_PROGRAM, userInfo.getId());
+            if (!authorized) {
+                return Result.paramNull(result);
+            }
+
+            List<IotScreenPlayStrategy> playStrategies = iotScreenPlayStrategyMapper.findByProgramId(programId);
+            if (playStrategies != null && playStrategies.size() > 0) {
+                // 节目删除失败，节目已关联策略
+                result.setCode(RzIotErrMessage.SCREEN_PROGRAM_DEL_PROGRAM_HAVING_LINKED_WITH_STRATEGY);
+                return result;
+            }
+
+            // 先删除布局
+            iotScreenVideoSourceMapper.delByProgramId(programId);
+            iotScreenImageSourceMapper.delByProgramId(programId);
+            iotScreenLineTextSourceMapper.delByProgramId(programId);
+            iotScreenDigitalClockSourceMapper.delByProgramId(programId);
+            iotScreenWeatherSourceMapper.delByProgramId(programId);
+
+            // 删除节目布局关系
+            iotScreenProgramSourceRelMapper.delByProgramId(programId);
+
+            // 删除节目
+            IotScreenProgramInfo iotScreenProgramInfo = new IotScreenProgramInfo();
+            iotScreenProgramInfo.setId(programId);
+            iotScreenProgramInfo.setStatus(RzIotDBConstParam.DATA_STATUS_OF_DELETE);
+            iotScreenProgramInfoMapper.updateByPrimaryKeySelective(iotScreenProgramInfo);
+
+            // 删除节目用户关联关系
+            if (userInfo.getStatus() == RzIotDBConstParam.USER_STATUS_OF_NORMAL) {
+
+                iotBusinessUserRelMapper.delRel(programId, userInfo.getId(), RzIotDBConstParam.BUSSINESS_TYPE_OF_SCREEN_PROGRAM);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 节目复制
+     * @param programId 节目id
+     * @return
+     */
+    @Transactional
+    @Override
+    public Result copy(Integer programId) {
+
+        Result result = new Result();
+        if (programId == null) {
+            return Result.paramNull(result);
+        }
+
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+
+        // 鉴权
+        boolean authorized = iotBusinessUserRelService.isAuthorized(programId, RzIotDBConstParam.BUSSINESS_TYPE_OF_SCREEN_PROGRAM, userInfo.getId());
+        if (!authorized) {
+            return Result.paramNull(result);
+        }
+
+        IotScreenProgramInfoShowDetail programInfo = (IotScreenProgramInfoShowDetail) this.programDetail(programId).getData();
+
+        String programName = programInfo.getName();
+        programName += "_" + UUID.randomUUID().toString().substring(0, 6);
+
+        IotScreenProgramInfo iotScreenProgramInfo = new IotScreenProgramInfo(
+                null,
+                programName,
+                programInfo.getHeight(),
+                programInfo.getWidth(),
+                programInfo.getTotalSize(),
+                programInfo.getProgramLength(),
+                programInfo.getResolution(),
+                programInfo.getType(),
+                userInfo.getId(),
+                programInfo.getDescribe()
+        );
+        // 复制节目信息
+        iotScreenProgramInfoMapper.insertSelective(iotScreenProgramInfo);
+
+        List<IotScreenProgramSourceRel> programSourceRels = new ArrayList<>();
+        List<IotScreenProgramLayer> programLayers = programInfo.getProgramLayers();
+        for (IotScreenProgramLayer programLayer : programLayers) {
+
+            // 复制布局
+            IotScreenProgramSourceRel iotScreenProgramSourceRel = new IotScreenProgramSourceRel();
+            iotScreenProgramSourceRel.setProgramId(iotScreenProgramInfo.getId());
+            iotScreenProgramSourceRel.setzIndex(programLayer.getzIndex());
+            iotScreenProgramSourceRel.setType(programLayer.getSourceType());
+
+            if (programLayer instanceof IotScreenProgramVideoLayer) {
+                IotScreenProgramVideoLayer programVideoLayer = (IotScreenProgramVideoLayer) programLayer;
+                IotScreenVideoSource videoSource = programVideoLayer.getSource();
+                videoSource.setPkId(null);
+                iotScreenVideoSourceMapper.insertSelective(videoSource);
+                iotScreenProgramSourceRel.setSourceId(videoSource.getPkId());
+
+            } else if (programLayer instanceof IotScreenProgramImageLayer) {
+
+                IotScreenProgramImageLayer programImageLayer = (IotScreenProgramImageLayer) programLayer;
+                IotScreenImageSource imageSource = programImageLayer.getSource();
+                imageSource.setPkId(null);
+                iotScreenImageSourceMapper.insertSelective(imageSource);
+                iotScreenProgramSourceRel.setSourceId(imageSource.getPkId());
+
+            } else if (programLayer instanceof IotScreenProgramSingleLineTextLayer) {
+                IotScreenProgramSingleLineTextLayer singleLineTextLayer = (IotScreenProgramSingleLineTextLayer) programLayer;
+                IotScreenLineTextSource lineTextSource = singleLineTextLayer.getSource();
+                lineTextSource.setPkId(null);
+                iotScreenLineTextSourceMapper.insertSelective(lineTextSource);
+                iotScreenProgramSourceRel.setSourceId(lineTextSource.getPkId());
+
+            } else if (programLayer instanceof IotScreenProgramDigitalClockLayer) {
+                IotScreenProgramDigitalClockLayer digitalClockLayer = (IotScreenProgramDigitalClockLayer) programLayer;
+                IotScreenDigitalClockSource digitalClockSource = digitalClockLayer.getSource();
+                digitalClockSource.setPkId(null);
+                iotScreenDigitalClockSourceMapper.insertSelective(digitalClockSource);
+                iotScreenProgramSourceRel.setSourceId(digitalClockSource.getPkId());
+
+            } else if (programLayer instanceof IotScreenProgramWeatherLayer) {
+                IotScreenProgramWeatherLayer weatherLayer = (IotScreenProgramWeatherLayer) programLayer;
+                IotScreenWeatherSource weatherSource = weatherLayer.getSource();
+                weatherSource.setPkId(null);
+                iotScreenWeatherSourceMapper.insertSelective(weatherSource);
+                iotScreenProgramSourceRel.setSourceId(weatherSource.getPkId());
+            }
+        }
+
+        iotScreenProgramSourceRelMapper.insertBatch(programSourceRels);
+
+        // 增加节目用户关联关系
+        if (userInfo.getStatus() == RzIotDBConstParam.USER_STATUS_OF_NORMAL) {
+            IotBusinessUserRel iotBusinessUserRel = new IotBusinessUserRel();
+            iotBusinessUserRel.setBusinessType(RzIotDBConstParam.BUSSINESS_TYPE_OF_SCREEN_PROGRAM);
+            iotBusinessUserRel.setBusinessId(iotScreenProgramInfo.getId());
+            iotBusinessUserRel.setUserId(userInfo.getId());
+            iotBusinessUserRelMapper.insertSelective(iotBusinessUserRel);
+        }
+
+        return result;
+    }
+}

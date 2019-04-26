@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotConcentratorStrategyRelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotConcentratorStrategyRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="concentrator_id" property="concentratorId" jdbcType="INTEGER" />
+    <result column="concentrator_type" property="concentratorType" jdbcType="VARCHAR" />
+    <result column="strategy_id" property="strategyId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, concentrator_id as concentratorid, concentrator_type as concentratorType, strategy_id  as strategyId, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_concentrator_strategy_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--查询所有与开关策略绑定的集中器-->
+  <select id="findBindConStrategy" parameterType="java.lang.Integer" resultType="com.rz.iot.think.model.show.IotBindConStraShow">
+    select con.id as id,con.name as name,con.sn as sn,arel.district_name as districtName,road.road_name as roadName,con.`status` as `status`,con.ip as ip,con.port as port
+    from iot_concentrator con
+    left join iot_business_user_rel urel on urel.business_id = con.id and urel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_CONCENTRATOR}
+    left join iot_area_rel arel on arel.id = con.area_rel_id
+    left join iot_area_city_road road on road.id = con.road_id
+    where con.id in (select srel.concentrator_id from iot_concentrator_strategy_rel srel where srel.concentrator_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@CONCENTRATOR_TYPE_OF_CONCENTRATOR})
+    AND(
+    CASE
+          (
+            SELECT type
+            FROM user_info
+            WHERE id = #{userId}
+          )
+          WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+            THEN
+              urel.user_id = #{userId}
+          WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+            THEN
+              true
+          END
+     )
+  </select>
+
+  <!--查询所有与开关策略绑定的集中器组-->
+  <select id="findBindConGroupStrategy" parameterType="java.lang.Integer" resultType="com.rz.iot.think.model.show.IotBindConStraShow">
+  select con.id as id,con.name as name,arel.district_name as districtName,road.road_name as roadName,con.`status` as `status`
+    from iot_concentrator_group con
+    left join iot_business_user_rel urel on urel.business_id = con.id and urel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_CONCENTRATOR_GROUP}
+    left join iot_area_rel arel on arel.id = con.area_rel_id
+    left join iot_area_city_road road on road.id = con.road_id
+    where con.id in (select srel.concentrator_id from iot_concentrator_strategy_rel srel where srel.concentrator_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@CONCENTRATOR_TYPE_OF_CONCENTRATOR_GROUP})
+    AND(
+    CASE
+          (
+            SELECT type
+            FROM user_info
+            WHERE id = #{userId}
+          )
+          WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+            THEN
+              urel.user_id = #{userId}
+          WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+            THEN
+              true
+          END
+     )
+  </select>
+
+  <select id="selectBySwitchId" resultType="com.rz.iot.think.model.IotConcentratorStrategyRel" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List" />
+    from iot_concentrator_strategy_rel
+    where strategy_id = #{switchId}
+  </select>
+
+  <select id="findBySwitchId" parameterType="java.lang.Integer" resultType="com.rz.iot.think.model.IotConcentratorSwitchBrightnessStrategyRel">
+     select id,switch_id as switchId,brightness_id as brightnessId,status
+     from iot_concentrator_switch_brightness_strategy_rel
+     where switch_id = #{id}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_concentrator_strategy_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteList" parameterType="java.util.List">
+    UPDATE iot_concentrator_strategy_rel
+    SET `status` = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    where id IN
+    <foreach collection="list" item="item" open="(" separator="," close=")">
+        #{item.id}
+    </foreach>
+  </delete>
+
+  <delete id="unbindSwitchConcentrator" parameterType="com.rz.iot.think.model.IotSwitchBindConcentrator">
+    delete from iot_concentrator_strategy_rel where
+    <foreach collection="concentratorId" item="item" separator="or">
+      concentrator_id = #{item} and concentrator_type = #{concentratorType}
+    </foreach>
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotConcentratorStrategyRel" >
+    insert into iot_concentrator_strategy_rel (id, concentrator_id, concentrator_type, 
+      strategy_id, status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{concentratorId,jdbcType=INTEGER}, #{concentratorType,jdbcType=VARCHAR}, 
+      #{strategyId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <!--开关绑定集中器(组)-->
+  <insert id="bindSwitchConcentrator" parameterType="com.rz.iot.think.model.IotSwitchBindConcentrator">
+     insert into iot_concentrator_strategy_rel(strategy_id,concentrator_id,concentrator_type) VALUES
+     <foreach collection="concentratorId" item="item" separator=",">
+       (#{switchId},#{item},#{concentratorType})
+     </foreach>
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotConcentratorStrategyRel" >
+    insert into iot_concentrator_strategy_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="concentratorId != null" >
+        concentrator_id,
+      </if>
+      <if test="concentratorType != null" >
+        concentrator_type,
+      </if>
+      <if test="strategyId != null" >
+        strategy_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="concentratorId != null" >
+        #{concentratorId,jdbcType=INTEGER},
+      </if>
+      <if test="concentratorType != null" >
+        #{concentratorType,jdbcType=VARCHAR},
+      </if>
+      <if test="strategyId != null" >
+        #{strategyId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotConcentratorStrategyRel" >
+    update iot_concentrator_strategy_rel
+    <set >
+      <if test="concentratorId != null" >
+        concentrator_id = #{concentratorId,jdbcType=INTEGER},
+      </if>
+      <if test="concentratorType != null" >
+        concentrator_type = #{concentratorType,jdbcType=VARCHAR},
+      </if>
+      <if test="strategyId != null" >
+        strategy_id = #{strategyId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotConcentratorStrategyRel" >
+    update iot_concentrator_strategy_rel
+    set concentrator_id = #{concentratorId,jdbcType=INTEGER},
+      concentrator_type = #{concentratorType,jdbcType=VARCHAR},
+      strategy_id = #{strategyId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--根据集中器id集中器类型（是否是集中器组）查询-->
+  <select id="findByConcentratorId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from iot_concentrator_strategy_rel
+    where concentrator_id = #{concentratorId}
+    AND concentrator_type = #{concentratorType}
+    AND status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+  </select>
+</mapper>

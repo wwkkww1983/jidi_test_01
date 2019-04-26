@@ -1,0 +1,143 @@
+package com.rz.iot.think.mqtt.util;
+
+/**
+ * Author by xuxiake, Date on 2019/4/11.
+ * PS: Not easy to write code, please indicate.
+ * Description: 
+ */
+public class RzIotConcentratorConstParam {
+
+    public static final int TYPE_SINGLE_PHASE = 1; // 一相
+    public static final int TYPE_THREE_PHASE = 3;  // 三相
+
+    public static final int TYPE_A_PHASE  = 1; // A 相
+    public static final int TYPE_B_PHASE  = 2; // B 相
+    public static final int TYPE_C_PHASE  = 3; // C 相
+    public static final int TYPE_UNION_PHASE  = 4; // 合 相
+
+    public static final int DATA_HEAD_LENGTH = 26; // 消息头长度
+
+    // 错误状态
+    public static final int FAULT_STATUS_PRODUCE  = 1; // 故障产生
+    public static final int FAULT_STATUS_RECOVERY = 0; // 故障恢复
+
+    // 错误级别
+    public static final int FAULT_LEVEL_OK   = 1; // 正常
+    public static final int FAULT_LEVEL_WARN    = 2; // 告警
+    public static final int FAULT_LEVEL_PROTECT = 3; // 保护
+    public static final int FAULT_LEVEL_Off = 4; // 离线
+
+    // 电箱状态 0:故障；1:正常运行；2：未激活；3：离线；9:已被删除;
+    public static final int EB_STATUS_FAULT        = 0;//0:故障；
+    public static final int EB_STATUS_0K           = 1;//1:正常运行；
+    public static final int EB_STATUS_OFFLINE      = 2;//2：离线；
+    public static final int EB_STATUS_INACTIVATED = 8;//8：未激活；
+    public static final int EB_STATUS_DELETE       = 9;//9:已被删除;
+
+    // 时间方案周期模式：
+    public static final int CYCLE_TYPE_DATE  = 1;  // 日期
+    public static final int CYCLE_TYPE_WEEK  = 2;  // 星期
+
+    //指令下发上报状态 iot_electric_box_subscribe_report 0: 等待客户端应答；1：客户端成功应答; 2：未知客户端应答; 3：执行失败
+    public static final int REPORT_STATUS_WAIT = 0;  //等待客户端应答
+    public static final int REPORT_STATUS_OK = 1;  //客户端成功应答
+    public static final int REPORT_STATUS_UNKNOWN = 2;  //未知客户端应答
+    public static final int REPORT_STATUS_FAIL = 3;  //执行失败
+
+    // 集中器发布指令
+    public static final int PUBLISH_COMMON               = 0x80;  // 服务端控制命令下发
+    public static final int PUBLISH_CTRL_CMD             = 0x82;  // 服务端输出控制命令下发
+    public static final int PUBLISH_WARN_CONFIG          = 0x84;  // 服务端告警参数下发
+    public static final int PUBLISH_SWITCH_STRATEGY      = 0x83;  // 服务端预约参数下发
+    public static final int PUBLISH_TIMING               = 0x86;  // 校时命令下发
+    public static final int PUBLISH_ENERGY_REPORT_TIME   = 0x85;  // 电量定时上报时间下发
+    public static final int PUBLISH_REMOTE_UPGRADE       = 0x8F;  // 服务端升级指令下发
+
+    public static final int PUBLISH_TIME_OUT  = 120; // 发布状态上报超时时长，单位：秒
+    public static final int PUBLISH_SWITCH_STRATEGY_T  = 131; // 服务端预约参数下发 十进制数据
+
+    // 集中器上报
+    public static final int REPORT_OF_FAULT = 0x01;  // 告警信息上报
+    public static final int REPORT_OF_SWITCH_STATUS = 0x02;  // 开关状态上报
+    public static final int REPORT_OF_ELECTRIC_PARAM = 0x03;  // 电气参数上报
+    public static final int REPORT_OF_FAULT_PARAM = 0x04;  // 告警参数上报
+    public static final int REPORT_OF_CONFIG_PARAM = 0x05;  // 配置参数上报
+    public static final int REPORT_OF_CURRENT_TIME = 0x06;  // 当前时间上报
+    public static final int REPORT_OF_SWITCH_STRATEGY = 0x07;  // 开关策略（预约方案）上报
+    public static final int REPORT_OF_ENERGY = 0x09;  // 电量上报
+    public static final int REPORT_OF_ENVIRONMENT_PARAM = 0x0A;  // 环境参数上报
+    public static final int REPORT_OF_HEARTBEAT_AND_SIGNAL_STRENGTH = 0x0B;  // 心跳&信号强度上报
+    public static final int REPORT_OF_AUTH = 0x0E;  // 身份认证上报
+    public static final int REPORT_OF_REMOTE_UPGRADE = 0x0F;  // 远程升级上报
+
+    // 电量类型 1：集中器；2：单灯控制器
+    public static final int ELECTRIC_QUANTITY_OF_CONCENTRATOR = 1;  // 1：集中器
+    public static final int ELECTRIC_QUANTITY_OF_SINGLE_LIGHT_CONTROLLER = 2;  // 2：单灯控制器
+
+    // 故障类型
+    // 1: 电流上限告警；2：电流上限保护 "电流过载"
+    // 3：电压上限告警；4：电压上限保护 "电压超限"
+    // 5：电压下限告警；6：电压下限保护 "漏电"
+    // 7：温度上限告警；8：温度上限保护 "温度过高"
+    // 9:进线剩余电流告警上限；10：进线剩余电流保护上限
+    public static final String[] FAULT_TYPE_DESC = {
+            "电流过载",  "电压超限",
+            "漏电", "温度过高","离线"};
+
+    // 1: 电流上限告警；
+    public final static int FAULT_TYPE_ELECTRIC_CURRENT_WARN_MAX  = 1;
+    // 2：电流上限保护
+    public final static int FAULT_TYPE_ELECTRIC_CURRENT_PROTECT_MAX = 2;
+    // 3：电压上限告警；
+    public final static int FAULT_TYPE_VOLTAGE_WARN_MAX = 3;
+    // 4：电压上限保护
+    public final static int FAULT_TYPE_VOLTAGE_PROTECT_MAX = 4;
+    // 5：电压下限告警；
+    public final static int FAULT_TYPE_VOLTAGE_WARN_MIN = 5;
+    // 6：电压下限保护
+    public final static int FAULT_TYPE_VOLTAGE_PROTECT_MIN = 6;
+    // 7：温度上限告警；
+    public final static int FAULT_TYPE_TEMP_WARN_MAX = 7;
+    // 8：温度上限保护
+    public final static int FAULT_TYPE_TEMP_PROTECT_MAX = 8;
+
+    // 云平台订阅（集中器发布）主题：rz_iot_think
+    public final static String MQTT_PUBLISH_TOPIC = "rz_iot_think_";
+    // 云平台发布（集中器订阅）主题前缀
+    public final static String MQTT_REPORT_TOPIC = "rz_iot_think";
+
+    /**
+     * mqtt 常量定义
+     */
+//    public static class MQTT {
+//        public final static String HOST = "tcp://"+
+//                ConfigureUtils.getStringValue("serverUrl")+":" +
+//                ConfigureUtils.getStringValue("emqttdPort");
+//
+//        public final static boolean CLEAN_START = true;
+//        public final static short KEEP_ALIVE = 30;// 低耗网络，但是又需要及时获取数据，心跳30s
+//
+//        public final static long RECONNECTION_ATTEMPT_MAX = 60000; // 6
+//        public final static long RECONNECTION_DELAY = 60; // 2000
+//
+//        public final static int SEND_BUFFER_SIZE = 64; // 发送最大缓冲为2M
+//
+//        public final static String ELECTRIC_MQTT_PATH = "$HOME/electric_mqtt/";
+//
+//        // 接收配置参数
+//        public final static String SUBSCRIBE_ID = "glc_switchbox_receiver";
+//        public final static Topic[] SUBSCRIBE_TOPICS = {
+//                // 2： 只有一次
+//                new Topic("glc_iot_dev", QoS.EXACTLY_ONCE)
+//        };
+//
+//
+//        // 发送配置参数
+//        public final static String PUBLISH_ID = "glc_switchbox_sender";
+//        public final static Topic[] PUBLISH_TOPICS = {
+//                // 2： 只有一次
+//                new Topic("glc_iot_cloud_", QoS.EXACTLY_ONCE)
+//        };
+//    }
+
+}

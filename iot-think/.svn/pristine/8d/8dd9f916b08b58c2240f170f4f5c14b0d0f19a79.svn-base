@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotSingleLightControllerLedLightsRelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotSingleLightControllerLedLightsRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="slc_id" property="slcId" jdbcType="INTEGER" />
+    <result column="let_lights_id" property="letLightsId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, slc_id, let_lights_id, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_single_light_controller_led_lights_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_single_light_controller_led_lights_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotSingleLightControllerLedLightsRel" >
+    insert into iot_single_light_controller_led_lights_rel (id, slc_id, let_lights_id, 
+      status, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{slcId,jdbcType=INTEGER}, #{letLightsId,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotSingleLightControllerLedLightsRel" >
+    insert into iot_single_light_controller_led_lights_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="slcId != null" >
+        slc_id,
+      </if>
+      <if test="letLightsId != null" >
+        let_lights_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="slcId != null" >
+        #{slcId,jdbcType=INTEGER},
+      </if>
+      <if test="letLightsId != null" >
+        #{letLightsId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotSingleLightControllerLedLightsRel" >
+    update iot_single_light_controller_led_lights_rel
+    <set >
+      <if test="slcId != null" >
+        slc_id = #{slcId,jdbcType=INTEGER},
+      </if>
+      <if test="letLightsId != null" >
+        let_lights_id = #{letLightsId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotSingleLightControllerLedLightsRel" >
+    update iot_single_light_controller_led_lights_rel
+    set slc_id = #{slcId,jdbcType=INTEGER},
+      let_lights_id = #{letLightsId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--批量插入-->
+  <insert id="insertBatch" useGeneratedKeys="true" keyColumn="id" keyProperty="id" parameterType="list">
+    insert into iot_single_light_controller_led_lights_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="list[0].id != null" >
+        id,
+      </if>
+      <if test="list[0].slcId != null" >
+        slc_id,
+      </if>
+      <if test="list[0].letLightsId != null" >
+        let_lights_id,
+      </if>
+      <if test="list[0].status != null" >
+        status,
+      </if>
+    </trim>
+    values
+    <foreach collection="list" item="item" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+        <if test="item.id != null" >
+          #{item.id,jdbcType=INTEGER},
+        </if>
+        <if test="item.slcId != null" >
+          #{item.slcId,jdbcType=INTEGER},
+        </if>
+        <if test="item.letLightsId != null" >
+          #{item.letLightsId,jdbcType=INTEGER},
+        </if>
+        <if test="item.status != null" >
+          #{item.status,jdbcType=INTEGER},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+
+  <!--根据路灯ID删除-->
+  <update id="delByStreetlightId">
+    UPDATE
+      iot_single_light_controller_led_lights_rel controller_led_lights_rel
+    SET
+      controller_led_lights_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    WHERE
+      controller_led_lights_rel.slc_id
+      IN
+      (
+        SELECT streetlight_slc_rel.slc_id
+        FROM
+          iot_streetlight_slc_rel streetlight_slc_rel
+        WHERE
+          streetlight_slc_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND streetlight_slc_rel.streetlight_id = #{streetlightId}
+      )
+  </update>
+</mapper>

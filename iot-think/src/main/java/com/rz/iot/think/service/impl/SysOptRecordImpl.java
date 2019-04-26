@@ -1,0 +1,61 @@
+package com.rz.iot.think.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.gson.Gson;
+import com.rz.iot.think.mapper.SysOptRecordMapper;
+import com.rz.iot.think.model.Page;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.SysOptRecord;
+import com.rz.iot.think.model.UserInfo;
+import com.rz.iot.think.model.show.SysOptRecordShowList;
+import com.rz.iot.think.service.SysOptRecordService;
+import com.rz.iot.think.utils.CommonFunctions;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+@Service
+public class SysOptRecordImpl implements SysOptRecordService {
+
+    @Resource
+    private SysOptRecordMapper sysOptRecordMapper;
+    @Autowired
+    private HttpServletRequest request;
+
+    /**
+     * 记录操作日志
+     * @param optType 操作类型
+     * @param content 内容
+     */
+    @Override
+    public void insertSelective(Integer optMode, Integer module, Integer optType, Object content) {
+        //记录操作日志
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        SysOptRecord sysOptRecord = new SysOptRecord();
+        sysOptRecord.setUserId(userInfo.getId());
+        sysOptRecord.setClientIp(CommonFunctions.getIpAddress(request));
+        sysOptRecord.setClientMac("");
+        sysOptRecord.setOptMode(optMode);
+        sysOptRecord.setModule(module);
+        sysOptRecord.setOptType(optType);
+        sysOptRecord.setContent(new Gson().toJson(content));
+        sysOptRecordMapper.insertSelective(sysOptRecord);
+    }
+
+    @Override
+    public Result findAll(Page<SysOptRecordShowList> page, SysOptRecordShowList sysOptRecordShowList) {
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<SysOptRecordShowList> list = sysOptRecordMapper.findAll(sysOptRecordShowList);
+        PageInfo<SysOptRecordShowList> pageInfo = new PageInfo<>(list);
+        page.setOtherParam(pageInfo);
+        Result result = new Result();
+        result.setData(page);
+        return result;
+    }
+
+}

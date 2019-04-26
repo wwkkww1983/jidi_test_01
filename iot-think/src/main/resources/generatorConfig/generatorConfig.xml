@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <!-- mysql驱动 -->
+    <classPathEntry
+            location="D:\Maven\LocalRepository\mysql\mysql-connector-java\5.1.47\mysql-connector-java-5.1.47.jar" />
+    <context id="context1">
+
+        <commentGenerator>
+            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressAllComments" value="true" />
+        </commentGenerator>
+
+        <!-- 数据库连接信息 -->
+        <jdbcConnection connectionURL="jdbc:mysql://192.168.3.3:3306/iot-think"
+                        driverClass="com.mysql.jdbc.Driver" password="Rz123456" userId="rz" />
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <!-- 生成实体类 -->
+        <javaModelGenerator targetPackage="com.rz.iot.think.model.alarm"
+                            targetProject="src/main/java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+
+        <!-- 生成映射文件 -->
+        <sqlMapGenerator targetPackage="mapping/alarm"
+                         targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+
+        <!-- 生成mapper接口 -->
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="com.rz.iot.think.mapper.alarm" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+
+        <!-- 要生成的表 -->
+        <table tableName="iot_alarm_box" domainObjectName="IotAlarmBox"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+        <table tableName="iot_alarm_box_fault" domainObjectName="IotAlarmBoxFault"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+        <table tableName="iot_alarm_box_fault_log" domainObjectName="IotAlarmBoxFaultLog"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+        <table tableName="iot_alarm_box_fault_log_history" domainObjectName="IotAlarmBoxFaultLogHistory"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+        <table tableName="iot_alarm_box_record" domainObjectName="IotAlarmBoxRecord"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+        <table tableName="iot_alarm_box_record_log" domainObjectName="IotAlarmBoxRecordLog"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+        <table tableName="iot_alarm_box_record_log_history" domainObjectName="IotAlarmBoxRecordLogHistory"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+    </context>
+</generatorConfiguration>

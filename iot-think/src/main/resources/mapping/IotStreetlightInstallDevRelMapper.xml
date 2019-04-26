@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotStreetlightInstallDevRelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotStreetlightInstallDevRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="streetlight_id" property="streetlightId" jdbcType="INTEGER" />
+    <result column="dev_type" property="devType" jdbcType="VARCHAR" />
+    <result column="dev_id" property="devId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, streetlight_id, dev_type, dev_id, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_streetlight_install_dev_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_streetlight_install_dev_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotStreetlightInstallDevRel" >
+    insert into iot_streetlight_install_dev_rel (id, streetlight_id, dev_type, 
+      dev_id, status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{streetlightId,jdbcType=INTEGER}, #{devType,jdbcType=VARCHAR}, 
+      #{devId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotStreetlightInstallDevRel" >
+    insert into iot_streetlight_install_dev_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="streetlightId != null" >
+        streetlight_id,
+      </if>
+      <if test="devType != null" >
+        dev_type,
+      </if>
+      <if test="devId != null" >
+        dev_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="streetlightId != null" >
+        #{streetlightId,jdbcType=INTEGER},
+      </if>
+      <if test="devType != null" >
+        #{devType,jdbcType=VARCHAR},
+      </if>
+      <if test="devId != null" >
+        #{devId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotStreetlightInstallDevRel" >
+    update iot_streetlight_install_dev_rel
+    <set >
+      <if test="streetlightId != null" >
+        streetlight_id = #{streetlightId,jdbcType=INTEGER},
+      </if>
+      <if test="devType != null" >
+        dev_type = #{devType,jdbcType=VARCHAR},
+      </if>
+      <if test="devId != null" >
+        dev_id = #{devId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotStreetlightInstallDevRel" >
+    update iot_streetlight_install_dev_rel
+    set streetlight_id = #{streetlightId,jdbcType=INTEGER},
+      dev_type = #{devType,jdbcType=VARCHAR},
+      dev_id = #{devId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <resultMap id="ResultMapDevList" type="com.rz.iot.think.model.show.IotStreetlightInstallDevShowList">
+    <result property="devType" column="dev_type"/>
+    <result property="devId" column="dev_id"/>
+    <result property="status" column="status"/>
+    <result property="name" column="name"/>
+    <result property="sn" column="sn"/>
+    <result property="manufacturer" column="manufacturer"/>
+    <result property="version" column="version"/>
+    <result property="netType" column="net_type"/>
+    <result property="ip" column="ip"/>
+    <result property="port" column="port"/>
+  </resultMap>
+
+  <!--根据路灯id查询所有的挂载设备-->
+  <select id="findByStreetlightId" resultMap="ResultMapDevList">
+    SELECT
+      install_dev_rel.dev_type,
+      install_dev_rel.dev_id,
+      CONCAT(IFNULL(monitor.status, ''), IFNULL(screen.status, ''), IFNULL(wifi.status, ''), IFNULL(sensor.status, '')) status,
+      CONCAT(IFNULL(monitor.name, ''), IFNULL(screen.name, ''), IFNULL(wifi.name, ''), IFNULL(sensor.name, '')) name,
+      CONCAT(IFNULL(monitor.sn, ''), IFNULL(screen.sn, ''), IFNULL(wifi.sn, ''), IFNULL(sensor.sn, '')) sn,
+      CONCAT(IFNULL(monitor.manufacturer, ''), IFNULL(screen.manufacturer, ''), IFNULL(wifi.manufacturer, ''), IFNULL(sensor.manufacturer, '')) manufacturer,
+      CONCAT(IFNULL(monitor.code_version, ''), IFNULL(screen.version, ''), IFNULL(wifi.version, ''), IFNULL(sensor.version, '')) version,
+      CONCAT(IFNULL(monitor.net_type, ''), IFNULL(screen.net_type, ''), IFNULL(wifi.net_type, ''), IFNULL(sensor.net_type, '')) net_type,
+      CONCAT(IFNULL(monitor.ip, ''), IFNULL(screen.ip, ''), IFNULL(wifi.ip, ''), IFNULL(sensor.ip, '')) ip,
+      CONCAT(IFNULL(monitor.port, ''), IFNULL(screen.port, ''), IFNULL(wifi.port, ''), IFNULL(sensor.port, '')) port
+    FROM
+      iot_streetlight_install_dev_rel install_dev_rel
+      LEFT JOIN iot_monitor monitor
+        ON monitor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+           AND monitor.id = install_dev_rel.dev_id
+           AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_CAMERA}
+      LEFT JOIN iot_screen screen
+        ON screen.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+           AND screen.id = install_dev_rel.dev_id
+           AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_SCREEN}
+      LEFT JOIN iot_wifi wifi
+        ON wifi.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+           AND wifi.id = install_dev_rel.dev_id
+           AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_WIFI}
+      LEFT JOIN iot_sensor sensor
+        ON sensor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+           AND sensor.id = install_dev_rel.dev_id
+           AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_ENVIRONMENT_SENSOR}
+    WHERE install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND install_dev_rel.streetlight_id = #{streetlightId}
+  </select>
+
+
+
+
+  <select id="devInfosByStreetlightId" resultType="java.util.HashMap">
+    SELECT
+      install_dev_rel.dev_type,
+      install_dev_rel.dev_id,
+      CONCAT(IFNULL(monitor.status, ''), IFNULL(screen.status, ''), IFNULL(wifi.status, ''), IFNULL(sensor.status, '')) status,
+      CONCAT(IFNULL(monitor.name, ''), IFNULL(screen.name, ''), IFNULL(wifi.name, ''), IFNULL(sensor.name, '')) name,
+      CONCAT(IFNULL(monitor.sn, ''), IFNULL(screen.sn, ''), IFNULL(wifi.sn, ''), IFNULL(sensor.sn, '')) sn,
+      CONCAT(IFNULL(monitor.manufacturer, ''), IFNULL(screen.manufacturer, ''), IFNULL(wifi.manufacturer, ''), IFNULL(sensor.manufacturer, '')) manufacturer,
+      CONCAT(IFNULL(monitor.code_version, ''), IFNULL(screen.version, ''), IFNULL(wifi.version, ''), IFNULL(sensor.version, '')) version,
+      CONCAT(IFNULL(monitor.net_type, ''), IFNULL(screen.net_type, ''), IFNULL(wifi.net_type, ''), IFNULL(sensor.net_type, '')) net_type,
+      CONCAT(IFNULL(monitor.ip, ''), IFNULL(screen.ip, ''), IFNULL(wifi.ip, ''), IFNULL(sensor.ip, '')) ip,
+      CONCAT(IFNULL(monitor.port, ''), IFNULL(screen.port, ''), IFNULL(wifi.port, ''), IFNULL(sensor.port, '')) port,
+      CASE install_dev_rel.dev_type
+        WHEN 1 THEN monitor.status
+        WHEN 2 THEN screenFaults.fault_code
+        WHEN 3 THEN wifiFaults.fault_code
+        WHEN 4 THEN sensorFaults.status
+      END AS fault_code
+
+    FROM
+      iot_streetlight_install_dev_rel install_dev_rel
+        LEFT JOIN iot_monitor monitor
+                  ON monitor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+                    AND monitor.id = install_dev_rel.dev_id
+                    AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_CAMERA}
+        LEFT JOIN iot_screen screen
+                  ON screen.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+                    AND screen.id = install_dev_rel.dev_id
+                    AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_SCREEN}
+        LEFT JOIN iot_screen_fault screenFaults ON screenFaults.screen_id = screen.id
+        LEFT JOIN iot_wifi wifi
+                  ON wifi.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+                    AND wifi.id = install_dev_rel.dev_id
+                    AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_WIFI}
+        LEFT JOIN iot_wifi_fault wifiFaults ON wifiFaults.wifi_id = wifi.id
+        LEFT JOIN iot_sensor sensor
+                  ON sensor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+                    AND sensor.id = install_dev_rel.dev_id
+                    AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_ENVIRONMENT_SENSOR}
+        LEFT JOIN iot_sensor_fault sensorFaults ON sensor.id = sensorFaults.sensor_id
+    WHERE install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      AND install_dev_rel.streetlight_id = #{streetlightId}
+  </select>
+
+
+
+
+
+  <!--批量插入-->
+  <insert id="insertBatch" parameterType="list" >
+    insert into iot_streetlight_install_dev_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="list[0].id != null" >
+        id,
+      </if>
+      <if test="list[0].streetlightId != null" >
+        streetlight_id,
+      </if>
+      <if test="list[0].devType != null" >
+        dev_type,
+      </if>
+      <if test="list[0].devId != null" >
+        dev_id,
+      </if>
+      <if test="list[0].status != null" >
+        status,
+      </if>
+    </trim>
+    values
+    <foreach collection="list" item="item" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+        <if test="item.id != null" >
+          #{item.id,jdbcType=INTEGER},
+        </if>
+        <if test="item.streetlightId != null" >
+          #{item.streetlightId,jdbcType=INTEGER},
+        </if>
+        <if test="item.devType != null" >
+          #{item.devType,jdbcType=VARCHAR},
+        </if>
+        <if test="item.devId != null" >
+          #{item.devId,jdbcType=INTEGER},
+        </if>
+        <if test="item.status != null" >
+          #{item.status,jdbcType=INTEGER},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+
+  <!--根据路灯id删除关联关系-->
+  <update id="delByStreetlightId">
+    UPDATE iot_streetlight_install_dev_rel SET status = 9 WHERE streetlight_id = #{streetlightId}
+  </update>
+</mapper>

@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotConcentratorLineOutMapper">
+    <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotConcentratorLineOut">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="concentrator_id" property="concentratorId" jdbcType="INTEGER"/>
+        <result column="no" property="no" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="switch_status" property="switchStatus" jdbcType="INTEGER"/>
+        <result column="describe" property="describe" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, name, concentrator_id, no, status, switch_status,
+        describe, create_time, update_time
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from iot_concentrator_line_out
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from iot_concentrator_line_out
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.rz.iot.think.model.IotConcentratorLineOut">
+        insert into iot_concentrator_line_out (id, name, concentrator_id,
+                                               no, status, switch_status,
+                                               describe, create_time, update_time)
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{concentratorId,jdbcType=INTEGER},
+                #{no,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{switchStatus,jdbcType=INTEGER},
+                #{describe,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotConcentratorLineOut">
+        insert into iot_concentrator_line_out
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="concentratorId != null">
+                concentrator_id,
+            </if>
+            <if test="no != null">
+                no,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="switchStatus != null">
+                switch_status,
+            </if>
+            <if test="describe != null">
+                describe,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="concentratorId != null">
+                #{concentratorId,jdbcType=INTEGER},
+            </if>
+            <if test="no != null">
+                #{no,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="switchStatus != null">
+                #{switchStatus,jdbcType=INTEGER},
+            </if>
+            <if test="describe != null">
+                #{describe,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotConcentratorLineOut">
+        update iot_concentrator_line_out
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="concentratorId != null">
+                concentrator_id = #{concentratorId,jdbcType=INTEGER},
+            </if>
+            <if test="no != null">
+                no = #{no,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="switchStatus != null">
+                switch_status = #{switchStatus,jdbcType=INTEGER},
+            </if>
+            <if test="describe != null">
+                describe = #{describe,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotConcentratorLineOut">
+        update iot_concentrator_line_out
+        set name            = #{name,jdbcType=VARCHAR},
+            concentrator_id = #{concentratorId,jdbcType=INTEGER},
+            no              = #{no,jdbcType=INTEGER},
+            status          = #{status,jdbcType=INTEGER},
+            switch_status   = #{switchStatus,jdbcType=INTEGER},
+            describe        = #{describe,jdbcType=VARCHAR},
+            create_time     = #{createTime,jdbcType=TIMESTAMP},
+            update_time     = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--根据集中器查找输出-->
+    <select id="findByConcentratorId" resultMap="BaseResultMap">
+        SELECT *
+        FROM iot_concentrator_line_out
+        WHERE concentrator_id = #{concentratorId}
+          AND status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    </select>
+    <!--批量插入出线信息-->
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into iot_concentrator_line_out
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="list[0].id != null">
+                id,
+            </if>
+            <if test="list[0].name != null">
+                name,
+            </if>
+            <if test="list[0].concentratorId != null">
+                concentrator_id,
+            </if>
+            <if test="list[0].no != null">
+                no,
+            </if>
+            <if test="list[0].status != null">
+                status,
+            </if>
+            <if test="list[0].switchStatus != null">
+                switch_status,
+            </if>
+            <if test="list[0].describe != null">
+                describe,
+            </if>
+            <if test="list[0].createTime != null">
+                create_time,
+            </if>
+            <if test="list[0].updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        VALUES
+        <foreach collection="list" separator="," item="item">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">
+                    #{item.id,jdbcType=INTEGER},
+                </if>
+                <if test="item.name != null">
+                    #{item.name,jdbcType=VARCHAR},
+                </if>
+                <if test="item.concentratorId != null">
+                    #{item.concentratorId,jdbcType=INTEGER},
+                </if>
+                <if test="item.no != null">
+                    #{item.no,jdbcType=INTEGER},
+                </if>
+                <if test="item.status != null">
+                    #{item.status,jdbcType=INTEGER},
+                </if>
+                <if test="item.switchStatus != null">
+                    #{item.switchStatus,jdbcType=INTEGER},
+                </if>
+                <if test="item.describe != null">
+                    #{item.describe,jdbcType=VARCHAR},
+                </if>
+                <if test="item.createTime != null">
+                    #{item.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="item.updateTime != null">
+                    #{item.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+
+    <!--假删除-->
+    <update id="fakeDelete" parameterType="java.lang.Integer">
+        UPDATE iot_concentrator_line_out
+        SET status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+        WHERE concentrator_id = #{concentrator}
+    </update>
+
+    <!--根据编号查找-->
+    <select id="findByNo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from iot_concentrator_line_out
+        where concentrator_id = #{concentratorId}
+        AND no = #{no}
+        AND status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    </select>
+</mapper>

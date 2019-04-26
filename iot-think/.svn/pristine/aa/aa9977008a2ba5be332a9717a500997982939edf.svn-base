@@ -1,0 +1,143 @@
+package com.rz.iot.think.mapper;
+
+import com.rz.iot.think.model.IotConcentrator;
+import com.rz.iot.think.model.IotSingleLightController;
+import com.rz.iot.think.model.IotSwitchBindConcentrator;
+import com.rz.iot.think.model.param.IotConcentratorListQueryParam;
+import com.rz.iot.think.model.param.IotPowerParam;
+import com.rz.iot.think.model.show.ConcentratorDetail;
+import com.rz.iot.think.model.show.IotConcentratorShowList;
+import com.rz.iot.think.model.show.ShowIotPower;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public interface IotConcentratorMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(IotConcentrator record);
+
+    int insertSelective(IotConcentrator record);
+
+    IotConcentrator selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(IotConcentrator record);
+
+    int updateByPrimaryKey(IotConcentrator record);
+
+    void updateConcentrators(IotSwitchBindConcentrator iotSwitchBindConcentrator);
+
+    /**
+     * 根据集中器信息查询集中器详细信息
+     * @param concentratorId 集中器id
+     * @return 返回查询结果
+     */
+    HashMap findById(Integer concentratorId);
+
+    /**
+     * 根据集中器id查询出所有与该集中器相关联的单灯控制器列表
+     * @param concentratorId 集中器id
+     * @return 返回集中器信息列表
+     */
+    List<HashMap> getSlcByConcentratorId(Integer concentratorId);
+
+    /**
+     * 根据集中器id查询详细的集中器信息，给集中器详情页面使用
+     * @param concentratorId 集中器页面
+     * @return 查询结果
+     */
+    ConcentratorDetail getDetailById(Integer concentratorId);
+
+    /**
+     * 为集中器详情页获取单灯控制器和路灯的相关信息
+     * @param concentratorId 集中器id
+     * @return 返回查询结果
+     */
+    List<HashMap> getSlcForConcentrator(Integer concentratorId);
+
+    /**
+     * 进线信息查询
+     * @param concentratorId 集中器Id
+     * @return 查询结果
+     */
+    List<HashMap> getLineIn(Integer concentratorId);
+
+    /**
+     * 出线信息查询
+     * @param concentratorId 集中器Id
+     * @return 查询结果
+     */
+    List<HashMap> getLineOut(Integer concentratorId);
+
+    /**
+     * 通过集中器序列号查询单灯控制器
+     * @param map 集中器序列号加用户id
+     * @return
+     */
+    List<IotSingleLightController> findSingleLightsByCSN(Map<String,Object> map);
+
+    /**
+     * 根据用电量参数查询出集中器的用电量情况
+     * @param
+     * @return
+     */
+    List<ShowIotPower> findPower(@Param("iotPowerParam") IotPowerParam iotPowerParam,@Param("userId") Integer userId);
+
+
+    /**
+     * 查询集中器列表
+     * @param userId 用户id
+     * @param param 查询参数
+     * @return
+     */
+    List<IotConcentratorShowList> findAll(@Param("userId") Integer userId, @Param("param") IotConcentratorListQueryParam param);
+
+    /**
+     * 获取施工方信息
+     * @param concentratorId 集中器id
+     * @return 返回查询结果
+     */
+    HashMap builderInfos(Integer concentratorId);
+
+    /**
+     * 查找集中器组下的集中器
+     * @param groupId 集中器组id
+     * @return
+     */
+    List<IotConcentratorShowList> findByGroupId(Integer groupId);
+
+    /**
+     * 查询未分组的集中器
+     * @param userId
+     * @return
+     */
+    List<IotConcentratorShowList> findNoGroup(Integer userId);
+
+    /**
+     * 根据集中器id列表查询集中器
+     * @param list 集中器id列表
+     * @return
+     */
+    List<IotConcentrator> findByIds(List<Integer> list);
+
+    /**
+     * 假删除集中器信息
+     * @param concentratorId 集中器id
+     */
+    void fakeDelete(Integer concentratorId);
+
+    /**
+     * 根据集中器删除策略id
+     * @param concentratorId 集中器id
+     */
+    void fakeDeleteStrategy(Integer concentratorId);
+
+    /**
+     * 根据集中器sn查找集中器
+     * @param sn 集中器sn
+     * @return
+     */
+    IotConcentrator findBySn(String sn);
+}

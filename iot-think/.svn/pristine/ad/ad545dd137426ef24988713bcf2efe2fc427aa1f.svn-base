@@ -1,0 +1,28 @@
+<html>
+    <meta>
+    <meta charset="UTF-8">
+    <script src="js/jquery-3.2.1.js"></script>
+    <script type="text/javascript">
+        $().ready(function(){
+            var iotSwitchBrightnessShowDetail = {iotConcentratorSwitchStrategy:{'id':12,'name':'测试112','cycleMode':2,'strategyMode': 2,'intervalType': 2},
+                iotConcentratorBrightnessStrategyList:[ {'name':'调光12', 'brightness':21},{'name':'调光23', 'brightness':41},{'name':'调光34', 'brightness':61}]};
+
+
+            //后台使用对象的形式接受
+            $.ajax({
+                url: "/iot-think/iotConcentratorSwitchStrategy/edit",
+                type: "POST",
+                contentType: 'application/json;charset=utf-8',
+                data: JSON.stringify(iotSwitchBrightnessShowDetail),
+                success : function(data){
+                    alert("haha");
+                }
+            });
+
+        });
+    </script>
+    </head>
+    <body>
+        来了老弟
+    </body>
+</html>

@@ -1,0 +1,22 @@
+package com.rz.iot.think.mapper;
+
+import com.rz.iot.think.model.SysOptRecord;
+
+import java.util.List;
+
+public interface SysOptRecordMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(SysOptRecord record);
+
+    int insertSelective(SysOptRecord record);
+
+    SysOptRecord selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(SysOptRecord record);
+
+    int updateByPrimaryKey(SysOptRecord record);
+
+    //查询所有操作日志
+    List<SysOptRecord> findAll(SysOptRecord sysOptRecord);
+}

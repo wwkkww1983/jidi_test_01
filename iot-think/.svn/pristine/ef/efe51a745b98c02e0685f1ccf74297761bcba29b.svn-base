@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rz.iot.think.mapper.SysDeviceConnRecordMapper">
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.SysDeviceConnRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="device_id" jdbcType="INTEGER" property="deviceId" />
+    <result column="device_type" jdbcType="INTEGER" property="deviceType" />
+    <result column="conn_type" jdbcType="INTEGER" property="connType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="message" jdbcType="VARCHAR" property="message" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, device_id, device_type, conn_type, create_time, update_time, message
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_device_conn_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sys_device_conn_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.SysDeviceConnRecord">
+    insert into sys_device_conn_record (id, device_id, device_type, 
+      conn_type, create_time, update_time, 
+      message)
+    values (#{id,jdbcType=INTEGER}, #{deviceId,jdbcType=INTEGER}, #{deviceType,jdbcType=INTEGER}, 
+      #{connType,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{message,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.SysDeviceConnRecord">
+    insert into sys_device_conn_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="deviceId != null">
+        device_id,
+      </if>
+      <if test="deviceType != null">
+        device_type,
+      </if>
+      <if test="connType != null">
+        conn_type,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="message != null">
+        message,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null">
+        #{deviceId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceType != null">
+        #{deviceType,jdbcType=INTEGER},
+      </if>
+      <if test="connType != null">
+        #{connType,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="message != null">
+        #{message,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.SysDeviceConnRecord">
+    update sys_device_conn_record
+    <set>
+      <if test="deviceId != null">
+        device_id = #{deviceId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceType != null">
+        device_type = #{deviceType,jdbcType=INTEGER},
+      </if>
+      <if test="connType != null">
+        conn_type = #{connType,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="message != null">
+        message = #{message,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.SysDeviceConnRecord">
+    update sys_device_conn_record
+    set device_id = #{deviceId,jdbcType=INTEGER},
+      device_type = #{deviceType,jdbcType=INTEGER},
+      conn_type = #{connType,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      message = #{message,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="findAll" resultMap="BaseResultMap">
+    select *
+      from(
+        select
+          device_conn_record.id,
+              device_conn_record.device_type,
+              device_conn_record.conn_type,
+              device_conn_record.message,
+              device_conn_record.create_time,
+              device_conn_record.update_time
+        from sys_device_conn_record device_conn_record
+    )t
+    <where>
+      <if test="sysDeviceConnRecord.createTime !=null and sysDeviceConnRecord.createTime!=''">
+        and t.create_time &gt;= #{sysDeviceConnRecord.createTime}
+      </if>
+      <if test="sysOptRecord.updateTime !=null and sysOptRecord.updateTime!=''">
+        and t.update_tiem &lt;= #{sysDeviceConnRecord.updateTime}
+      </if>
+    </where>
+  </select>
+</mapper>

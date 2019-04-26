@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.screen.IotScreenProgramSourceRelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.screen.IotScreenProgramSourceRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="program_id" property="programId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="source_id" property="sourceId" jdbcType="INTEGER" />
+    <result column="z_index" property="zIndex" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, program_id, type, source_id, z_index, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_screen_program_source_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_screen_program_source_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.screen.IotScreenProgramSourceRel" >
+    insert into iot_screen_program_source_rel (id, program_id, type, 
+      source_id, z_index, status, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{programId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
+      #{sourceId,jdbcType=INTEGER}, #{zIndex,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.screen.IotScreenProgramSourceRel" >
+    insert into iot_screen_program_source_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="programId != null" >
+        program_id,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="sourceId != null" >
+        source_id,
+      </if>
+      <if test="zIndex != null" >
+        z_index,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null" >
+        #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="zIndex != null" >
+        #{zIndex,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.screen.IotScreenProgramSourceRel" >
+    update iot_screen_program_source_rel
+    <set >
+      <if test="programId != null" >
+        program_id = #{programId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null" >
+        source_id = #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="zIndex != null" >
+        z_index = #{zIndex,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.screen.IotScreenProgramSourceRel" >
+    update iot_screen_program_source_rel
+    set program_id = #{programId,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      source_id = #{sourceId,jdbcType=INTEGER},
+      z_index = #{zIndex,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <resultMap id="ResultMapFindProgramVideoLayer" type="com.rz.iot.think.model.show.IotScreenProgramVideoLayer">
+    <result column="z_index" property="zIndex"></result>
+    <result column="source_type" property="sourceType"></result>
+    <association property="source" javaType="com.rz.iot.think.model.screen.IotScreenVideoSource">
+      <id column="pk_id" property="pkId" jdbcType="INTEGER" />
+      <result column="id" property="id" jdbcType="VARCHAR" />
+      <result column="md5" property="md5" jdbcType="VARCHAR" />
+      <result column="name" property="name" jdbcType="VARCHAR" />
+      <result column="left" property="left" jdbcType="INTEGER" />
+      <result column="top" property="top" jdbcType="INTEGER" />
+      <result column="width" property="width" jdbcType="INTEGER" />
+      <result column="height" property="height" jdbcType="INTEGER" />
+      <result column="size" property="size" jdbcType="BIGINT" />
+      <result column="play_time" property="playTime" jdbcType="INTEGER" />
+      <result column="time_span" property="timeSpan" jdbcType="INTEGER" />
+      <result column="entry_effect_str" property="entryEffectStr" jdbcType="VARCHAR" />
+      <result column="exit_effect_str" property="exitEffectStr" jdbcType="VARCHAR" />
+      <result column="entry_effect_time_span" property="entryEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="exit_effect_time_span" property="exitEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="_type" property="type" jdbcType="VARCHAR" />
+      <result column="video_id" property="videoId" jdbcType="INTEGER" />
+      <result column="status" property="status" jdbcType="INTEGER" />
+      <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </association>
+  </resultMap>
+
+  <resultMap id="ResultMapFindProgramImageLayer" type="com.rz.iot.think.model.show.IotScreenProgramImageLayer">
+    <result column="z_index" property="zIndex"></result>
+    <result column="source_type" property="sourceType"></result>
+    <association property="source" javaType="com.rz.iot.think.model.screen.IotScreenImageSource">
+      <id column="pk_Id" property="pkId" jdbcType="INTEGER" />
+      <result column="id" property="id" jdbcType="VARCHAR" />
+      <result column="md5" property="md5" jdbcType="VARCHAR" />
+      <result column="name" property="name" jdbcType="VARCHAR" />
+      <result column="left" property="left" jdbcType="INTEGER" />
+      <result column="top" property="top" jdbcType="INTEGER" />
+      <result column="width" property="width" jdbcType="INTEGER" />
+      <result column="height" property="height" jdbcType="INTEGER" />
+      <result column="size" property="size" jdbcType="BIGINT" />
+      <result column="play_time" property="playTime" jdbcType="INTEGER" />
+      <result column="time_span" property="timeSpan" jdbcType="INTEGER" />
+      <result column="entry_effect_str" property="entryEffectStr" jdbcType="VARCHAR" />
+      <result column="exit_effect_str" property="exitEffectStr" jdbcType="VARCHAR" />
+      <result column="entry_effect_time_span" property="entryEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="exit_effect_time_span" property="exitEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="_type" property="type" jdbcType="VARCHAR" />
+      <result column="pic_id" property="picId" jdbcType="INTEGER" />
+      <result column="status" property="status" jdbcType="INTEGER" />
+      <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </association>
+  </resultMap>
+
+  <resultMap id="ResultMapFindProgramLineTextLayer" type="com.rz.iot.think.model.show.IotScreenProgramSingleLineTextLayer">
+    <result column="z_index" property="zIndex"></result>
+    <result column="source_type" property="sourceType"></result>
+    <association property="source" javaType="com.rz.iot.think.model.screen.IotScreenLineTextSource">
+      <id column="pk_id" property="pkId" jdbcType="INTEGER" />
+      <result column="id" property="id" jdbcType="VARCHAR" />
+      <result column="name" property="name" jdbcType="VARCHAR" />
+      <result column="html" property="html" jdbcType="VARCHAR" />
+      <result column="line_height" property="lineHeight" jdbcType="DOUBLE" />
+      <result column="speed" property="speed" jdbcType="INTEGER" />
+      <result column="left" property="left" jdbcType="INTEGER" />
+      <result column="top" property="top" jdbcType="INTEGER" />
+      <result column="width" property="width" jdbcType="INTEGER" />
+      <result column="height" property="height" jdbcType="INTEGER" />
+      <result column="play_time" property="playTime" jdbcType="INTEGER" />
+      <result column="time_span" property="timeSpan" jdbcType="INTEGER" />
+      <result column="entry_effect_str" property="entryEffectStr" jdbcType="VARCHAR" />
+      <result column="exit_effect_str" property="exitEffectStr" jdbcType="VARCHAR" />
+      <result column="entry_effect_time_span" property="entryEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="exit_effect_time_span" property="exitEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="_type" property="type" jdbcType="VARCHAR" />
+      <result column="status" property="status" jdbcType="INTEGER" />
+      <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </association>
+  </resultMap>
+
+  <resultMap id="ResultMapFindProgramDigitalClockLayer" type="com.rz.iot.think.model.show.IotScreenProgramDigitalClockLayer">
+    <result column="z_index" property="zIndex"></result>
+    <result column="source_type" property="sourceType"></result>
+    <association property="source" javaType="com.rz.iot.think.model.screen.IotScreenDigitalClockSource">
+      <id column="pk_id" property="pkId" jdbcType="INTEGER" />
+      <result column="id" property="id" jdbcType="VARCHAR" />
+      <result column="name" property="name" jdbcType="VARCHAR" />
+      <result column="html" property="html" jdbcType="VARCHAR" />
+      <result column="line_height" property="lineHeight" jdbcType="DOUBLE" />
+      <result column="left" property="left" jdbcType="INTEGER" />
+      <result column="top" property="top" jdbcType="INTEGER" />
+      <result column="width" property="width" jdbcType="INTEGER" />
+      <result column="height" property="height" jdbcType="INTEGER" />
+      <result column="play_time" property="playTime" jdbcType="INTEGER" />
+      <result column="time_span" property="timeSpan" jdbcType="INTEGER" />
+      <result column="entry_effect_str" property="entryEffectStr" jdbcType="VARCHAR" />
+      <result column="exit_effect_str" property="exitEffectStr" jdbcType="VARCHAR" />
+      <result column="entry_effect_time_span" property="entryEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="exit_effect_time_span" property="exitEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="_type" property="type" jdbcType="VARCHAR" />
+      <result column="status" property="status" jdbcType="INTEGER" />
+      <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </association>
+  </resultMap>
+
+  <resultMap id="ResultMapFindProgramWeatherLayer" type="com.rz.iot.think.model.show.IotScreenProgramWeatherLayer">
+    <result column="z_index" property="zIndex"></result>
+    <result column="source_type" property="sourceType"></result>
+    <association property="source" javaType="com.rz.iot.think.model.screen.IotScreenWeatherSource">
+      <id column="pk_id" property="pkId" jdbcType="INTEGER" />
+      <result column="id" property="id" jdbcType="VARCHAR" />
+      <result column="city" property="city" jdbcType="VARCHAR" />
+      <result column="code" property="code" jdbcType="INTEGER" />
+      <result column="name" property="name" jdbcType="VARCHAR" />
+      <result column="html" property="html" jdbcType="VARCHAR" />
+      <result column="line_height" property="lineHeight" jdbcType="DOUBLE" />
+      <result column="left" property="left" jdbcType="INTEGER" />
+      <result column="top" property="top" jdbcType="INTEGER" />
+      <result column="width" property="width" jdbcType="INTEGER" />
+      <result column="height" property="height" jdbcType="INTEGER" />
+      <result column="play_time" property="playTime" jdbcType="INTEGER" />
+      <result column="time_span" property="timeSpan" jdbcType="INTEGER" />
+      <result column="entry_effect_str" property="entryEffectStr" jdbcType="VARCHAR" />
+      <result column="exit_effect_str" property="exitEffectStr" jdbcType="VARCHAR" />
+      <result column="entry_effect_time_span" property="entryEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="exit_effect_time_span" property="exitEffectTimeSpan" jdbcType="INTEGER" />
+      <result column="_type" property="type" jdbcType="VARCHAR" />
+      <result column="status" property="status" jdbcType="INTEGER" />
+      <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </association>
+  </resultMap>
+
+  <select id="findProgramVideoLayer" resultMap="ResultMapFindProgramVideoLayer">
+    SELECT
+      video_source.*,
+      program_source_rel.z_index,
+      program_source_rel.type source_type
+    FROM
+      iot_screen_program_source_rel program_source_rel,
+      iot_screen_video_source video_source
+    WHERE
+      program_source_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND video_source.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND video_source.pk_id = program_source_rel.source_id
+    AND program_source_rel.type = ${@com.rz.iot.think.utils.RzIotDBConstParam@SCREEN_PROGRAM_SOURCE_TYPE_OF_VIDEO}
+    AND program_source_rel.program_id = #{programId}
+  </select>
+
+  <select id="findProgramImageLayer" resultMap="ResultMapFindProgramImageLayer">
+    SELECT
+      image_source.*,
+      program_source_rel.z_index,
+      program_source_rel.type source_type
+    FROM
+      iot_screen_program_source_rel program_source_rel,
+      iot_screen_image_source image_source
+    WHERE
+      program_source_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND image_source.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND image_source.pk_id = program_source_rel.source_id
+    AND program_source_rel.type = ${@com.rz.iot.think.utils.RzIotDBConstParam@SCREEN_PROGRAM_SOURCE_TYPE_OF_IMAGE}
+    AND program_source_rel.program_id = #{programId}
+  </select>
+
+  <select id="findProgramLineTextLayer" resultMap="ResultMapFindProgramLineTextLayer">
+    SELECT
+      line_text_source.*,
+      program_source_rel.z_index,
+      program_source_rel.type source_type
+    FROM
+      iot_screen_program_source_rel program_source_rel,
+      iot_screen_line_text_source line_text_source
+    WHERE
+      program_source_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND line_text_source.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND line_text_source.pk_id = program_source_rel.source_id
+    AND program_source_rel.type = ${@com.rz.iot.think.utils.RzIotDBConstParam@SCREEN_PROGRAM_SOURCE_TYPE_OF_SINGLE_LINE_TEXT}
+    AND program_source_rel.program_id = #{programId}
+  </select>
+
+  <select id="findProgramDigitalClockLayer" resultMap="ResultMapFindProgramDigitalClockLayer">
+    SELECT
+      digitalclock_source.*,
+      program_source_rel.z_index,
+      program_source_rel.type source_type
+    FROM
+      iot_screen_program_source_rel program_source_rel,
+      iot_screen_digitalclock_source digitalclock_source
+    WHERE
+      program_source_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND digitalclock_source.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND digitalclock_source.pk_id = program_source_rel.source_id
+    AND program_source_rel.type = ${@com.rz.iot.think.utils.RzIotDBConstParam@SCREEN_PROGRAM_SOURCE_TYPE_OF_DIGITAL_CLOCK}
+    AND program_source_rel.program_id = #{programId}
+  </select>
+
+  <select id="findProgramWeatherLayer" resultMap="ResultMapFindProgramWeatherLayer">
+    SELECT
+      weather_source.*,
+      program_source_rel.z_index,
+      program_source_rel.type source_type
+    FROM
+      iot_screen_program_source_rel program_source_rel,
+      iot_screen_weather_source weather_source
+    WHERE
+      program_source_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND weather_source.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    AND weather_source.pk_id = program_source_rel.source_id
+    AND program_source_rel.type = ${@com.rz.iot.think.utils.RzIotDBConstParam@SCREEN_PROGRAM_SOURCE_TYPE_OF_SINGLE_LINE_TEXT}
+    AND program_source_rel.program_id = #{programId}
+  </select>
+
+  <!--批量插入-->
+  <insert id="insertBatch" parameterType="list">
+    insert into iot_screen_program_source_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="list[0].id != null" >
+        id,
+      </if>
+      <if test="list[0].programId != null" >
+        program_id,
+      </if>
+      <if test="list[0].type != null" >
+        type,
+      </if>
+      <if test="list[0].sourceId != null" >
+        source_id,
+      </if>
+      <if test="list[0].zIndex != null" >
+        z_index,
+      </if>
+      <if test="list[0].status != null" >
+        status,
+      </if>
+    </trim>
+    VALUES
+    <foreach collection="list" item="item" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+        <if test="item.id != null" >
+          #{itemid,jdbcType=INTEGER},
+        </if>
+        <if test="item.programId != null" >
+          #{item.programId,jdbcType=INTEGER},
+        </if>
+        <if test="item.type != null" >
+          #{item.type,jdbcType=INTEGER},
+        </if>
+        <if test="item.sourceId != null" >
+          #{item.sourceId,jdbcType=INTEGER},
+        </if>
+        <if test="item.zIndex != null" >
+          #{item.zIndex,jdbcType=INTEGER},
+        </if>
+        <if test="item.status != null" >
+          #{item.status,jdbcType=INTEGER},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+
+  <!--根据节目id删除节目布局关系-->
+  <update id="delByProgramId">
+    UPDATE iot_screen_program_source_rel SET status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETA}
+    WHERE program_id = #{programId}
+  </update>
+</mapper>

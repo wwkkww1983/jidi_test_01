@@ -1,0 +1,110 @@
+package com.rz.iot.think.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rz.iot.think.mapper.screen.IotScreenVideoInfoMapper;
+import com.rz.iot.think.model.Page;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.screen.IotScreenVideoInfo;
+import com.rz.iot.think.service.IotScreenVideoInfoService;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import java.io.File;
+import java.util.List;
+
+/**
+ * @Author:jidi
+ * @Date:2019/04/01 17:26
+ * @Description:屏幕播放素材（视频）操作实现类
+ **/
+@Log4j2
+@Service("iotScreenVidenInfoService")
+public class IotScreenVideoInfoImpl implements IotScreenVideoInfoService {
+
+    @Resource
+    private IotScreenVideoInfoMapper iotScreenVideoInfoMapper;
+
+    /**
+     * @Desc:分页查询所有的未被删除的屏幕播放素材（视频）
+     */
+    @Override
+    public Result findAll(Page<IotScreenVideoInfo> page) {
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<IotScreenVideoInfo> list = iotScreenVideoInfoMapper.findAll();
+        PageInfo<IotScreenVideoInfo> pageInfo = new PageInfo<>(list);
+        page.setOtherParam(pageInfo);
+        Result result = new Result();
+        result.setData(page);
+        return result;
+    }
+
+
+    /**
+     * @Desc:根据素材名和上传者分页查询所有的未被删除的屏幕播放素材（视频）
+     */
+    @Override
+    public Result findAllByCondition(Page<IotScreenVideoInfo> page, IotScreenVideoInfo iotScreenVideoInfo) {
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<IotScreenVideoInfo> list = iotScreenVideoInfoMapper.findAllByCondition(iotScreenVideoInfo);
+        PageInfo<IotScreenVideoInfo> pageInfo = new PageInfo<>(list);
+        page.setOtherParam(pageInfo);
+        Result result = new Result();
+        result.setData(page);
+        return result;
+    }
+
+    /**
+     * @Desc:查询在视频来源表（iot_screen_video_source）中的视频素材
+     */
+    @Override
+    public Result findById(List<Integer> iotScreenMaterialIds) {
+        Result result = new Result();
+
+        List<IotScreenVideoInfo> iotScreenVideoInfoList = iotScreenVideoInfoMapper.findById();
+        for(int i=0; i<iotScreenMaterialIds.size(); i++){
+            for (int j=0; j<iotScreenVideoInfoList.size(); j++){
+                if(iotScreenMaterialIds.get(i) == iotScreenVideoInfoList.get(j).getId()){
+                    result.setData(iotScreenVideoInfoList.get(j));
+                    return result;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @Desc:批量删除记录
+     */
+    @Override
+    public Result delByIds(List<Integer> iotScreenMaterialIds) {
+        Result result = new Result();
+
+        for(Integer id:iotScreenMaterialIds){
+            iotScreenVideoInfoMapper.delById(id);
+        }
+        result.setMessage("删除视频素材成功！");
+        return result;
+    }
+
+    /**
+     * @Desc:增加视频素材
+     */
+    @Override
+    public IotScreenVideoInfo addIotScreenVideoInfo(Integer userId, MultipartFile file) {
+        IotScreenVideoInfo iotScreenVideoInfo = new IotScreenVideoInfo();
+        //增加记录
+        iotScreenVideoInfoMapper.insertSelective(iotScreenVideoInfo);
+        return iotScreenVideoInfo;
+    }
+
+    /**
+     * @Desc:根据name，hash_key，creatAdmin查询id
+     */
+    @Override
+    public Integer selectIdByCondition(IotScreenVideoInfo iotScreenVideoInfo) {
+        return iotScreenVideoInfoMapper.selectIdByCondition(iotScreenVideoInfo);
+    }
+}

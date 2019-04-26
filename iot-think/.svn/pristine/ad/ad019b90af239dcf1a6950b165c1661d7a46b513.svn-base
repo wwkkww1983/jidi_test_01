@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotBusinessUserRelMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotBusinessUserRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="business_id" property="businessId" jdbcType="INTEGER" />
+    <result column="business_type" property="businessType" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, business_id, business_type, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_business_user_rel
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="findIotBusinessUserRel" parameterType="java.lang.Integer" resultType="com.rz.iot.think.model.IotBusinessUserRel">
+      select rel.id,rel.user_id,rel.business_id,rel.business_type from iot_business_user_rel rel
+      where rel.user_id = #{userId} and rel.business_id = #{concentratorId} and rel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_CONCENTRATOR}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_business_user_rel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotBusinessUserRel" >
+    insert into iot_business_user_rel (id, user_id, business_id, 
+      business_type, status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{businessId,jdbcType=INTEGER}, 
+      #{businessType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotBusinessUserRel" >
+    insert into iot_business_user_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="businessId != null" >
+        business_id,
+      </if>
+      <if test="businessType != null" >
+        business_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="businessId != null" >
+        #{businessId,jdbcType=INTEGER},
+      </if>
+      <if test="businessType != null" >
+        #{businessType,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotBusinessUserRel" >
+    update iot_business_user_rel
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="businessId != null" >
+        business_id = #{businessId,jdbcType=INTEGER},
+      </if>
+      <if test="businessType != null" >
+        business_type = #{businessType,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotBusinessUserRel" >
+    update iot_business_user_rel
+    set user_id = #{userId,jdbcType=INTEGER},
+      business_id = #{businessId,jdbcType=INTEGER},
+      business_type = #{businessType,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <!--检查数据权限-->
+  <select id="isAuthorized" resultMap="BaseResultMap">
+    select
+      iot_business_user_rel.*
+    from
+      iot_business_user_rel
+    where
+      status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      and business_id=#{businessId}
+      and business_type=#{businessType}
+      and
+      (
+      CASE
+      (SELECT type from user_info WHERE user_info.id = #{userId})
+      WHEN
+      ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+      THEN
+      user_id = #{userId}
+      WHEN
+      ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+      THEN
+      TRUE
+      END
+      )
+    GROUP BY iot_business_user_rel.business_id
+  </select>
+
+  <!--批量插入-->
+  <insert id="insertBatch">
+    insert into iot_business_user_rel
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="list[0].id != null">
+        id,
+      </if>
+      <if test="list[0].userId != null">
+        user_id,
+      </if>
+      <if test="list[0].businessId != null">
+        business_id,
+      </if>
+      <if test="list[0].businessType != null">
+        business_type,
+      </if>
+      <if test="list[0].status != null">
+        status,
+      </if>
+    </trim>
+    values
+    <foreach collection="list" index="index" item="item" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="item.id != null">
+          #{item.id,jdbcType=INTEGER},
+        </if>
+        <if test="item.userId != null">
+          #{item.userId,jdbcType=INTEGER},
+        </if>
+        <if test="item.businessId != null">
+          #{item.businessId,jdbcType=INTEGER},
+        </if>
+        <if test="item.businessType != null">
+          #{item.businessType,jdbcType=INTEGER},
+        </if>
+        <if test="item.status != null">
+          #{item.status,jdbcType=INTEGER},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+
+  <!--批量删除，适用于权限管理-->
+  <update id="delBatch">
+  update iot_business_user_rel
+  set status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+  where status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+  and user_id = #{param.userId}
+  and business_type = #{param.businesses[0].businessType}
+  and business_id in
+  <foreach collection="param.businesses" open="(" separator="," close=")" item="business">
+    #{business.businessId}
+  </foreach>
+  </update>
+
+  <update id="delByUserId">
+    update iot_business_user_rel
+    set status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    where status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    and user_id=#{userId}
+  </update>
+
+  <!--删除用户业务关联关系-->
+  <update id="delRel">
+    update iot_business_user_rel
+    set status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    where status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    and business_id=#{businessId}
+    and business_type=#{businessType}
+    and user_id = #{userId}
+  </update>
+
+  <resultMap id="MyResultMap" type="com.rz.iot.think.model.show.PermissionShowDataList">
+    <result column="business_id" property="businessId"></result>
+    <result column="business_type" property="businessType"></result>
+    <result column="business_name" property="businessName"></result>
+  </resultMap>
+
+  <!--不可用待整理-->
+  <select id="dataOwned" resultMap="MyResultMap">
+    select
+    business_user_rel.business_id,
+    business_user_rel.business_type,
+    CONCAT(IFNULL(node.name, ""), IFNULL(node_group.name, ""), IFNULL(box.name, ""), IFNULL(omc.name, ""))                      business_name,
+    CONCAT(IFNULL(node.area_rel_id, ""), IFNULL(node_group.area_rel_id, ""), IFNULL(box.area_rel_id, ""), IFNULL(omc.area_rel_id, "")) area_rel_id
+    from
+    iot_business_user_rel business_user_rel
+    left join iot_light_node node
+    on node.id = business_user_rel.business_id and node.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE}
+    left join iot_light_node_group node_group
+    on node_group.id = business_user_rel.business_id and node_group.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS} and
+    business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE_GROUP}
+    left join iot_electric_box box
+    on box.id = business_user_rel.business_id and box.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_BOX}
+    left join iot_light_node_offline_controller omc
+    on omc.id = business_user_rel.business_id and omc.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_OFFLINE}
+    where
+    business_user_rel.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    and business_user_rel.user_id = #{userId}
+    AND (business_user_rel.business_type=${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE} OR business_user_rel.business_type=${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE_GROUP} OR business_user_rel.business_type=${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_BOX} OR business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_OFFLINE})
+  </select>
+
+  <!--查询用户拥有的数据权限，查询全部的数据权限，取补集，就是用户未拥有的数据权限   待整理！！！-->
+  <select id="dataNotOwned" resultMap="MyResultMap">
+    select t.*
+    from
+    iot_role_setting_user_info org_user_rel,
+    iot_role_setting_organization org,
+    iot_user_info user,
+    (
+    select
+    business_user_rel.id,
+    business_user_rel.business_id,
+    business_user_rel.business_type,
+    CONCAT(IFNULL(node.name, ""), IFNULL(node_group.name, ""), IFNULL(box.name, ""), IFNULL(omc.name, ""))                      business_name,
+    CONCAT(IFNULL(node.area_rel_id, ""), IFNULL(node_group.area_rel_id, ""), IFNULL(box.area_rel_id, ""), IFNULL(omc.area_rel_id, "")) area_rel_id
+    from
+    iot_business_user_rel business_user_rel
+    left join iot_light_node node
+    on node.id = business_user_rel.business_id and node.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE}
+    left join iot_light_node_group node_group
+    on node_group.id = business_user_rel.business_id and node_group.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and
+    business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE_GROUP}
+    left join iot_electric_box box
+    on box.id = business_user_rel.business_id and box.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_BOX}
+    left join iot_light_node_offline_controller omc
+    on omc.id = business_user_rel.business_id and omc.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_OFFLINE}
+    where
+    business_user_rel.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    and business_user_rel.user_id = #{userId}
+
+    UNION ALL
+
+    -- 所有跟用户绑定的节点、节点组、电箱
+    select
+    business_user_rel.id,
+    business_user_rel.business_id,
+    business_user_rel.business_type,
+    CONCAT(IFNULL(node.name, ""), IFNULL(node_group.name, ""), IFNULL(box.name, ""), IFNULL(omc.name, ""))                      business_name,
+    CONCAT(IFNULL(node.area_rel_id, ""), IFNULL(node_group.area_rel_id, ""), IFNULL(box.area_rel_id, ""), IFNULL(omc.area_rel_id, "")) area_rel_id
+    from
+    iot_business_user_rel business_user_rel
+    left join iot_light_node node
+    on node.id = business_user_rel.business_id and node.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE}
+    left join iot_light_node_group node_group
+    on node_group.id = business_user_rel.business_id and node_group.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and
+    business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE_GROUP}
+    left join iot_electric_box box
+    on box.id = business_user_rel.business_id and box.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_BOX}
+    left join iot_light_node_offline_controller omc
+    on omc.id = business_user_rel.business_id and omc.status != ${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS} and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_OFFLINE}
+    where
+    business_user_rel.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    AND (business_user_rel.business_type=${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE} OR business_user_rel.business_type=${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE_GROUP} OR business_user_rel.business_type=${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_BOX} OR business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_OFFLINE})
+    group by business_user_rel.business_id,business_user_rel.business_type
+    ) t
+    where
+    t.area_rel_id = org.area_rel_id
+    and org.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    and org_user_rel.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    and user.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    and org.id = org_user_rel.org_id
+    and org_user_rel.user_id = user.id
+    and user.id = #{userId}
+    group by t.business_id,t.business_type
+    having count(t.id)=1
+
+    UNION ALL
+
+    -- 没有跟用户绑定的节点、节点组、电箱
+    select t1.*
+    from
+    (
+    select
+    business_user_rel.id,
+    node.id   business_id,
+    ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE} business_type,
+    node.name business_name,
+    node.area_rel_id
+    from
+    iot_light_node node
+    left join iot_business_user_rel business_user_rel
+    on node.id = business_user_rel.business_id and business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE} and business_user_rel.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    where
+    node.status!=${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS}
+
+    UNION ALL
+
+    select
+    business_user_rel.id,
+    node_group.id   business_id,
+    ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE_GROUP} business_type,
+    node_group.name business_name,
+    node_group.area_rel_id
+    from
+    iot_light_node_group node_group
+    left join iot_business_user_rel business_user_rel
+    on node_group.id = business_user_rel.business_id and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_NODE_GROUP} and
+    business_user_rel.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    where node_group.status!=${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS}
+
+    UNION ALL
+
+    select
+    business_user_rel.id,
+    omc.id   business_id,
+    ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_OFFLINE} business_type,
+    omc.name business_name,
+    omc.area_rel_id
+    from
+    iot_light_node_offline_controller omc
+    left join iot_business_user_rel business_user_rel
+    on omc.id = business_user_rel.business_id and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_OFFLINE} and
+    business_user_rel.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    where omc.status!=${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS}
+
+    UNION ALL
+
+    select
+    business_user_rel.id,
+    box.id   business_id,
+    ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_BOX} business_type,
+    box.name business_name,
+    box.area_rel_id
+    from
+    iot_electric_box box
+    left join iot_business_user_rel business_user_rel
+    on box.id = business_user_rel.business_id and business_user_rel.business_type = ${@com.rz.iot.utils.RzIotConstParam@BUSINESS_TYPE_BOX} and
+    business_user_rel.status = ${@com.rz.iot.utils.RzIotConstParam@OK_STATUS}
+    where box.status!=${@com.rz.iot.utils.RzIotConstParam@DELETE_STATUS}
+    ) t1
+    where t1.id is null
+  </select>
+</mapper>

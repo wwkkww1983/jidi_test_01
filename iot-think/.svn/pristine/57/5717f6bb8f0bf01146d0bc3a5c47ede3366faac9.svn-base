@@ -1,0 +1,74 @@
+package com.rz.iot.think.configuration;
+
+
+import com.rz.iot.think.model.alarm.IotAlarmBox;
+import com.rz.iot.think.model.param.IotAlarmBoxRecorderStatusUpdateParam;
+import com.rz.iot.think.service.AggregationAlarmService;
+import com.rz.iot.think.service.IotAlarmBoxService;
+import com.rz.iot.think.websocket.screen.ScreenHeartbeat;
+import com.rz.iot.think.websocket.screen.ScreenWebSocketHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * @Auther: yyjuan
+ * @Date: 2019/3/20 0020 10:49
+ * @Description: 定时任务
+ */
+@Component
+@Slf4j
+public class IOTTask {
+
+    @Resource
+    private ScreenHeartbeat screenheartbeat;
+    @Resource
+    private IotAlarmBoxService iotAlarmBoxService;
+    @Resource
+    private AggregationAlarmService aggregationAlarmService;
+
+
+    /**
+     *     信息屏心跳
+     *     每隔60秒循环发送心跳信息
+     */
+    @Scheduled(cron = "0/60 * * * * ?")
+    public void screen_HeartbeatStart(){
+        log.debug("Heartbeat update start of screen ");
+
+            for(String key : ScreenWebSocketHandler.socketSessionMap.keySet()){
+                screenheartbeat.heartbeatSend(key);
+            }
+    }
+
+    /***
+     * 更新报警箱状态信息
+     * 每隔一小时更新
+     */
+    @Scheduled(cron = "0 0 * * * ?")
+    public void alarmBoxStatus(){
+        //查询报警箱id集合
+        List<Integer> boxIdList = iotAlarmBoxService.findBoxIds();
+        for(Integer boxId : boxIdList){
+            //查询报警箱工作状态
+            IotAlarmBoxRecorderStatusUpdateParam iotAlarmBoxRecorderStatusUpdateParam = aggregationAlarmService.findAlarmWorkInfo(boxId);
+            //更新报警箱工作状态
+            IotAlarmBox iotAlarmBox = new IotAlarmBox();
+            iotAlarmBox.setId(boxId);
+            iotAlarmBox.setStatus(iotAlarmBoxRecorderStatusUpdateParam.getStatus());
+            iotAlarmBoxService.updateAlarmbox(iotAlarmBox);
+        }
+    }
+
+    /***
+     * 更新报警箱报警记录
+     * 每隔一小时更新
+     */
+    @Scheduled(cron = "0 0 * * * ?")
+    public void alarmBoxRecordLog(){
+
+    }
+}

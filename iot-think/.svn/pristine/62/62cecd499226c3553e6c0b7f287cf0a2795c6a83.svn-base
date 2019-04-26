@@ -1,0 +1,19 @@
+package com.rz.iot.think.model.param;
+
+import lombok.Data;
+
+import java.util.List;
+
+/**
+ * Author by xuxiake, Date on 2019/4/4.
+ * PS: Not easy to write code, please indicate.
+ * Description：屏幕播放策略下发参数
+ */
+@Data
+public class IotScreenPlayStrategySendParam {
+
+    // 播放策略id
+    private Integer playStrategyId;
+    // 信息屏sn列表
+    private List<String> cardIds;
+}

@@ -1,0 +1,136 @@
+package com.rz.iot.think.service.impl;
+
+import com.rz.iot.think.mapper.*;
+import com.rz.iot.think.mapper.alarm.IotAlarmBoxMapper;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.show.IotStreetlightInstallDevForNoBinding;
+import com.rz.iot.think.model.show.IotStreetlightInstallDevShowDetail;
+import com.rz.iot.think.model.show.IotStreetlightInstallDevShowList;
+import com.rz.iot.think.service.IotStreetlightInstallDevRelService;
+import com.rz.iot.think.utils.RzIotDBConstParam;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * 描述:
+ * 路灯挂载设备
+ *
+ * @author Zhouyz
+ * @create 2019-03-18 16:31
+ */
+@Service
+public class IotStreetlightInstallDevShowListServiceImpl implements IotStreetlightInstallDevRelService {
+
+    @Resource
+    private IotStreetlightInstallDevRelMapper iotStreetlightInstallDevRelMapper;
+    @Resource
+    private IotMonitorMapper iotMonitorMapper;
+    @Resource
+    private IotScreenMapper iotScreenMapper;
+    @Resource
+    private IotWifiMapper iotWifiMapper;
+    @Resource
+    private IotSensorMapper iotSensorMapper;
+    @Resource
+    private IotAlarmBoxMapper iotAlarmBoxMapper;
+    @Resource
+    private IotChargingPointMapper iotChargingPointMapper;
+
+    @Override
+    public List<HashMap> getDevByStreetlightId(Integer StreetlightId) {
+        return iotStreetlightInstallDevRelMapper.devInfosByStreetlightId(StreetlightId);
+    }
+
+    /**
+     * 查找未与路灯绑定的挂载设备
+     * @param devType 挂载设备类型，1：摄像头；2：显示屏；3：WiFi；4：环境传感器；5：广播/紧急求助；6：充电桩
+     * @return
+     */
+    @Override
+    public Result findNoBinding(Integer devType) {
+
+        Result result = new Result();
+        if (devType == null) {
+            return Result.paramNull(result);
+        }
+        List<IotStreetlightInstallDevForNoBinding> devs = null;
+        switch (devType) {
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_CAMERA:
+                // 摄像头
+                devs = iotMonitorMapper.findNoBinding();
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_SCREEN:
+                // 屏幕
+                devs = iotScreenMapper.findNoBinding();
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_ENVIRONMENT_SENSOR:
+                // 温度传感器
+                devs = iotSensorMapper.findNoBinding();
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_WIFI:
+                // wifi
+                devs = iotWifiMapper.findNoBinding();
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_EMERGENCY_CALLING:
+                // 紧急求助、报警器
+                devs = iotAlarmBoxMapper.findNoBinding();
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_CHARGING_POINT:
+                // 充电桩
+                devs = iotChargingPointMapper.findNoBinding();
+                break;
+
+        }
+        result.setData(devs);
+        return result;
+    }
+
+    /**
+     * 挂载设备详情
+     * @param devId 挂载设备id
+     * @param devType 挂载设备类型，1：摄像头；2：显示屏；3：WiFi；4：环境传感器；5：广播/紧急求助；6：充电桩
+     * @return
+     */
+    @Override
+    public Result detail(Integer devId, Integer devType) {
+
+        Result result = new Result();
+        if (devId == null || devType == null) {
+            return Result.paramNull(result);
+        }
+
+        IotStreetlightInstallDevShowDetail iotStreetlightInstallDevShowDetail = null;
+        switch (devType) {
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_CAMERA:
+                // 摄像头
+                iotStreetlightInstallDevShowDetail = iotMonitorMapper.detailForStreetLight(devId);
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_SCREEN:
+                // 屏幕
+                iotStreetlightInstallDevShowDetail = iotScreenMapper.detailForStreetLight(devId);
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_ENVIRONMENT_SENSOR:
+                // 温度传感器
+                iotStreetlightInstallDevShowDetail = iotSensorMapper.detailForStreetLight(devId);
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_WIFI:
+                // wifi
+                iotStreetlightInstallDevShowDetail = iotWifiMapper.detailForStreetLight(devId);
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_EMERGENCY_CALLING:
+                // 紧急求助、报警器
+                iotStreetlightInstallDevShowDetail= iotAlarmBoxMapper.detailForStreetLight(devId);
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_CHARGING_POINT:
+                // 充电桩
+                iotStreetlightInstallDevShowDetail = iotChargingPointMapper.detailForStreetLight(devId);
+                break;
+
+        }
+        result.setData(iotStreetlightInstallDevShowDetail);
+        return result;
+    }
+}

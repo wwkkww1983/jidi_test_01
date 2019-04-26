@@ -1,0 +1,129 @@
+package com.rz.iot.think.controller;
+
+import com.rz.iot.think.model.Page;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.alarm.IotAlarmBox;
+import com.rz.iot.think.model.param.IotAlarmBoxRecorderSelectParam;
+import com.rz.iot.think.model.param.IotAlarmBoxRecorderStatusUpdateParam;
+import com.rz.iot.think.model.param.IotAlarmBoxSelectParam;
+import com.rz.iot.think.service.AggregationAlarmService;
+import com.rz.iot.think.service.IotAlarmBoxRecordService;
+import com.rz.iot.think.service.IotAlarmBoxService;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+/**
+ * @Author:jidi
+ * @Date:2019/04/10 10:54
+ * @Description:报警箱Controller
+ **/
+
+@RestController
+@RequestMapping("/alarmBox")
+public class IotAlarmBoxController {
+    @Resource
+    private  IotAlarmBoxService iotAlarmBoxService;
+    @Resource
+    private IotAlarmBoxRecordService iotAlarmBoxRecordService;
+    @Resource
+    private AggregationAlarmService aggregationAlarmService;
+    /***
+     * 查询报警箱基本信息
+     * @param page
+     * @param iotAlarmBoxSelectParam
+     * @return
+     */
+    @RequestMapping("/findAlarmBoxByCondition")
+    public Result findAlarmByCondition(Page page, IotAlarmBoxSelectParam iotAlarmBoxSelectParam){
+        Result res = iotAlarmBoxService.findAlarmByCondition(page, iotAlarmBoxSelectParam);
+        return res;
+    }
+
+    /***
+     * 查询报警箱详细信息
+     * @param id
+     * @return
+     */
+    @RequestMapping("/findAlarmBoxDetail")
+    public Result findAlarmBoxDetail(Integer id){
+        Result res = iotAlarmBoxService.findAlarmBoxDetail(id);
+        return res;
+    }
+
+    /***
+     * 修改报警箱信息时，查询报警箱自身的信息
+     * @param id
+     * @return
+     */
+    @RequestMapping("/updateAlarmboxDetail")
+    public Result updateAlarmboxDetail(Integer id){
+        Result res = iotAlarmBoxService.updateAlarmboxDetail(id);
+        return res;
+    }
+
+
+    /***
+     * 修改报警箱信息
+     * @param iotAlarmBox
+     * @return
+     */
+    @RequestMapping("/updateAlarmbox")
+    public Result updateAlarmbox(IotAlarmBox iotAlarmBox){
+        Result res = iotAlarmBoxService.updateAlarmbox(iotAlarmBox);
+        return res;
+    }
+
+
+    /***
+     * 主动报警
+     * @return
+     */
+    @RequestMapping("/autoalarm")
+    public Result autoalarm(){
+        Result res = new Result();
+        return res;
+    }
+
+    /***
+     * 报警历史统计
+     * @param page
+     * @param iotAlarmBoxRecorderSelectParam
+     * @return
+     */
+    @RequestMapping("/alarmBoxMessageStatistical")
+    public Result alarmBoxMessageStatistical(Page page, IotAlarmBoxRecorderSelectParam iotAlarmBoxRecorderSelectParam){
+        Result res = iotAlarmBoxService.alarmBoxMessageStatistical(page, iotAlarmBoxRecorderSelectParam);
+        return res;
+    }
+
+    /***
+     * 根据主键修改报警信息记录状态
+     * @param iotAlarmBoxRecorderStatusUpdateParam
+     * @return
+     */
+    @RequestMapping("/updateAlarmBoxRecordStatus")
+    public Result updateAlarmBoxRecordStatus(IotAlarmBoxRecorderStatusUpdateParam iotAlarmBoxRecorderStatusUpdateParam){
+        Result res = iotAlarmBoxRecordService.updateStatusById(iotAlarmBoxRecorderStatusUpdateParam);
+        return res;
+    }
+
+    @RequestMapping("/testAlarmBoxStatus")
+    public Result testAlarmBoxStatus(){
+        Result result = new Result();
+        result.setData(aggregationAlarmService.findAlarmWorkInfo(5));
+
+        return result;
+    }
+
+    @RequestMapping("/testAlarmBoxLog")
+    public Result testAlarmBoxLog(){
+        Result result = new Result();
+        result.setData(aggregationAlarmService.findAlarmLog(5,0,null,null,1,0));
+
+        return result;
+    }
+
+
+}

@@ -1,0 +1,119 @@
+package com.rz.iot.think.aggregation.warn;
+
+import com.rz.iot.think.aggregation.warn.HCNetSDK;
+import com.rz.iot.think.service.AggregationAlarmService;
+import com.rz.iot.think.service.IotAreaCityRoadService;
+import com.rz.iot.think.service.impl.AggregationAlarmServiceImpl;
+import com.rz.iot.think.service.impl.IotAreaCityRoadServiceImpl;
+import com.sun.jna.NativeLong;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+
+public class myDemo {
+	private static NativeLong lUserID;// 用户句柄
+	private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
+	private static HCNetSDK.NET_DVR_DEVICEINFO_V30 m_strDeviceInfo;// 设备信息
+	private static NativeLong lFindHandle;// 报警主机日志句柄
+	private static List<HCNetSDK.NET_DVR_ALARMHOST_LOG_RET> info = new ArrayList();//日志记录信息
+
+	public myDemo() {
+		lUserID = new NativeLong(-1);
+	}
+
+	public static void main(String args[]) {
+		login_30();
+		// getNVRWorkInfo_30();
+		findAlarmHostLog();
+		//getNVRWorkInfo_30();
+		//alarmHostAssistantControl();
+
+	}
+
+
+	private static void login_30() {// 登录接口30
+		boolean initSuc = hCNetSDK.NET_DVR_Init();
+		if (initSuc != true) {
+			JOptionPane.showMessageDialog(null, "初始化失败");
+		}
+
+		int port = 8000;
+		m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V30();
+		lUserID = hCNetSDK.NET_DVR_Login_V30("192.168.3.102", (short) port, "admin", "Rz123456", m_strDeviceInfo);
+		System.out.println("lUserID:" + lUserID);
+		long userID = lUserID.longValue();
+		System.out.println("userID:" + userID);
+	}
+
+	private static void getNVRWorkInfo_30() {
+		if (lUserID.longValue() == -1) {
+			login_30();
+		}
+
+		HCNetSDK.NET_DVR_WORKSTATE_V30 lpWorkState = new HCNetSDK.NET_DVR_WORKSTATE_V30();
+		boolean a = hCNetSDK.NET_DVR_GetDVRWorkState_V30(lUserID, lpWorkState);
+		// dwVolume
+		System.out.println(lpWorkState.toString());
+	}
+
+	private static void findAlarmHostLog() {
+		HCNetSDK.NET_DVR_ALARMHOST_SEARCH_LOG_PARAM lpSearchParam = new HCNetSDK.NET_DVR_ALARMHOST_SEARCH_LOG_PARAM();
+		
+		lpSearchParam.struStartTime = new HCNetSDK.NET_DVR_TIME(2019,3,22,0,0,0);
+		lpSearchParam.struEndTime = new HCNetSDK.NET_DVR_TIME(2019,4,22,0,0,0);
+		lpSearchParam.wMajorType = 1;//主类型
+		lpSearchParam.wMinorType = 0;//次类型
+	
+		System.out.println("打印传入参数"+lpSearchParam.toString());
+		//0:全部,1:类型,2:时间,3时间与类型
+		lFindHandle = hCNetSDK.NET_DVR_FindAlarmHostLog(lUserID, 3, lpSearchParam);//根据查询条件获取日志句柄
+		
+		int error = hCNetSDK.NET_DVR_GetLastError();//获取错误参数
+		System.out.println(error);
+		
+		if (lFindHandle.longValue() == -1) {
+			System.out.println("查询失败！");
+			return;
+		} else
+			findNextAlarmHostLog();// 通过句柄获取后续数据
+
+		System.out.println(lpSearchParam.toString());
+	}
+
+	private static void findNextAlarmHostLog() {
+		if (lFindHandle.longValue() == -1) {
+			System.out.println("查询失败！");
+			return;
+		}
+
+		HCNetSDK.NET_DVR_ALARMHOST_LOG_RET lpFindData = new HCNetSDK.NET_DVR_ALARMHOST_LOG_RET();
+		NativeLong next = hCNetSDK.NET_DVR_FindNextAlarmHostLog(lFindHandle, lpFindData);//6750211 6684675
+		
+		if(next.longValue() == 1000) {//查询成功
+			System.out.println("*********************"+"\n打印输出"+lpFindData);
+			info.add(lpFindData);
+			findNextAlarmHostLog();//成功则继续查找
+		}else if(next.longValue() == 1002)//正在查找请等待
+			findNextAlarmHostLog();//继续查找
+		else if(next.longValue() == 1001 || next.longValue() == 1003 || next.longValue() == 1004) {//查找失败
+			hCNetSDK.NET_DVR_FindAlarmHostLogClose(lFindHandle);//结束查找
+			System.out.println("-------------------------\n"+info.toString());
+
+		}
+
+	}
+
+	private static void alarmHostAssistantControl(){//未成功
+		short dwType = 5;//辅助功能类型：1- 电锁，2- 移动门，3- 语音输出，4- 警号，5- 警灯
+		short dwNumber = 1;//控制号。对于电锁、移动门，按位表示，从第零位开始；对于语音输出，不按位，对应的是语音输出号；对于警号(警号输出只有一个)，赋值为1；对于警灯(警灯输出只有一个) ，赋值为1。
+		short dwCmdParam = 0;// 命令参数：0- 关闭，1- 开启
+		boolean temp = hCNetSDK.NET_DVR_AlarmHostAssistantControl(lUserID,dwType,dwNumber,dwCmdParam);
+		int temp2 = hCNetSDK.NET_DVR_GetLastError();
+		System.out.print(temp2);
+	}
+
+}

@@ -1,0 +1,76 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /iot-think
+
+spring:
+  datasource:
+    name: db
+    url: jdbc:mysql://192.168.3.3:3306/iot-think?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+    username: rz
+    password: Rz123456
+
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+  # redis
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+  devtools:
+    restart:
+      enabled: true
+  # 配置jackson 时间返回格式
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+  # 文件上传大小
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 1024MB
+
+  # mqtt
+  mqtt:
+    url: tcp://192.168.3.188:1883
+    client:
+      id: mqttId
+    default:
+      topic: topic
+    completionTimeout: 3000
+
+mybatis:
+  mapper-locations: classpath:mapping/**/*.xml  #注意：一定要对应mapper映射xml文件的所在路径
+  type-aliases-package: com.rz.iot.think.model  # 注意：对应实体类的路径
+  configuration:
+    call-setters-on-nulls: true
+
+#pagehelper分页插件
+#无需配置
+
+logging:
+  config: classpath:log4j2.xml
+
+# 信息屏
+screen:
+  preDownloadURL: http://192.168.3.188:8080/iot-think/screenPlayStrategy/downloadMaterial?key=
+  notificationURL: http://192.168.3.188:8080/iot-think/screenPlayStrategy/getDownloadProgress
+
+# ffmpeg
+ffmpeg_path: D:\ProjectDevelopmentTools\ffmpeg\bin\ffmpeg.exe
+

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.screen.IotScreenPlayStrategyMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.screen.IotScreenPlayStrategy" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="start_date" property="startDate" jdbcType="DATE" />
+    <result column="end_date" property="endDate" jdbcType="DATE" />
+    <result column="weekfilter" property="weekfilter" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="TIME" />
+    <result column="end_time" property="endTime" jdbcType="TIME" />
+    <result column="program_id" property="programId" jdbcType="INTEGER" />
+    <result column="priority" property="priority" jdbcType="INTEGER" />
+    <result column="loop_count" property="loopCount" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, start_date, end_date, weekfilter, start_time, end_time, program_id, priority, 
+    loop_count, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_screen_play_strategy
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_screen_play_strategy
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.screen.IotScreenPlayStrategy" >
+    insert into iot_screen_play_strategy (id, name, start_date, 
+      end_date, weekfilter, start_time, 
+      end_time, program_id, priority, 
+      loop_count, status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{startDate,jdbcType=DATE}, 
+      #{endDate,jdbcType=DATE}, #{weekfilter,jdbcType=VARCHAR}, #{startTime,jdbcType=TIME}, 
+      #{endTime,jdbcType=TIME}, #{programId,jdbcType=INTEGER}, #{priority,jdbcType=INTEGER}, 
+      #{loopCount,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.screen.IotScreenPlayStrategy" >
+    insert into iot_screen_play_strategy
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="startDate != null" >
+        start_date,
+      </if>
+      <if test="endDate != null" >
+        end_date,
+      </if>
+      <if test="weekfilter != null" >
+        weekfilter,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="programId != null" >
+        program_id,
+      </if>
+      <if test="priority != null" >
+        priority,
+      </if>
+      <if test="loopCount != null" >
+        loop_count,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null" >
+        #{startDate,jdbcType=DATE},
+      </if>
+      <if test="endDate != null" >
+        #{endDate,jdbcType=DATE},
+      </if>
+      <if test="weekfilter != null" >
+        #{weekfilter,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIME},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=INTEGER},
+      </if>
+      <if test="priority != null" >
+        #{priority,jdbcType=INTEGER},
+      </if>
+      <if test="loopCount != null" >
+        #{loopCount,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.screen.IotScreenPlayStrategy" >
+    update iot_screen_play_strategy
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null" >
+        start_date = #{startDate,jdbcType=DATE},
+      </if>
+      <if test="endDate != null" >
+        end_date = #{endDate,jdbcType=DATE},
+      </if>
+      <if test="weekfilter != null" >
+        weekfilter = #{weekfilter,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIME},
+      </if>
+      <if test="programId != null" >
+        program_id = #{programId,jdbcType=INTEGER},
+      </if>
+      <if test="priority != null" >
+        priority = #{priority,jdbcType=INTEGER},
+      </if>
+      <if test="loopCount != null" >
+        loop_count = #{loopCount,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.screen.IotScreenPlayStrategy" >
+    update iot_screen_play_strategy
+    set name = #{name,jdbcType=VARCHAR},
+      start_date = #{startDate,jdbcType=DATE},
+      end_date = #{endDate,jdbcType=DATE},
+      weekfilter = #{weekfilter,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIME},
+      end_time = #{endTime,jdbcType=TIME},
+      program_id = #{programId,jdbcType=INTEGER},
+      priority = #{priority,jdbcType=INTEGER},
+      loop_count = #{loopCount,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--根据节目id查找策略-->
+  <select id="findByProgramId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from iot_screen_play_strategy
+    where program_id = #{programId}
+    AND status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+  </select>
+</mapper>

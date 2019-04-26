@@ -1,0 +1,20 @@
+package com.rz.iot.think.service;
+
+import com.rz.iot.think.model.alarm.IotAlarmBoxRecordLog;
+
+/**
+ * @Author:jidi
+ * @Date:2019/04/22 17:40
+ * @Description:报警箱报警日志记录
+ **/
+public interface IotAlarmBoxRecordLogService {
+
+    /***
+     * 增加一条记录
+     * @param iotAlarmBoxRecordLog
+     * @return
+     */
+    int addIotAlarmBoxRecorderLog(IotAlarmBoxRecordLog iotAlarmBoxRecordLog);
+
+
+}

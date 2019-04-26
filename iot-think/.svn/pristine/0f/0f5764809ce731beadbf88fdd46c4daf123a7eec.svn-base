@@ -1,0 +1,89 @@
+package com.rz.iot.think.mqtt.handler.publish;
+
+import com.rz.iot.think.mqtt.handler.MqttGateway;
+import com.rz.iot.think.mqtt.model.ConcentratorMessageBase;
+import com.rz.iot.think.mqtt.model.publish.ConcentratorCtrlCmdPublish;
+import com.rz.iot.think.mqtt.model.publish.ConcentratorWarnConfigPublish;
+import com.rz.iot.think.mqtt.util.RzIotConcentratorConstParam;
+import com.rz.iot.utils.MD5;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * Author by xuxiake, Date on 2019/4/13.
+ * PS: Not easy to write code, please indicate.
+ * Description：集中器消息下发入口接口实现类
+ */
+@Component("concentratorPublishService")
+@Log4j2
+public class ConcentratorPublishServiceImpl implements IConcentratorPublishService {
+
+    @Resource
+    private MqttGateway mqttGateway;
+
+    /**
+     * 向集中器发送消息
+     * @param data 发送的数据
+     * @param concentratorSn 集中器sn
+     */
+    public void sendMessage(String data, String concentratorSn) {
+
+        log.debug("平台下发编码后报文：{}", data);
+        mqttGateway.sendToMqtt(data, RzIotConcentratorConstParam.MQTT_PUBLISH_TOPIC + MD5.encryptionUpper(concentratorSn));
+    }
+
+    /**
+     * 服务端输出控制命令下发
+     * @param ctrlCmdPublishes
+     * @param concentratorSn
+     */
+    @Override
+    public void publishCtrlCmd(List<ConcentratorCtrlCmdPublish> ctrlCmdPublishes, String concentratorSn) {
+
+        ConcentratorMessageBase concentratorMessageBase = new ConcentratorMessageBase();
+        concentratorMessageBase.setOperateCode(RzIotConcentratorConstParam.PUBLISH_CTRL_CMD);
+        concentratorMessageBase.setSerialNo(concentratorSn);
+        concentratorMessageBase.setObject(ctrlCmdPublishes);
+
+        log.debug("平台下发原始报文：{}", concentratorMessageBase);
+        String data = concentratorMessageBase.encode();
+        this.sendMessage(data, concentratorSn);
+    }
+
+    /**
+     * 服务端告警参数下发
+     * @param warnConfigPublishes
+     * @param concentratorSn
+     */
+    @Override
+    public void warnConfigPublish(List<ConcentratorWarnConfigPublish> warnConfigPublishes, String concentratorSn) {
+
+        ConcentratorMessageBase concentratorMessageBase = new ConcentratorMessageBase();
+        concentratorMessageBase.setOperateCode(RzIotConcentratorConstParam.PUBLISH_WARN_CONFIG);
+        concentratorMessageBase.setSerialNo(concentratorSn);
+        concentratorMessageBase.setObject(warnConfigPublishes);
+
+        log.debug("平台下发原始报文：{}", concentratorMessageBase);
+        String data = concentratorMessageBase.encode();
+        this.sendMessage(data, concentratorSn);
+    }
+
+    /**
+     * 校时命令下发
+     * @param concentratorSn
+     */
+    @Override
+    public void timingPublish(String concentratorSn) {
+
+        ConcentratorMessageBase concentratorMessageBase = new ConcentratorMessageBase();
+        concentratorMessageBase.setOperateCode(RzIotConcentratorConstParam.PUBLISH_TIMING);
+        concentratorMessageBase.setSerialNo(concentratorSn);
+
+        log.debug("平台下发原始报文：{}", concentratorMessageBase);
+        String data = concentratorMessageBase.encode();
+        this.sendMessage(data, RzIotConcentratorConstParam.MQTT_PUBLISH_TOPIC + MD5.encryptionUpper(concentratorSn));
+    }
+}

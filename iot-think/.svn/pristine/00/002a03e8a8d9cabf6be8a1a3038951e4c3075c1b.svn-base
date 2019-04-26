@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.screen.IotScreenVideoInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.screen.IotScreenVideoInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="video_url" property="videoUrl" jdbcType="VARCHAR" />
+    <result column="convert_url" property="convertUrl" jdbcType="VARCHAR" />
+    <result column="thumbnail_url" property="thumbnailUrl" jdbcType="VARCHAR" />
+    <result column="video_type" property="videoType" jdbcType="INTEGER" />
+    <result column="duration" property="duration" jdbcType="INTEGER" />
+    <result column="resolution" property="resolution" jdbcType="VARCHAR" />
+    <result column="width" property="width" jdbcType="INTEGER" />
+    <result column="height" property="height" jdbcType="INTEGER" />
+    <result column="verify" property="verify" jdbcType="INTEGER" />
+    <result column="hash_key" property="hashKey" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="create_admin" property="createAdmin" jdbcType="INTEGER" />
+    <result column="file_size" property="fileSize" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, status, video_url, convert_url, thumbnail_url, video_type, duration, resolution, 
+    width, height, verify, hash_key, create_time, update_time, `describe`, create_admin,
+    file_size
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_screen_video_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!--查询所有的未被删除的播放素材（视频）-->
+  <select id="findAll" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List"/>
+    from iot_screen_video_info
+    where status != ${@com.rz.iot.think.utils.RzIotDBConstParam@MATERIAL_STATUS_OF_DELETE}
+  </select>
+
+  <!--根据名字与上传者查询所有的未被删除的播放素材（视频）-->
+  <select id="findAllByCondition" resultMap="BaseResultMap" parameterType="com.rz.iot.think.model.screen.IotScreenVideoInfo">
+    select
+    <include refid="Base_Column_List"/>
+    from iot_screen_video_info
+    where status != ${@com.rz.iot.think.utils.RzIotDBConstParam@MATERIAL_STATUS_OF_DELETE}
+    <if test="name != null" >
+      AND name like "%"#{name,jdbcType=VARCHAR}"%"
+    </if>
+    <if test="createAdmin != null" >
+      AND create_admin =  #{createAdmin,jdbcType=INTEGER}
+    </if>
+  </select>
+
+  <!--查询在视频来源表（iot_screen_video_source）中的视频素材-->
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List"/>
+    from iot_screen_video_info
+    where id in
+    (select video_id
+        from iot_screen_video_source
+        where status != ${@com.rz.iot.think.utils.RzIotDBConstParam@MATERIAL_STATUS_OF_DELETE}
+        and video_id is not null
+    )
+  </select>
+
+  <!--根据name,hashKey，createAdmin查询id-->
+  <select id="selectIdByCondition" resultType="java.lang.Integer" parameterType="com.rz.iot.think.model.screen.IotScreenVideoInfo">
+    select id from iot_screen_video_info
+    where name = #{name,jdbcType=VARCHAR}
+    and hash_key = #{hashKey,jdbcType=VARCHAR}
+    and create_admin = #{createAdmin,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_screen_video_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.screen.IotScreenVideoInfo" >
+    insert into iot_screen_video_info (id, name, status, 
+      video_url, convert_url, thumbnail_url, 
+      video_type, duration, resolution, 
+      width, height, verify, 
+      hash_key, create_time, update_time, 
+      describe, create_admin, file_size
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{videoUrl,jdbcType=VARCHAR}, #{convertUrl,jdbcType=VARCHAR}, #{thumbnailUrl,jdbcType=VARCHAR}, 
+      #{videoType,jdbcType=INTEGER}, #{duration,jdbcType=INTEGER}, #{resolution,jdbcType=VARCHAR}, 
+      #{width,jdbcType=INTEGER}, #{height,jdbcType=INTEGER}, #{verify,jdbcType=INTEGER}, 
+      #{hashKey,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{describe,jdbcType=VARCHAR}, #{createAdmin,jdbcType=INTEGER}, #{fileSize,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.screen.IotScreenVideoInfo" >
+    insert into iot_screen_video_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="videoUrl != null" >
+        video_url,
+      </if>
+      <if test="convertUrl != null" >
+        convert_url,
+      </if>
+      <if test="thumbnailUrl != null" >
+        thumbnail_url,
+      </if>
+      <if test="videoType != null" >
+        video_type,
+      </if>
+      <if test="duration != null" >
+        duration,
+      </if>
+      <if test="resolution != null" >
+        resolution,
+      </if>
+      <if test="width != null" >
+        width,
+      </if>
+      <if test="height != null" >
+        height,
+      </if>
+      <if test="verify != null" >
+        verify,
+      </if>
+      <if test="hashKey != null" >
+        hash_key,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="describe != null" >
+        describe,
+      </if>
+      <if test="createAdmin != null" >
+        create_admin,
+      </if>
+      <if test="fileSize != null" >
+        file_size,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="videoUrl != null" >
+        #{videoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="convertUrl != null" >
+        #{convertUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="thumbnailUrl != null" >
+        #{thumbnailUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="videoType != null" >
+        #{videoType,jdbcType=INTEGER},
+      </if>
+      <if test="duration != null" >
+        #{duration,jdbcType=INTEGER},
+      </if>
+      <if test="resolution != null" >
+        #{resolution,jdbcType=VARCHAR},
+      </if>
+      <if test="width != null" >
+        #{width,jdbcType=INTEGER},
+      </if>
+      <if test="height != null" >
+        #{height,jdbcType=INTEGER},
+      </if>
+      <if test="verify != null" >
+        #{verify,jdbcType=INTEGER},
+      </if>
+      <if test="hashKey != null" >
+        #{hashKey,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="createAdmin != null" >
+        #{createAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="fileSize != null" >
+        #{fileSize,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.screen.IotScreenVideoInfo" >
+    update iot_screen_video_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="videoUrl != null" >
+        video_url = #{videoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="convertUrl != null" >
+        convert_url = #{convertUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="thumbnailUrl != null" >
+        thumbnail_url = #{thumbnailUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="videoType != null" >
+        video_type = #{videoType,jdbcType=INTEGER},
+      </if>
+      <if test="duration != null" >
+        duration = #{duration,jdbcType=INTEGER},
+      </if>
+      <if test="resolution != null" >
+        resolution = #{resolution,jdbcType=VARCHAR},
+      </if>
+      <if test="width != null" >
+        width = #{width,jdbcType=INTEGER},
+      </if>
+      <if test="height != null" >
+        height = #{height,jdbcType=INTEGER},
+      </if>
+      <if test="verify != null" >
+        verify = #{verify,jdbcType=INTEGER},
+      </if>
+      <if test="hashKey != null" >
+        hash_key = #{hashKey,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="describe != null" >
+        describe = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="createAdmin != null" >
+        create_admin = #{createAdmin,jdbcType=INTEGER},
+      </if>
+      <if test="fileSize != null" >
+        file_size = #{fileSize,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.screen.IotScreenVideoInfo" >
+    update iot_screen_video_info
+    set name = #{name,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      video_url = #{videoUrl,jdbcType=VARCHAR},
+      convert_url = #{convertUrl,jdbcType=VARCHAR},
+      thumbnail_url = #{thumbnailUrl,jdbcType=VARCHAR},
+      video_type = #{videoType,jdbcType=INTEGER},
+      duration = #{duration,jdbcType=INTEGER},
+      resolution = #{resolution,jdbcType=VARCHAR},
+      width = #{width,jdbcType=INTEGER},
+      height = #{height,jdbcType=INTEGER},
+      verify = #{verify,jdbcType=INTEGER},
+      hash_key = #{hashKey,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      describe = #{describe,jdbcType=VARCHAR},
+      create_admin = #{createAdmin,jdbcType=INTEGER},
+      file_size = #{fileSize,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--修改素材状态为删除-->
+  <update id="delById" parameterType="java.lang.Integer">
+    update  iot_screen_video_info
+    set status =  ${@com.rz.iot.think.utils.RzIotDBConstParam@MATERIAL_STATUS_OF_DELETE}
+    where id =  #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

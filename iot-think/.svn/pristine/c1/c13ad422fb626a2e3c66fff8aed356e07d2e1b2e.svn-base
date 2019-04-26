@@ -1,0 +1,91 @@
+package com.rz.iot.think.controller;
+
+import com.rz.iot.think.model.Page;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.param.IotScreenPlayStrategyListQueryParam;
+import com.rz.iot.think.model.param.IotScreenPlayStrategySendParam;
+import com.rz.iot.think.model.screen.DownloadProgressModel;
+import com.rz.iot.think.service.IotScreenPlayStrategyService;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
+/**
+ * @Auther: yyjuan
+ * @Date: 2019/3/22 0022 09:52
+ * @Description: 播放策略
+ */
+@RestController
+@RequestMapping("/screenPlayStrategy")
+public class IotScreenPlayStrategyController {
+
+    @Resource
+    private IotScreenPlayStrategyService iotScreenPlayStrategyService;
+
+    /**
+     * 屏幕策略列表
+     * @param page 分页参数
+     * @param param 查询参数
+     * @return
+     */
+    @RequestMapping("/findList")
+    public Result findList(Page page, IotScreenPlayStrategyListQueryParam param) {
+        return iotScreenPlayStrategyService.findList(page, param);
+    }
+
+    /**
+     * 信息屏播放详情
+     * @param playStrategyId 策略id
+     * @return
+     */
+    @RequestMapping("/detail")
+    public Result detail(Integer playStrategyId) {
+        return iotScreenPlayStrategyService.detail(playStrategyId);
+    }
+
+    /**
+     * 下发信息屏播放策略
+     * @param param 下发参数
+     * @return
+     */
+    @RequestMapping("/sendStrategy")
+    public Result sendStrategy(@RequestBody IotScreenPlayStrategySendParam param){
+
+        return iotScreenPlayStrategyService.sendStrategy(param);
+    }
+
+    /**
+     * 获取xixunplay下载进度
+     * @return
+     */
+    @RequestMapping(value = "/getDownloadProgress")
+    public void getDownloadProgress(@RequestBody DownloadProgressModel param) {
+
+        iotScreenPlayStrategyService.getDownloadProgress(param);
+    }
+
+    /**
+     * 信息屏下载素材的接口
+     * @param key
+     * @param response
+     */
+    @RequestMapping("/downloadMaterial")
+    public void downloadMaterial(String key, HttpServletResponse response) {
+        iotScreenPlayStrategyService.downloadMaterial(key, response);
+    }
+
+    /**
+     * 删除播放策略
+     * @param strategyId 策略id
+     * @return
+     */
+    @RequestMapping("/del")
+    public Result del(Integer strategyId) {
+        return iotScreenPlayStrategyService.del(strategyId);
+    }
+}

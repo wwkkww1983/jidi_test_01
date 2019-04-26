@@ -1,0 +1,40 @@
+package com.rz.iot.think.model.show;
+
+/**
+ * Author by zhangxd, Date on 2019/3/25.
+ * PS: Not easy to write code, please indicate.
+ * Description：展示用户数据权限列表
+ */
+public class PermissionShowDataList {
+
+    //业务id
+    private Integer businessId;
+    //业务类型（1:灯光节点；2：灯光节点组；3：强电；4：视频；5：图片；6：文字；10：播放策略；11：强电亮灯策略）
+    private Integer businessType;
+    //业务名称
+    private String businessName;
+
+    public Integer getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(Integer businessId) {
+        this.businessId = businessId;
+    }
+
+    public Integer getBusinessType() {
+        return businessType;
+    }
+
+    public void setBusinessType(Integer businessType) {
+        this.businessType = businessType;
+    }
+
+    public String getBusinessName() {
+        return businessName;
+    }
+
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
+    }
+}

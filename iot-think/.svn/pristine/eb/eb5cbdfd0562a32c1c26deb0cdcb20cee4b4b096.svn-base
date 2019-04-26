@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotStreetlightLedLightsMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotStreetlightLedLights" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sn" property="sn" jdbcType="VARCHAR" />
+    <result column="model_number" property="modelNumber" jdbcType="INTEGER" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="voltage" property="voltage" jdbcType="INTEGER" />
+    <result column="electric_current" property="electricCurrent" jdbcType="INTEGER" />
+    <result column="install_location" property="installLocation" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="rated_power" property="ratedPower" jdbcType="INTEGER" />
+    <result column="light_type" property="lightType" jdbcType="INTEGER" />
+    <result column="light_source" property="lightSource" jdbcType="INTEGER" />
+    <result column="manufactor" property="manufactor" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, sn, model_number, `describe`, voltage, electric_current, install_location,
+    status, rated_power, light_type, light_source, manufactor, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_streetlight_led_lights
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_streetlight_led_lights
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotStreetlightLedLights" >
+    insert into iot_streetlight_led_lights (id, name, sn, 
+      model_number, `describe`, voltage,
+      electric_current, install_location, status, 
+      rated_power, light_type, light_source, 
+      manufactor, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{sn,jdbcType=VARCHAR}, 
+      #{modelNumber,jdbcType=INTEGER}, #{describe,jdbcType=VARCHAR}, #{voltage,jdbcType=INTEGER}, 
+      #{electricCurrent,jdbcType=INTEGER}, #{installLocation,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{ratedPower,jdbcType=INTEGER}, #{lightType,jdbcType=INTEGER}, #{lightSource,jdbcType=INTEGER}, 
+      #{manufactor,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotStreetlightLedLights" >
+    insert into iot_streetlight_led_lights
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="sn != null" >
+        sn,
+      </if>
+      <if test="modelNumber != null" >
+        model_number,
+      </if>
+      <if test="describe != null" >
+        `describe`,
+      </if>
+      <if test="voltage != null" >
+        voltage,
+      </if>
+      <if test="electricCurrent != null" >
+        electric_current,
+      </if>
+      <if test="installLocation != null" >
+        install_location,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="ratedPower != null" >
+        rated_power,
+      </if>
+      <if test="lightType != null" >
+        light_type,
+      </if>
+      <if test="lightSource != null" >
+        light_source,
+      </if>
+      <if test="manufactor != null" >
+        manufactor,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        #{sn,jdbcType=VARCHAR},
+      </if>
+      <if test="modelNumber != null" >
+        #{modelNumber,jdbcType=INTEGER},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="voltage != null" >
+        #{voltage,jdbcType=INTEGER},
+      </if>
+      <if test="electricCurrent != null" >
+        #{electricCurrent,jdbcType=INTEGER},
+      </if>
+      <if test="installLocation != null" >
+        #{installLocation,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="ratedPower != null" >
+        #{ratedPower,jdbcType=INTEGER},
+      </if>
+      <if test="lightType != null" >
+        #{lightType,jdbcType=INTEGER},
+      </if>
+      <if test="lightSource != null" >
+        #{lightSource,jdbcType=INTEGER},
+      </if>
+      <if test="manufactor != null" >
+        #{manufactor,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotStreetlightLedLights" >
+    update iot_streetlight_led_lights
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        sn = #{sn,jdbcType=VARCHAR},
+      </if>
+      <if test="modelNumber != null" >
+        model_number = #{modelNumber,jdbcType=INTEGER},
+      </if>
+      <if test="describe != null" >
+        `describe` = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="voltage != null" >
+        voltage = #{voltage,jdbcType=INTEGER},
+      </if>
+      <if test="electricCurrent != null" >
+        electric_current = #{electricCurrent,jdbcType=INTEGER},
+      </if>
+      <if test="installLocation != null" >
+        install_location = #{installLocation,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="ratedPower != null" >
+        rated_power = #{ratedPower,jdbcType=INTEGER},
+      </if>
+      <if test="lightType != null" >
+        light_type = #{lightType,jdbcType=INTEGER},
+      </if>
+      <if test="lightSource != null" >
+        light_source = #{lightSource,jdbcType=INTEGER},
+      </if>
+      <if test="manufactor != null" >
+        manufactor = #{manufactor,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotStreetlightLedLights" >
+    update iot_streetlight_led_lights
+    set name = #{name,jdbcType=VARCHAR},
+      sn = #{sn,jdbcType=VARCHAR},
+      model_number = #{modelNumber,jdbcType=INTEGER},
+      `describe` = #{describe,jdbcType=VARCHAR},
+      voltage = #{voltage,jdbcType=INTEGER},
+      electric_current = #{electricCurrent,jdbcType=INTEGER},
+      install_location = #{installLocation,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      rated_power = #{ratedPower,jdbcType=INTEGER},
+      light_type = #{lightType,jdbcType=INTEGER},
+      light_source = #{lightSource,jdbcType=INTEGER},
+      manufactor = #{manufactor,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <!--根据路灯ID查询路灯上所有led-->
+  <select id="findByStreetlightId" resultMap="BaseResultMap">
+    SELECT led_lights.*
+    FROM
+      iot_streetlight_led_lights led_lights,
+      iot_single_light_controller_led_lights_rel controller_led_lights_rel
+    WHERE
+      led_lights.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      AND controller_led_lights_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      AND led_lights.id = controller_led_lights_rel.led_lights_id
+      AND controller_led_lights_rel.slc_id IN
+          (
+            SELECT streetlight_slc_rel.slc_id
+            FROM
+              iot_streetlight streetlight,
+              iot_streetlight_slc_rel streetlight_slc_rel
+            WHERE
+              streetlight.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+              AND streetlight_slc_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+              AND streetlight.id = streetlight_slc_rel.streetlight_id
+              AND streetlight.id = #{streetlightId}
+          )
+  </select>
+
+  <!--批量插入-->
+  <insert id="insertBatch" useGeneratedKeys="true" keyColumn="id" keyProperty="id" parameterType="list">
+    insert into iot_streetlight_led_lights
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="list[0].id != null" >
+        id,
+      </if>
+      <if test="list[0].name != null" >
+        name,
+      </if>
+      <if test="list[0].sn != null" >
+        sn,
+      </if>
+      <if test="list[0].modelNumber != null" >
+        model_number,
+      </if>
+      <if test="list[0].describe != null" >
+        `describe`,
+      </if>
+      <if test="list[0].voltage != null" >
+        voltage,
+      </if>
+      <if test="list[0].electricCurrent != null" >
+        electric_current,
+      </if>
+      <if test="list[0].installLocation != null" >
+        install_location,
+      </if>
+      <if test="list[0].status != null" >
+        status,
+      </if>
+      <if test="list[0].ratedPower != null" >
+        rated_power,
+      </if>
+      <if test="list[0].lightType != null" >
+        light_type,
+      </if>
+      <if test="list[0].lightSource != null" >
+        light_source,
+      </if>
+      <if test="list[0].manufactor != null" >
+        manufactor,
+      </if>
+      <if test="list[0].createTime != null" >
+        create_time,
+      </if>
+      <if test="list[0].updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="item.id != null" >
+          #{item.id,jdbcType=INTEGER},
+        </if>
+        <if test="item.name != null" >
+          #{item.name,jdbcType=VARCHAR},
+        </if>
+        <if test="item.sn != null" >
+          #{item.sn,jdbcType=VARCHAR},
+        </if>
+        <if test="item.modelNumber != null" >
+          #{item.modelNumber,jdbcType=INTEGER},
+        </if>
+        <if test="item.describe != null" >
+          #{item.describe,jdbcType=VARCHAR},
+        </if>
+        <if test="item.voltage != null" >
+          #{item.voltage,jdbcType=INTEGER},
+        </if>
+        <if test="item.electricCurrent != null" >
+          #{item.electricCurrent,jdbcType=INTEGER},
+        </if>
+        <if test="item.installLocation != null" >
+          #{item.installLocation,jdbcType=INTEGER},
+        </if>
+        <if test="item.status != null" >
+          #{item.status,jdbcType=INTEGER},
+        </if>
+        <if test="item.ratedPower != null" >
+          #{item.ratedPower,jdbcType=INTEGER},
+        </if>
+        <if test="item.lightType != null" >
+          #{item.lightType,jdbcType=INTEGER},
+        </if>
+        <if test="item.lightSource != null" >
+          #{item.lightSource,jdbcType=INTEGER},
+        </if>
+        <if test="item.manufactor != null" >
+          #{item.manufactor,jdbcType=VARCHAR},
+        </if>
+        <if test="item.createTime != null" >
+          #{item.createTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="item.updateTime != null" >
+          #{item.updateTime,jdbcType=TIMESTAMP},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+
+  <!--根据路灯id删除-->
+  <update id="delByStreetlightId">
+    UPDATE iot_streetlight_led_lights streetlight_led_lights
+    SET streetlight_led_lights.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    WHERE streetlight_led_lights.id IN
+    (
+      SELECT
+        controller_led_lights_rel.led_lights_id
+      FROM
+        iot_streetlight_slc_rel streetlight_slc_rel,
+        iot_single_light_controller_led_lights_rel controller_led_lights_rel
+      WHERE
+        streetlight_slc_rel.streetlight_id = #{streetlightId}
+      AND streetlight_slc_rel.slc_id = controller_led_lights_rel.slc_id
+      AND streetlight_slc_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      AND controller_led_lights_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+    )
+  </update>
+
+  <resultMap id="ResultMapDetail" type="com.rz.iot.think.model.show.IotStreetlightLedLightsShowDetail">
+    <result column="id" property="id"></result>
+    <result column="name" property="name"></result>
+    <result column="sn" property="sn"></result>
+    <result column="status" property="status"></result>
+    <result column="model_number" property="modelNumber"></result>
+    <result column="province_id" property="provinceId"></result>
+    <result column="province_name" property="provinceName"></result>
+    <result column="city_id" property="cityId"></result>
+    <result column="city_name" property="cityName"></result>
+    <result column="district_id" property="districtId"></result>
+    <result column="district_name" property="districtName"></result>
+    <result column="road_id" property="roadId"></result>
+    <result column="road_name" property="roadName"></result>
+    <result column="streetlight_name" property="streetLightName"></result>
+    <result column="install_location" property="installLocation"></result>
+    <result column="voltage" property="voltage"></result>
+    <result column="electric_current" property="electricCurrent"></result>
+    <result column="rated_power" property="ratedPower"></result>
+    <result column="light_type" property="lightType"></result>
+    <result column="light_source" property="lightSource"></result>
+    <result column="manufactor" property="manufactor"></result>
+  </resultMap>
+
+  <select id="detail" resultMap="ResultMapDetail">
+    SELECT
+      led_lights.id,
+      led_lights.name,
+      led_lights.sn,
+      led_lights.status,
+      led_lights.model_number,
+      area_rel.province_id,
+      area_rel.province_name,
+      area_rel.city_id,
+      area_rel.city_name,
+      area_rel.district_id,
+      area_rel.district_name,
+      road.id road_id,
+      road.road_name,
+      t.streetlight_name,
+      led_lights.install_location,
+      led_lights.voltage,
+      led_lights.electric_current,
+      led_lights.rated_power,
+      led_lights.light_type,
+      led_lights.light_source,
+      led_lights.manufactor
+    FROM
+      iot_streetlight_led_lights led_lights
+      LEFT JOIN
+      (
+        SELECT
+          streetlight.name streetlight_name,
+          streetlight.area_rel_id,
+          streetlight.road_id,
+          single_light_controller_led_lights_rel.led_lights_id
+        FROM
+          iot_streetlight streetlight,
+          iot_single_light_controller_led_lights_rel single_light_controller_led_lights_rel,
+          iot_streetlight_slc_rel streetlight_slc_rel
+        WHERE
+          streetlight.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+          AND single_light_controller_led_lights_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND streetlight_slc_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND streetlight.id = streetlight_slc_rel.streetlight_id
+          AND streetlight_slc_rel.slc_id = single_light_controller_led_lights_rel.slc_id
+      ) t ON led_lights.id = t.led_lights_id
+      LEFT JOIN iot_area_rel area_rel ON area_rel.id = t.area_rel_id AND area_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+      LEFT JOIN iot_area_city_road road ON road.id = t.road_id
+    WHERE
+      led_lights.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+    AND led_lights.id = #{ledId}
+  </select>
+</mapper>

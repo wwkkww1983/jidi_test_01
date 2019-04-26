@@ -1,0 +1,994 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rz.iot.think.mapper.IotStreetlightMapper" >
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.IotStreetlight" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sn" property="sn" jdbcType="VARCHAR" />
+    <result column="build_id" property="buildId" jdbcType="INTEGER" />
+    <result column="dev_type" property="devType" jdbcType="INTEGER" />
+    <result column="area_rel_id" property="areaRelId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="lng" property="lng" jdbcType="DOUBLE" />
+    <result column="lat" property="lat" jdbcType="DOUBLE" />
+    <result column="road_id" property="roadId" jdbcType="BIGINT" />
+    <result column="full_address" property="fullAddress" jdbcType="VARCHAR" />
+    <result column="brand_type" property="brandType" jdbcType="INTEGER" />
+    <result column="height" property="height" jdbcType="DOUBLE" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, sn, build_id, dev_type, area_rel_id, status, version, lng, lat, road_id, 
+    full_address, brand_type, height, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from iot_streetlight
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from iot_streetlight
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.IotStreetlight" >
+    insert into iot_streetlight (id, name, sn, 
+      build_id, dev_type, area_rel_id, 
+      status, version, lng, 
+      lat, road_id, full_address, 
+      brand_type, height, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{sn,jdbcType=VARCHAR}, 
+      #{buildId,jdbcType=INTEGER}, #{devType,jdbcType=INTEGER}, #{areaRelId,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{version,jdbcType=VARCHAR}, #{lng,jdbcType=DOUBLE}, 
+      #{lat,jdbcType=DOUBLE}, #{roadId,jdbcType=BIGINT}, #{fullAddress,jdbcType=VARCHAR}, 
+      #{brandType,jdbcType=INTEGER}, #{height,jdbcType=DOUBLE}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.IotStreetlight" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    insert into iot_streetlight
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="sn != null" >
+        sn,
+      </if>
+      <if test="buildId != null" >
+        build_id,
+      </if>
+      <if test="devType != null" >
+        dev_type,
+      </if>
+      <if test="areaRelId != null" >
+        area_rel_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="lng != null" >
+        lng,
+      </if>
+      <if test="lat != null" >
+        lat,
+      </if>
+      <if test="roadId != null" >
+        road_id,
+      </if>
+      <if test="fullAddress != null" >
+        full_address,
+      </if>
+      <if test="brandType != null" >
+        brand_type,
+      </if>
+      <if test="height != null" >
+        height,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        #{sn,jdbcType=VARCHAR},
+      </if>
+      <if test="buildId != null" >
+        #{buildId,jdbcType=INTEGER},
+      </if>
+      <if test="devType != null" >
+        #{devType,jdbcType=INTEGER},
+      </if>
+      <if test="areaRelId != null" >
+        #{areaRelId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="lng != null" >
+        #{lng,jdbcType=DOUBLE},
+      </if>
+      <if test="lat != null" >
+        #{lat,jdbcType=DOUBLE},
+      </if>
+      <if test="roadId != null" >
+        #{roadId,jdbcType=BIGINT},
+      </if>
+      <if test="fullAddress != null" >
+        #{fullAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="brandType != null" >
+        #{brandType,jdbcType=INTEGER},
+      </if>
+      <if test="height != null" >
+        #{height,jdbcType=DOUBLE},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.IotStreetlight" >
+    update iot_streetlight
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        sn = #{sn,jdbcType=VARCHAR},
+      </if>
+      <if test="buildId != null" >
+        build_id = #{buildId,jdbcType=INTEGER},
+      </if>
+      <if test="devType != null" >
+        dev_type = #{devType,jdbcType=INTEGER},
+      </if>
+      <if test="areaRelId != null" >
+        area_rel_id = #{areaRelId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="lng != null" >
+        lng = #{lng,jdbcType=DOUBLE},
+      </if>
+      <if test="lat != null" >
+        lat = #{lat,jdbcType=DOUBLE},
+      </if>
+      <if test="roadId != null" >
+        road_id = #{roadId,jdbcType=BIGINT},
+      </if>
+      <if test="fullAddress != null" >
+        full_address = #{fullAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="brandType != null" >
+        brand_type = #{brandType,jdbcType=INTEGER},
+      </if>
+      <if test="height != null" >
+        height = #{height,jdbcType=DOUBLE},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.IotStreetlight" >
+    update iot_streetlight
+    set name = #{name,jdbcType=VARCHAR},
+      sn = #{sn,jdbcType=VARCHAR},
+      build_id = #{buildId,jdbcType=INTEGER},
+      dev_type = #{devType,jdbcType=INTEGER},
+      area_rel_id = #{areaRelId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      version = #{version,jdbcType=VARCHAR},
+      lng = #{lng,jdbcType=DOUBLE},
+      lat = #{lat,jdbcType=DOUBLE},
+      road_id = #{roadId,jdbcType=BIGINT},
+      full_address = #{fullAddress,jdbcType=VARCHAR},
+      brand_type = #{brandType,jdbcType=INTEGER},
+      height = #{height,jdbcType=DOUBLE},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--获取单灯调光页面信息列表-->
+  <resultMap id="infoList" type="com.rz.iot.think.model.StreetlightSwitch">
+    <id property="streetlightId" column="streetlightId"/>
+    <result property="streetlightName" column="streetlightName"/>
+    <result property="streetlightSn" column="streetlightSn"/>
+    <result property="streetlightStatus" column="streetlightStatus"/>
+    <collection property="ledInfos" ofType="java.util.HashMap">
+      <result property="slcId" column="slcId"/>
+      <result property="slcSn" column="slcSn"/>
+      <result property="ledSn" column="ledSn"/>
+      <result property="light_type" column="light_type"/>
+      <result property="lightSource" column="lightSource"/>
+      <result property="rated_power" column="rated_power"/>
+      <result property="install_location" column="install_location"/>
+      <result property="brightness" column="brightness"/>
+      <result property="switch_status" column="switch_status"/>
+      <result property="slcStatus" column="slcStatus"/>
+      <result property="ledId" column="ledId"/>
+    </collection>
+  </resultMap>
+  <select id="getInfoList" resultMap="infoList">
+  select T.* from (
+                  SELECT
+                    streetlight.id streetlightId,
+                    streetlight.name streetlightName,
+                    streetlight.sn streetlightSn,
+                    streetlight.status streetlightStatus,
+                    streetlightSlcRel.slc_id slcId,
+                    slc.switch_status,
+                    slc.brightness,
+                    slc.sn slcSn,
+                    ledInfos.id ledId,
+                    ledInfos.sn ledSn,
+                    ledInfos.light_type,
+                    ledInfos.light_source lightSource,
+                    ledInfos.rated_power,
+                    ledInfos.install_location
+                  FROM
+                    iot_streetlight streetlight
+                      LEFT JOIN iot_business_user_rel business_user_rel ON business_user_rel.business_type = 2
+                      LEFT JOIN iot_streetlight_slc_rel streetlightSlcRel ON streetlight.id = streetlightSlcRel.streetlight_id
+                      LEFT JOIN iot_single_light_controller slc ON streetlightSlcRel.slc_id = slc.id
+                      LEFT JOIN iot_single_light_controller_led_lights_rel slcLedRel ON slcLedRel.slc_id = slc.id
+                      LEFT JOIN iot_streetlight_led_lights ledInfos ON ledInfos.id = slcLedRel.led_lights_id
+                  WHERE
+                    streetlight.`status` != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+                    AND streetlightSlcRel.`status` != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+                    AND slc.`status` != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+                    AND slcLedRel.`status` != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+                    <if test="param.areaRelId != null">
+                      AND streetlight.area_rel_id = #{param.areaRelId}
+                    </if>
+                    <if test="param.fullAddress != null">
+                      AND streetlight.full_address LIKE CONCAT('%', #{param.fullAddress}, '%')
+                    </if>
+                    <if test="param.SlName != null">
+                      AND streetlight.name LIKE CONCAT('%', #{param.SlName}, '%')
+                    </if>
+                    <if test="param.brandType != null">
+                      AND streetlight.brand_type = #{param.brandType}
+                    </if>
+                    <if test="param.devType != null">
+                      AND streetlight.dev_type = #{param.devType}
+                    </if>
+                    AND
+                    (
+                      CASE
+                      (
+                        SELECT type
+                        FROM user_info
+                        WHERE id = #{userId}
+                      )
+                      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+                        THEN
+                        business_user_rel.user_id = #{userId} AND business_user_rel.business_id = streetlight.id
+                      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+                      THEN
+                        true
+                      END
+                    )
+    ) T
+  </select>
+
+  <resultMap id="GisStreetlightList" type="com.rz.iot.think.model.show.GISStreetlightShowList">
+    <id column="streetLightId" property="streetLightId" jdbcType="INTEGER" />
+    <result column="lng" property="lng" jdbcType="INTEGER" />
+    <result column="lat" property="lat" jdbcType="INTEGER" />
+    <result column="streetlightStatus" property="streetlightStatus" jdbcType="INTEGER"/>
+    <result column="switchStatus" property="switchStatus" jdbcType="INTEGER" />
+    <result column="areaRelId" property="areaRelId" jdbcType="INTEGER" />
+    <result column="roadId" property="roadId" jdbcType="INTEGER" />
+    <result column="hasMonitor" property="hasMonitor" jdbcType="INTEGER" />
+  </resultMap>
+  <select id="getStreetlightInGis" resultMap="GisStreetlightList">
+    SELECT T.*,
+     dev.dev_type hasMonitor
+    FROM
+    (SELECT
+    streetlight.id streetlightId,
+    streetlight.lng,
+    streetlight.lat,
+    streetlight.status streetlightStatus,
+    SUM( slc.switch_status ) switchStatus,
+    streetlight.`name` streetlightName,
+    streetlight.full_address,
+    streetlight.area_rel_id areaRelId,
+    streetlight.road_id roadId
+    FROM
+    iot_streetlight streetlight
+    LEFT JOIN iot_business_user_rel business_user_rel ON business_user_rel.business_type = 2
+    LEFT JOIN iot_streetlight_slc_rel streetlightSlc ON streetlightSlc.streetlight_id = streetlight.id
+    LEFT JOIN iot_single_light_controller slc ON slc.id = streetlightSlc.slc_id
+    LEFT JOIN iot_concentrator concentrator ON concentrator.id = slc.concentrator_id
+    LEFT JOIN iot_streetlight_install_dev_rel dev ON dev.streetlight_id = streetlight.id
+    LEFT JOIN iot_area_rel areaRel ON areaRel.id = streetlight.area_rel_id
+    LEFT JOIN iot_area_city_road road ON road.id = streetlight.road_id
+    <where>
+      AND streetlight.`status` != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+      <if test="param.streetlightName != null">
+        AND streetlight.name LIKE CONCAT('%', #{param.streetlightName}, '%')
+      </if>
+      <if test="param.fullAddress != null">
+        AND streetlight.full_address LIKE CONCAT('%', #{param.fullAddress}, '%')
+      </if>
+      <if test="param.concentratorName != null">
+        AND concentrator.`name` LIKE CONCAT('%', #{param.concentratorName}, '%')
+      </if>
+      <if test="param.devType != null">
+        AND dev.dev_type = #{param.devType}
+      </if>
+      <if test="param.districtId != null">
+        AND areaRel.district_id = #{param.districtId}
+      </if>
+      <if test="param.roadId != null">
+        AND streetlight.road_id = #{param.roadId}
+      </if>
+      AND
+      (
+      CASE
+      (
+      SELECT type
+      FROM user_info
+      WHERE id = #{userId}
+      )
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+      THEN
+      business_user_rel.user_id = #{userId} AND business_user_rel.business_id = streetlight.id
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+      THEN
+      true
+      END
+      )
+    </where>
+    GROUP BY
+    streetlightId) T
+    LEFT JOIN iot_streetlight_install_dev_rel dev ON T.streetlightId = dev.streetlight_id AND dev.dev_type=1
+  </select>
+
+
+  <!--查询打开的路灯信息列表-->
+  <select id="getStreetlightInGisOpen" resultMap="GisStreetlightList">
+    SELECT T.*,
+    dev.dev_type hasMonitor
+    FROM
+    (SELECT
+    streetlight.id streetlightId,
+    streetlight.lng,
+    streetlight.lat,
+    streetlight.status streetlightStatus,
+    SUM( slc.switch_status ) switchStatus,
+    streetlight.`name` streetlightName,
+    streetlight.full_address,
+    streetlight.area_rel_id areaRelId,
+    streetlight.road_id roadId
+    FROM
+    iot_streetlight streetlight
+    LEFT JOIN iot_business_user_rel business_user_rel ON business_user_rel.business_type = 2
+    LEFT JOIN iot_streetlight_slc_rel streetlightSlc ON streetlightSlc.streetlight_id = streetlight.id
+    LEFT JOIN iot_single_light_controller slc ON slc.id = streetlightSlc.slc_id
+    LEFT JOIN iot_concentrator concentrator ON concentrator.id = slc.concentrator_id
+    LEFT JOIN iot_streetlight_install_dev_rel dev ON dev.streetlight_id = streetlight.id
+    LEFT JOIN iot_area_rel areaRel ON areaRel.id = streetlight.area_rel_id
+    LEFT JOIN iot_area_city_road road ON road.id = streetlight.road_id
+    <where>
+      AND streetlight.`status` != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+      <if test="param.streetlightName != null">
+        AND streetlight.name LIKE CONCAT('%', #{param.streetlightName}, '%')
+      </if>
+      <if test="param.fullAddress != null">
+        AND streetlight.full_address LIKE CONCAT('%', #{param.fullAddress}, '%')
+      </if>
+      <if test="param.concentratorName != null">
+        AND concentrator.`name` LIKE CONCAT('%', #{param.concentratorName}, '%')
+      </if>
+      <if test="param.devType != null">
+        AND dev.dev_type = #{param.devType}
+      </if>
+      <if test="param.districtId != null">
+        AND areaRel.district_id = #{param.districtId}
+      </if>
+      <if test="param.roadId != null">
+        AND streetlight.road_id = #{param.roadId}
+      </if>
+      AND
+      (
+      CASE
+      (
+      SELECT type
+      FROM user_info
+      WHERE id = #{userId}
+      )
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+      THEN
+      business_user_rel.user_id = #{userId} AND business_user_rel.business_id = streetlight.id
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+      THEN
+      true
+      END
+      )
+    </where>
+    GROUP BY
+    streetlightId) T
+    LEFT JOIN iot_streetlight_install_dev_rel dev ON T.streetlightId = dev.streetlight_id AND dev.dev_type=1 WHERE T.switchStatus > 0
+  </select>
+
+  <!--查询关闭了的路灯信息列表-->
+  <select id="getStreetlightInGisOff" resultMap="GisStreetlightList">
+    SELECT T.*,
+    dev.dev_type hasMonitor
+    FROM
+    (SELECT
+    streetlight.id streetlightId,
+    streetlight.lng,
+    streetlight.lat,
+    streetlight.status streetlightStatus,
+    SUM( slc.switch_status ) switchStatus,
+    streetlight.`name` streetlightName,
+    streetlight.full_address,
+    streetlight.area_rel_id areaRelId,
+    streetlight.road_id roadId
+    FROM
+    iot_streetlight streetlight
+    LEFT JOIN iot_business_user_rel business_user_rel ON business_user_rel.business_type = 2
+    LEFT JOIN iot_streetlight_slc_rel streetlightSlc ON streetlightSlc.streetlight_id = streetlight.id
+    LEFT JOIN iot_single_light_controller slc ON slc.id = streetlightSlc.slc_id
+    LEFT JOIN iot_concentrator concentrator ON concentrator.id = slc.concentrator_id
+    LEFT JOIN iot_streetlight_install_dev_rel dev ON dev.streetlight_id = streetlight.id
+    LEFT JOIN iot_area_rel areaRel ON areaRel.id = streetlight.area_rel_id
+    LEFT JOIN iot_area_city_road road ON road.id = streetlight.road_id
+    <where>
+      AND streetlight.`status` != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+      <if test="param.streetlightName != null">
+        AND streetlight.name LIKE CONCAT('%', #{param.streetlightName}, '%')
+      </if>
+      <if test="param.fullAddress != null">
+        AND streetlight.full_address LIKE CONCAT('%', #{param.fullAddress}, '%')
+      </if>
+      <if test="param.concentratorName != null">
+        AND concentrator.`name` LIKE CONCAT('%', #{param.concentratorName}, '%')
+      </if>
+      <if test="param.devType != null">
+        AND dev.dev_type = #{param.devType}
+      </if>
+      <if test="param.districtId != null">
+        AND areaRel.district_id = #{param.districtId}
+      </if>
+      <if test="param.roadId != null">
+        AND streetlight.road_id = #{param.roadId}
+      </if>
+      AND
+      (
+      CASE
+      (
+      SELECT type
+      FROM user_info
+      WHERE id = #{userId}
+      )
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+      THEN
+      business_user_rel.user_id = #{userId} AND business_user_rel.business_id = streetlight.id
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+      THEN
+      true
+      END
+      )
+    </where>
+    GROUP BY
+    streetlightId) T
+    LEFT JOIN iot_streetlight_install_dev_rel dev ON T.streetlightId = dev.streetlight_id AND dev.dev_type=1 WHERE T.switchStatus = 0
+  </select>
+
+  <!--在GIS地图页面获取集中器信息-->
+  <resultMap id="ConcentratorInfos" type="com.rz.iot.think.model.show.GISConcentratorList">
+    <result property="id" column="id" jdbcType="INTEGER"/>
+    <result property="name" column="name" jdbcType="VARCHAR"/>
+    <result property="lat" column="lat" jdbcType="INTEGER"/>
+    <result property="lng" column="lng" jdbcType="INTEGER"/>
+  </resultMap>
+  <select id="getConcentratorListInGis" resultMap="ConcentratorInfos">
+    SELECT
+      concentrator.id id,
+      concentrator.`name` name,
+      concentrator.lat lat,
+      concentrator.lng lng
+    FROM
+    iot_streetlight streetlight
+    LEFT JOIN iot_business_user_rel business_user_rel ON business_user_rel.business_type = 2
+    LEFT JOIN iot_streetlight_slc_rel streetlightSlc ON streetlightSlc.streetlight_id = streetlight.id
+    LEFT JOIN iot_single_light_controller slc ON slc.id = streetlightSlc.slc_id
+    LEFT JOIN iot_concentrator concentrator ON concentrator.id = slc.concentrator_id
+    LEFT JOIN iot_streetlight_install_dev_rel dev ON dev.streetlight_id = streetlight.id
+    LEFT JOIN iot_area_rel areaRel ON areaRel.id = streetlight.area_rel_id
+    LEFT JOIN iot_area_city_road road ON road.id = streetlight.road_id
+    <where>
+      AND streetlight.`status` != ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+      <if test="param.fullAddress != null">
+        AND streetlight.full_address LIKE CONCAT('%', #{param.fullAddress}, '%')
+      </if>
+      <if test="param.concentratorName != null">
+        AND concentrator.`name` LIKE CONCAT('%', #{param.concentratorName}, '%')
+      </if>
+      <if test="param.devType != null">
+        AND dev.dev_type = #{param.devType}
+      </if>
+      <if test="param.districtId != null">
+        AND areaRel.district_id = #{param.districtId}
+      </if>
+      <if test="param.roadId != null">
+        AND streetlight.road_id = #{param.roadId}
+      </if>
+      AND
+      (
+      CASE
+      (
+      SELECT type
+      FROM user_info
+      WHERE id = #{userId}
+      )
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+      THEN
+      business_user_rel.user_id = #{userId} AND business_user_rel.business_id = streetlight.id
+      WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+      THEN
+      true
+      END
+      )
+    </where>
+    GROUP BY
+      concentrator.id
+  </select>
+
+
+  <resultMap id="ResultMapList" type="com.rz.iot.think.model.show.IotStreetlightShowList">
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sn" property="sn" jdbcType="VARCHAR" />
+    <result column="dev_type" property="devType" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="brand_type" property="brandType" jdbcType="INTEGER" />
+    <result column="monitor" property="monitor"/>
+    <result column="screen" property="screen"/>
+    <result column="wifi" property="wifi"/>
+    <result column="environmental_sensor" property="environmentalSensor"/>
+    <result column="emergencyCalling" property="emergency_calling"/>
+    <result column="chargingPoint" property="charging_point"/>
+  </resultMap>
+
+  <select id="findAll" resultMap="ResultMapList">
+    SELECT T.*
+    FROM
+      (
+        SELECT
+          streetlight.*,
+          t1.status AS monitor,
+          t2.status AS screen,
+          t3.status AS wifi,
+          t4.status AS environmental_sensor,
+          t5.status AS emergency_calling,
+          t6.status AS charging_point
+        FROM
+          iot_streetlight streetlight
+          LEFT JOIN iot_business_user_rel business_user_rel ON business_user_rel.business_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@BUSSINESS_TYPE_OF_STREETLIGHT}
+          LEFT JOIN iot_area_rel area_rel ON area_rel.id = streetlight.area_rel_id AND area_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          LEFT JOIN
+          (
+            SELECT
+              install_dev_rel.streetlight_id,
+              monitor.status
+            FROM
+              iot_streetlight_install_dev_rel install_dev_rel,
+              iot_monitor monitor
+            WHERE
+              monitor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+              AND install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+              AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_CAMERA}
+              AND install_dev_rel.dev_id = monitor.id
+          ) t1 ON t1.streetlight_id = streetlight.id
+          LEFT JOIN
+          (
+            SELECT
+              install_dev_rel.streetlight_id,
+              screen.status
+            FROM
+              iot_streetlight_install_dev_rel install_dev_rel,
+              iot_screen screen
+            WHERE
+              screen.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+              AND install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+              AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_SCREEN}
+              AND install_dev_rel.dev_id = screen.id
+          ) t2 ON t2.streetlight_id = streetlight.id
+          LEFT JOIN
+          (
+            SELECT
+              install_dev_rel.streetlight_id,
+              wifi.status
+            FROM
+              iot_streetlight_install_dev_rel install_dev_rel,
+              iot_wifi wifi
+            WHERE
+              wifi.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+              AND install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+              AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_WIFI}
+              AND install_dev_rel.dev_id = wifi.id
+          ) t3 ON t3.streetlight_id = streetlight.id
+          LEFT JOIN
+          (
+            SELECT
+              install_dev_rel.streetlight_id,
+              sensor.status
+            FROM
+              iot_streetlight_install_dev_rel install_dev_rel,
+              iot_sensor sensor
+            WHERE
+              sensor.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+              AND install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+              AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_ENVIRONMENT_SENSOR}
+              AND sensor.sensor_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@SENSOR_TYPE_OF_ENVIRONMENTAL_SENSOR}
+              AND install_dev_rel.dev_id = sensor.id
+          ) t4 ON t4.streetlight_id = streetlight.id
+          LEFT JOIN
+          (
+          SELECT
+          install_dev_rel.streetlight_id,
+          alarm_box.status
+          FROM
+          iot_streetlight_install_dev_rel install_dev_rel,
+          iot_alarm_box alarm_box
+          WHERE
+          alarm_box.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+          AND install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_EMERGENCY_CALLING}
+          AND install_dev_rel.dev_id = alarm_box.id
+          ) t5 ON t5.streetlight_id = streetlight.id
+          LEFT JOIN
+          (
+          SELECT
+          install_dev_rel.streetlight_id,
+          charging_point.status
+          FROM
+          iot_streetlight_install_dev_rel install_dev_rel,
+          iot_charging_point charging_point
+          WHERE
+          charging_point.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+          AND install_dev_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND install_dev_rel.dev_type = ${@com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_CHARGING_POINT}
+          AND install_dev_rel.dev_id = charging_point.id
+          ) t6 ON t6.streetlight_id = streetlight.id
+        WHERE
+          business_user_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL}
+          AND streetlight.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+          <if test="param.districtId != null">
+            AND area_rel.district_id = #{param.districtId}
+          </if>
+          <if test="param.roadId != null">
+            AND streetlight.road_id = #{param.roadId}
+          </if>
+          <if test="param.name != null and param.name != ''">
+            AND streetlight.name LIKE CONCAT('%',#{param.name},'%')
+          </if>
+          <if test="param.brandType != null">
+            AND streetlight.brand_type = #{param.brandType}
+          </if>
+          <if test="param.devType != null">
+            AND streetlight.dev_type = #{param.devType}
+          </if>
+          AND
+          (
+            CASE
+            (
+              SELECT type
+              FROM user_info
+              WHERE id = #{userId}
+            )
+            WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_NORMAL}
+              THEN
+                business_user_rel.user_id = #{userId} AND business_user_rel.business_id = streetlight.id
+            WHEN ${@com.rz.iot.think.utils.RzIotDBConstParam@USER_STATUS_OF_ADMIN}
+              THEN
+                true
+            END
+          )
+        GROUP BY streetlight.id
+      ) T
+      <where>
+        <if test="param.installDevType == @com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_CAMERA">
+          AND T.monitor IS NOT NULL
+        </if>
+        <if test="param.installDevType == @com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_SCREEN">
+          AND T.screen IS NOT NULL
+        </if>
+        <if test="param.installDevType == @com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_WIFI">
+          AND T.wifi IS NOT NULL
+        </if>
+        <if test="param.installDevType == @com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_ENVIRONMENT_SENSOR">
+          AND T.environmental_sensor IS NOT NULL
+        </if>
+        <if test="param.installDevType == @com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_EMERGENCY_CALLING">
+          AND T.emergency_calling IS NOT NULL
+        </if>
+        <if test="param.installDevType == @com.rz.iot.think.utils.RzIotDBConstParam@STREET_LIGHT_DEV_TYPE_OF_CHARGING_POINT">
+          AND T.charging_point IS NOT NULL
+        </if>
+      </where>
+  </select>
+
+
+  <resultMap id="ResultMapDetail" type="com.rz.iot.think.model.show.IotStreetlightShowDetail" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sn" property="sn" jdbcType="VARCHAR" />
+    <result column="province_id" property="provinceId"/>
+    <result column="province_name" property="provinceName"/>
+    <result column="city_id" property="cityId"/>
+    <result column="city_name" property="cityName"/>
+    <result column="district_id" property="districtId"/>
+    <result column="district_name" property="districtName"/>
+    <result column="road_id" property="roadId"/>
+    <result column="road_name" property="roadName"/>
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="lng" property="lng" jdbcType="DOUBLE" />
+    <result column="lat" property="lat" jdbcType="DOUBLE" />
+    <result column="full_address" property="fullAddress" jdbcType="VARCHAR" />
+    <result column="brand_type" property="brandType" jdbcType="INTEGER" />
+    <result column="height" property="height" jdbcType="DOUBLE" />
+    <result column="builder_name" property="builderName"/>
+    <result column="linkman" property="linkman"/>
+    <result column="phone" property="phone"/>
+  </resultMap>
+
+  <!--根据路灯id查找路灯-->
+  <select id="findById" resultMap="ResultMapDetail">
+    SELECT
+      streetlight.id,
+      streetlight.name,
+      streetlight.sn,
+      area_rel.province_id,
+      area_rel.province_name,
+      area_rel.city_id,
+      area_rel.city_name,
+      area_rel.district_id,
+      area_rel.district_name,
+      area_city_road.id road_id,
+      area_city_road.road_name,
+      streetlight.status,
+      streetlight.version,
+      streetlight.brand_type,
+      streetlight.height,
+      streetlight.lng,
+      streetlight.lat,
+      streetlight.full_address,
+      builder.name builder_name,
+      builder.linkman,
+      builder.phone
+    FROM
+      iot_streetlight streetlight
+      LEFT JOIN iot_area_rel area_rel
+        ON area_rel.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL} AND area_rel.id = streetlight.area_rel_id
+      LEFT JOIN iot_area_city_road area_city_road
+        ON area_city_road.id = streetlight.road_id
+      LEFT JOIN iot_builder builder
+        ON builder.status = ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_NORMAL} AND streetlight.build_id = builder.id
+    WHERE
+      streetlight.status != ${@com.rz.iot.think.utils.RzIotDBConstParam@DEVICE_STATUS_OF_DELETE}
+      AND streetlight.id = #{streetlightId}
+  </select>
+
+  <!--批量插入-->
+  <insert id="insertBatch" parameterType="list" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into iot_streetlight
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="list[0].id != null" >
+        id,
+      </if>
+      <if test="list[0].name != null" >
+        name,
+      </if>
+      <if test="list[0].sn != null" >
+        sn,
+      </if>
+      <if test="list[0].buildId != null" >
+        build_id,
+      </if>
+      <if test="list[0].devType != null" >
+        dev_type,
+      </if>
+      <if test="list[0].areaRelId != null" >
+        area_rel_id,
+      </if>
+      <if test="list[0].status != null" >
+        status,
+      </if>
+      <if test="list[0].version != null" >
+        version,
+      </if>
+      <if test="list[0].lng != null" >
+        lng,
+      </if>
+      <if test="list[0].lat != null" >
+        lat,
+      </if>
+      <if test="list[0].roadId != null" >
+        road_id,
+      </if>
+      <if test="list[0].fullAddress != null" >
+        full_address,
+      </if>
+      <if test="list[0].brandType != null" >
+        brand_type,
+      </if>
+      <if test="list[0].height != null" >
+        height,
+      </if>
+    </trim>
+    values
+    <foreach collection="list" item="item" separator=",">
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+        <if test="item.id != null" >
+          #{item.id,jdbcType=INTEGER},
+        </if>
+        <if test="item.name != null" >
+          #{item.name,jdbcType=VARCHAR},
+        </if>
+        <if test="item.sn != null" >
+          #{item.sn,jdbcType=VARCHAR},
+        </if>
+        <if test="item.buildId != null" >
+          #{item.buildId,jdbcType=INTEGER},
+        </if>
+        <if test="item.devType != null" >
+          #{item.devType,jdbcType=INTEGER},
+        </if>
+        <if test="item.areaRelId != null" >
+          #{item.areaRelId,jdbcType=INTEGER},
+        </if>
+        <if test="item.status != null" >
+          #{item.status,jdbcType=INTEGER},
+        </if>
+        <if test="item.version != null" >
+          #{item.version,jdbcType=VARCHAR},
+        </if>
+        <if test="item.lng != null" >
+          #{item.lng,jdbcType=DOUBLE},
+        </if>
+        <if test="item.lat != null" >
+          #{item.lat,jdbcType=DOUBLE},
+        </if>
+        <if test="item.roadId != null" >
+          #{item.roadId,jdbcType=BIGINT},
+        </if>
+        <if test="item.fullAddress != null" >
+          #{item.fullAddress,jdbcType=VARCHAR},
+        </if>
+        <if test="item.brandType != null" >
+          #{item.brandType,jdbcType=INTEGER},
+        </if>
+        <if test="item.height != null" >
+          #{item.height,jdbcType=DOUBLE},
+        </if>
+      </trim>
+    </foreach>
+  </insert>
+
+  <select id="getRoadIds" resultType="java.util.HashMap">
+    SELECT id roadId, road_name roadName FROM iot_area_city_road
+  </select>
+
+  <select id="getDistrictIds" resultType="java.util.HashMap">
+    SELECT id districtId, district_name districtName FROM iot_area_rel
+  </select>
+<!--获取故障列表-->
+  <select id="getStreetlightFaults" resultType="java.util.HashMap">
+    SELECT *,
+           CASE
+             dev_type
+             WHEN 1 THEN "摄像头"
+             WHEN 2 THEN "显示屏"
+             WHEN 3 THEN "WIFI"
+             WHEN 4 THEN "传感器"
+             WHEN 5 THEN "单灯控制器"
+             END AS devTypeName
+    FROM (SELECT devInstall.streetlight_id,
+                 streetlight.NAME streetlightName,
+                 dev.id           dev_id,
+                 dev.`status`     fault_code,
+                 devInstall.dev_type
+          FROM iot_monitor dev,
+               iot_streetlight_install_dev_rel devInstall,
+               iot_streetlight streetlight
+            WHERE
+               devInstall.dev_id = dev.id
+                 AND devInstall.dev_type = 1
+                 AND devInstall.streetlight_id = streetlight.id UNION ALL
+            SELECT
+               devInstall.streetlight_id,
+               streetlight.NAME streetlightName,
+               dev.wifi_id dev_id,
+               dev.fault_code,
+               devInstall.dev_type
+            FROM
+               iot_wifi_fault dev,
+               iot_streetlight_install_dev_rel devInstall,
+               iot_streetlight streetlight
+            WHERE
+               devInstall.dev_id = dev.id
+                 AND devInstall.dev_type = 3
+                 AND devInstall.streetlight_id = streetlight.id UNION ALL
+            SELECT
+               devInstall.streetlight_id,
+               streetlight.NAME streetlightName,
+               dev.screen_id dev_id,
+               dev.fault_code,
+               devInstall.dev_type
+            FROM
+               iot_screen_fault dev,
+               iot_streetlight_install_dev_rel devInstall,
+               iot_streetlight streetlight
+            WHERE
+               devInstall.dev_id = dev.id
+                 AND devInstall.dev_type = 2
+                 AND devInstall.streetlight_id = streetlight.id UNION ALL
+            SELECT
+               devInstall.streetlight_id,
+               streetlight.NAME streetlightName,
+               dev.sensor_id dev_id,
+               dev.type,
+               devInstall.dev_type
+            FROM
+               iot_sensor_fault dev,
+               iot_streetlight_install_dev_rel devInstall,
+               iot_streetlight streetlight
+            WHERE
+               devInstall.dev_id = dev.id
+                 AND devInstall.dev_type = 4
+                 AND devInstall.streetlight_id = streetlight.id UNION ALL
+          SELECT
+            streetlight.id streetlight_id,
+            streetlight.NAME streetlightName,
+            slcFault.slc_id dev_id,
+            slcFault.type fault_code,
+            5 dev_type
+          FROM
+            iot_single_light_controller_fault slcFault
+              LEFT JOIN iot_streetlight_slc_rel rel ON rel.slc_id = slcFault.slc_id
+              LEFT JOIN iot_streetlight streetlight ON rel.streetlight_id = streetlight.id) T
+
+  </select>
+
+</mapper>

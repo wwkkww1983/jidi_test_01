@@ -1,0 +1,71 @@
+package com.rz.iot.think.service.impl;
+
+import com.rz.iot.think.mapper.*;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.show.IotStreetlightInstallDevForNoBinding;
+import com.rz.iot.think.model.show.IotStreetlightInstallDevShowList;
+import com.rz.iot.think.service.IotStreetlightInstallDevRelService;
+import com.rz.iot.think.utils.RzIotDBConstParam;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * 描述:
+ * 路灯挂载设备
+ *
+ * @author Zhouyz
+ * @create 2019-03-18 16:31
+ */
+@Service
+public class IotStreetlightInstallDevShowListServiceImpl implements IotStreetlightInstallDevRelService {
+
+    @Resource
+    private IotStreetlightInstallDevRelMapper iotStreetlightInstallDevRelMapper;
+    @Resource
+    private IotMonitorMapper iotMonitorMapper;
+    @Resource
+    private IotScreenMapper iotScreenMapper;
+    @Resource
+    private IotWifiMapper iotWifiMapper;
+    @Resource
+    private IotSensorMapper iotSensorMapper;
+
+    @Override
+    public List<HashMap> getDevByStreetlightId(Integer StreetlightId) {
+        return iotStreetlightInstallDevRelMapper.devInfosByStreetlightId(StreetlightId);
+    }
+
+    /**
+     * 查找未与路灯绑定的挂载设备
+     * @param devType 挂载设备类型，1：摄像头；2：显示屏；3：WiFi；4：环境传感器
+     * @return
+     */
+    @Override
+    public Result findNoBinding(Integer devType) {
+
+        Result result = new Result();
+        if (devType == null) {
+            return Result.paramNull(result);
+        }
+        List<IotStreetlightInstallDevForNoBinding> devs = null;
+        switch (devType) {
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_CAMERA:
+                devs = iotMonitorMapper.findNoBinding();
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_SCREEN:
+                devs = iotScreenMapper.findNoBinding();
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_ENVIRONMENT_SENSOR:
+                devs = iotSensorMapper.findNoBinding();
+                break;
+            case RzIotDBConstParam.STREET_LIGHT_DEV_TYPE_OF_WIFI:
+                devs = iotWifiMapper.findNoBinding();
+
+        }
+        result.setData(devs);
+        return result;
+    }
+}

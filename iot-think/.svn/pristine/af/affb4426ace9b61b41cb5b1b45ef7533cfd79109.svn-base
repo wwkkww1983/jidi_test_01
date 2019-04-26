@@ -1,0 +1,8 @@
+package com.rz.iot.think.service;
+
+import java.util.HashMap;
+import java.util.List;
+
+public interface IotSingleLightControllerService {
+    List<HashMap> getSlcByIds(List<Integer> ids);
+}

@@ -1,0 +1,138 @@
+package com.rz.iot.think.service.impl;
+
+import com.rz.iot.think.mapper.screen.IotScreenVideoInfoMapper;
+import com.rz.iot.think.model.Result;
+import com.rz.iot.think.model.UserInfo;
+import com.rz.iot.think.model.screen.IotScreenVideoInfo;
+import com.rz.iot.think.model.screen.IotScreenVideoSource;
+import com.rz.iot.think.service.IotScreenVideoService;
+import com.rz.iot.think.utils.RzIotErrMessage;
+import com.rz.iot.utils.MD5;
+import it.sauronsoftware.jave.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.poi.util.SystemOutLogger;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
+
+/**
+ * @Auther: yyjuan
+ * @Date: 2019/3/23 0023 10:33
+ * @Description: 信息屏视频处理
+ */
+@Service
+@Slf4j
+public class IotScreenVideoServiceImpl implements IotScreenVideoService {
+
+    @Value("${file.screen_video_path}")
+    public String SCREEN_VIDEO_PATH;
+
+    @Value(("${file.video_path_disc_local}"))
+    public String VIDEO_PATH_DISC_LOCAL;
+
+    @Value("${file.ftp_ip}")
+    public String FTP_IP;
+
+    @Value("${file.protocol_header}")
+    public String PROTOCOL_HEADER;
+
+    @Autowired
+    private IotScreenVideoInfoMapper iotScreenVideoInfoMapper;
+
+    @Override
+    public Result updateVideo(MultipartFile file, HttpServletRequest request) {
+
+        Result result = new Result();
+
+        result.setCode(RzIotErrMessage.EXCEPTION);
+
+        UserInfo iotUserInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        //保存文件
+        try {
+
+            //获得原始文件名
+            String originalFilename = file.getOriginalFilename();
+            //文件大小
+            long fileSize = file.getSize();
+            //获得文件后缀名
+            String extName = originalFilename.substring(originalFilename.lastIndexOf(".") + 1, originalFilename.length());
+
+            //用UUID产生不重复文件名
+            String fileName = UUID.randomUUID().toString() + "." + extName;
+            //转码后的文件名
+            String fileNameConvert = UUID.randomUUID().toString() + ".mp4";
+            //缩率图文件名
+            String thumbnailName = UUID.randomUUID().toString() + ".jpg";
+
+            //将视频保存到视频服务器，
+            File destFile = new File(VIDEO_PATH_DISC_LOCAL+SCREEN_VIDEO_PATH, fileName);
+
+            FileUtils.copyInputStreamToFile(file.getInputStream(), destFile);
+            //获得文件md5值
+            String md5 = MD5.getSHA1(destFile);
+            if (md5.length() == 39) {
+                md5 = "0" + md5;
+            }
+            log.debug("获取md5值：" + md5);
+
+            //TODO 转码
+            if(!extName.equals("mp4")){
+                System.out.println("转MP4格式");
+
+                return new Result();
+            }
+
+
+            //获取视频缩率图
+//            VideoThumbnail.thumbnail(destFile.getAbsolutePath(),video_path_disc_local + thumbnail_path + "/" + thumbnailName);
+//            //缩率图url
+//            String thumbnailUrl = protocol_header + ftp_ip + ":" + file_server_port + thumbnail_path + "/" + thumbnailName;
+//            String url = protocol_header + ftp_ip + ":" + file_server_port + video_path + "/" + fileName;
+//            //视频转码后的url
+//            String convertUrl = protocol_header + ftp_ip + ":" + file_server_port + convert_path + "/" + fileNameConvert;
+//            log.debug("url:" + url);
+
+//            // 获取多媒体信息对象
+            MultimediaInfo mi = new Encoder().getInfo(destFile);
+            long duration = mi.getDuration();
+            VideoInfo videoInfo = mi.getVideo();
+            int height = videoInfo.getSize().getHeight();
+            int width = videoInfo.getSize().getWidth();
+            String resolution = height + "*" + width;
+            log.debug("视频分辨率：" + resolution);
+
+            IotScreenVideoInfo screenVideoInfo = new IotScreenVideoInfo();
+            screenVideoInfo.setHashKey(md5);
+            screenVideoInfo.setVideoUrl(PROTOCOL_HEADER+FTP_IP+SCREEN_VIDEO_PATH+fileName);
+            screenVideoInfo.setDuration((int) (duration/1000));
+            screenVideoInfo.setHeight(height);
+            screenVideoInfo.setWidth(width);
+            screenVideoInfo.setName(fileName);
+            screenVideoInfo.setStatus(1);
+            screenVideoInfo.setResolution(resolution);
+            screenVideoInfo.setFileSize((int)fileSize);
+
+//            screenVideoInfo.setCreateAdmin(iotUserInfo.getId());
+
+            int i = iotScreenVideoInfoMapper.insertSelective(screenVideoInfo);
+
+            if(i >= 0){
+                result.setCode(RzIotErrMessage.REQUEST_SUCCESS);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            log.error("Screen视频文件上传错误！");
+        }
+
+        return result;
+    }
+}

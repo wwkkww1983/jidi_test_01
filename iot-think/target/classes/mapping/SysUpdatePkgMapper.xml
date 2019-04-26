@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rz.iot.think.mapper.SysUpdatePkgMapper">
+  <resultMap id="BaseResultMap" type="com.rz.iot.think.model.SysUpdatePkg">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="file_path" jdbcType="VARCHAR" property="filePath" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="file_size" jdbcType="BIGINT" property="fileSize" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, file_name, file_path, version, file_size, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_update_pkg
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sys_update_pkg
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rz.iot.think.model.SysUpdatePkg">
+    insert into sys_update_pkg (id, file_name, file_path, 
+      version, file_size, status, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{fileName,jdbcType=VARCHAR}, #{filePath,jdbcType=VARCHAR}, 
+      #{version,jdbcType=VARCHAR}, #{fileSize,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rz.iot.think.model.SysUpdatePkg">
+    insert into sys_update_pkg
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fileName != null">
+        file_name,
+      </if>
+      <if test="filePath != null">
+        file_path,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+      <if test="fileSize != null">
+        file_size,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fileName != null">
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="filePath != null">
+        #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null">
+        #{fileSize,jdbcType=BIGINT},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rz.iot.think.model.SysUpdatePkg">
+    update sys_update_pkg
+    <set>
+      <if test="fileName != null">
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="filePath != null">
+        file_path = #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null">
+        file_size = #{fileSize,jdbcType=BIGINT},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rz.iot.think.model.SysUpdatePkg">
+    update sys_update_pkg
+    set file_name = #{fileName,jdbcType=VARCHAR},
+      file_path = #{filePath,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR},
+      file_size = #{fileSize,jdbcType=BIGINT},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findAll" resultMap="BaseResultMap">
+    select*
+    from(
+      select
+        update_pkg.id,
+        update_pkg.file_name,
+        update_pkg.file_path,
+        update_pkg.version,
+        update_pkg.file_size,
+        update_pkg.`status`,
+        update_pkg.create_time,
+        update_pkg.update_time
+      from sys_update_pkg update_pkg
+    )t
+    <where>
+      t.`status`!= ${@com.rz.iot.think.utils.RzIotDBConstParam@DATA_STATUS_OF_DELETE}
+      <if test="fileName != null and fileName !=''">
+        and t.file_name LIKE CONCAT('%',#{fileName},'%')
+      </if>
+      <if test="version !=null and version !=''">
+        and t.version LIKE CONCAT('%',#{version},'%')
+      </if>
+    </where>
+  </select>
+</mapper>
