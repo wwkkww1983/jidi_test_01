@@ -1,5 +1,0 @@
-path£º%Java_Home%\bin;%Java_Home%\jre\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\iCLS\;C:\Program Files\Intel\Intel(R) Management Engine Components\iCLS\;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\;%SYSTEMROOT%\System32\OpenSSH\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;%CATALINA_HOME%\lib;%CATALINA_HOME%\bin;D:\SVN\program\bin;D:\Redis\redis\;%MAVEN_HOME%\bin;D:\Git\git\Git\cmd;D:\TortoiseGit\TortoiseGit-2.8.0.0-64bit\bin
-
-
-classpath:  .;%Java_Home%\bin;%Java_Home%\lib\dt.jar;%Java_Home%\lib\tools.jar
-
